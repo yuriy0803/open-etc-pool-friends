@@ -3,6 +3,8 @@
 
 ### Features  
 
+Telegram  https://t.me/poolnode
+
 **This pool is being further developed to provide an easy to use pool for Perkle miners. Testing and bug submissions are welcome!**
 
 * Updated to work with Perkle 0.2.1
