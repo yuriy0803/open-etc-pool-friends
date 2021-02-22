@@ -67,7 +67,7 @@ See https://github.com/esprezzo/perkle
 ### Install Perkle Pool
 
     $ git clone https://github.com/yuriy0803/open-etc-pool-friends
-    $ cd open-perkle-pool
+    $ cd open-etc-pool-friends
     $ make all
 
 If you see open-perkle-pool after ls ~/open-etc-pool-friends/build/bin/, the installation has completed.
