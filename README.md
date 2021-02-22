@@ -70,7 +70,7 @@ See https://github.com/esprezzo/perkle
 
 If you see open-perkle-pool after ls ~/open-etc-pool-friends/build/bin/, the installation has completed.
 
-    $ ls ~/open-perkle-pool/build/bin/
+    $ ls ~/open-etc-pool-friends/build/bin/
 
 ### Set up Perkle pool
 
