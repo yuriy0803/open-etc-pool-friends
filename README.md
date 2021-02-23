@@ -33,7 +33,7 @@ Dependencies:
   * redis-server >= 2.8.0
   * nodejs >= 4 LTS
   * nginx
-  * geth (multi-geth)
+  * geth (core-geth)
 
 **I highly recommend to use Ubuntu 16.04 LTS.**
 
@@ -86,7 +86,7 @@ Set up based on commands below.
   // The number of cores of CPU.
   "threads": 2,
   // Prefix for keys in redis store
-  "coin": "prkl",
+  "coin": "etc",
   // Give unique name to each instance
   "name": "main",
   // PPLNS rounds
