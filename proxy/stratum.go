@@ -103,6 +103,20 @@ func (s *ProxyServer) handleTCPClient(cs *Session) error {
 func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 	// Handle RPC methods
 	switch req.Method {
+	// claymore -esm 1
+	case "eth_login":
+		var params []string
+		err := json.Unmarshal(req.Params, &params)
+		if err != nil {
+			log.Println("Malformed stratum request params from", cs.ip)
+			return err
+		}
+		reply, errReply := s.handleLoginRPC(cs, params, req.Worker)
+		if errReply != nil {
+			return cs.sendTCPError(req.Id, errReply)
+		}
+		return cs.sendTCPResult(req.Id, reply)
+	// claymore -esm 0
 	case "eth_submitLogin":
 		var params []string
 		err := json.Unmarshal(req.Params, &params)
