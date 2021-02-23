@@ -19,7 +19,7 @@
     "blockRefreshInterval": "120ms",
     "stateUpdateInterval": "3s",
     "difficulty": 2000000000,
-    "stratumHostname": "perkle-pool.esprezzo.io",
+    "stratumHostname": "Domain name",
     "healthCheck": true,
     "maxFails": 100,
     "hashrateExpiration": "3h",
@@ -66,7 +66,7 @@
   "upstream": [
     {
       "name": "backup",
-      "url": "http://127.0.0.1:8501",
+      "url": "http://127.0.0.1:8545",
       "timeout": "10s"
     }
   ],
@@ -89,6 +89,7 @@
     "interval": "10m",
     "daemon": "http://127.0.0.1:8545",
     "timeout": "10s"
+    "classic": true
   },
 
   "payouts": {

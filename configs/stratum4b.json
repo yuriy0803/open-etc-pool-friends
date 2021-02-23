@@ -19,7 +19,7 @@
     "blockRefreshInterval": "120ms",
     "stateUpdateInterval": "3s",
     "difficulty": 4000000000,
-    "stratumHostname": "perkle-pool.esprezzo.io",
+    "stratumHostname": "Domain name",
     "healthCheck": true,
     "maxFails": 100,
     "hashrateExpiration": "3h",
@@ -66,7 +66,7 @@
   "upstream": [
     {
       "name": "main",
-      "url": "http://40.121.105.44:8501",
+      "url": "http://127.0.0.1:8545",
       "timeout": "10s"
     },
     {
@@ -92,15 +92,16 @@
     "immatureDepth": 20,
     "keepTxFees": false,
     "interval": "10m",
-    "daemon": "http://127.0.0.1:8501",
-    "timeout": "10s"
+    "daemon": "http://127.0.0.1:8545",
+    "timeout": "10s",
+    "classic": true
   },
 
   "payouts": {
     "enabled": false,
     "requirePeers": 5,
     "interval": "3h",
-    "daemon": "http://127.0.0.1:8501",
+    "daemon": "http://127.0.0.1:8545",
     "timeout": "10s",
     "address": "0x",
     "autoGas": true,

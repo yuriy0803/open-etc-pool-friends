@@ -65,7 +65,7 @@
   "upstream": [
     {
       "name": "main",
-      "url": "http://40.121.105.44:8501",
+      "url": "http://127.0.0.1:8545",
       "timeout": "10s"
     },
     {
@@ -92,7 +92,8 @@
     "keepTxFees": false,
     "interval": "10m",
     "daemon": "http://127.0.0.1:8545",
-    "timeout": "10s"
+    "timeout": "10s",
+    "classic": true
   },
 
   "payouts": {
