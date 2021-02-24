@@ -107,6 +107,7 @@ func (b *BlockData) key() string {
 type Miner struct {
 	LastBeat  int64 `json:"lastBeat"`
 	HR        int64 `json:"hr"`
+	Shares    int   `json:"shares"`
 	Offline   bool  `json:"offline"`
 	startedAt int64
 }
@@ -117,6 +118,7 @@ type Worker struct {
 	TotalHR        int64  `json:"hr2"`
 	WorkerDiff     int64  `json:"difficulty"`
 	WorkerHostname string `json:"hostname"`
+	TotalShares    int    `json:"valid"`
 }
 
 func NewRedisClient(cfg *Config, prefix string, pplns int64) *RedisClient {
@@ -1211,6 +1213,7 @@ func convertWorkersStats(window int64, raw *redis.ZSliceCmd) map[string]Worker {
 
 		// Add for large window
 		worker.TotalHR += share
+		worker.TotalShares += 1
 
 		// Addition from Mohannad Otaibi to report Difficulty
 		worker.WorkerDiff = share
@@ -1220,6 +1223,7 @@ func convertWorkersStats(window int64, raw *redis.ZSliceCmd) map[string]Worker {
 		// Add for small window if matches
 		if score >= now-window {
 			worker.HR += share
+			worker.Shares += 1
 		}
 
 		if worker.LastBeat < score {

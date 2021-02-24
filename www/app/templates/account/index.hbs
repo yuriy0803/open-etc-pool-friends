@@ -11,6 +11,7 @@
           <th>{{t "account.earnings.worker"}}</th>
           <th>{{t "account.difficulty"}}</th>
           <th>{{t "account.server"}}</th>
+          <th>{{t "account.valid"}}</th>
           <th>{{t "account.last_share"}}</th>
         </tr>
       </thead>
@@ -22,6 +23,7 @@
             <td>{{format-number (worker-earnperday v.hr netstats.hashrate)}} {{config.Unit}}</td>
             <td>{{format-difficulty v.difficulty}}</td>
             <td>{{v.hostname}}</td>
+            <td>{{v.valid}}</td>
             <td>{{format-relative (seconds-to-ms v.lastBeat)}}</td>
           </tr>
         {{/each-in}}

@@ -76,6 +76,7 @@ account:
 
   your_workers: Workers
   server: Server
+  valid: valid
   difficulty: Difficulty
   last_share: Last Seen
   short_average: rough, short average
