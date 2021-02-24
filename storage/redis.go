@@ -63,6 +63,7 @@ type RewardData struct {
 }
 
 type BlockData struct {
+	Finder         string   `json:"finder"`
 	Height         int64    `json:"height"`
 	Timestamp      int64    `json:"timestamp"`
 	Difficulty     int64    `json:"difficulty"`
@@ -101,7 +102,7 @@ func (b *BlockData) RoundKey() string {
 }
 
 func (b *BlockData) key() string {
-	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward)
+	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward, b.Finder)
 }
 
 type Miner struct {
@@ -1137,6 +1138,7 @@ func convertCandidateResults(raw *redis.ZSliceCmd) []*BlockData {
 		block.Timestamp, _ = strconv.ParseInt(fields[3], 10, 64)
 		block.Difficulty, _ = strconv.ParseInt(fields[4], 10, 64)
 		block.TotalShares, _ = strconv.ParseInt(fields[5], 10, 64)
+		block.Finder = fields[6]
 		block.candidateKey = v.Member.(string)
 		result = append(result, &block)
 	}
@@ -1182,6 +1184,7 @@ func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 			block.TotalShares, _ = strconv.ParseInt(fields[6], 10, 64)
 			block.RewardString = fields[7]
 			block.ImmatureReward = fields[7]
+			block.Finder = fields[8]
 			block.immatureKey = v.Member.(string)
 			result = append(result, &block)
 		}
