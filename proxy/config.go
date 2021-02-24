@@ -17,6 +17,7 @@ type Config struct {
 	Threads int `json:"threads"`
 
 	Coin  string         `json:"coin"`
+  Network string       `json:"network"`
 	Pplns int64          `json:"pplns"`
 	Redis storage.Config `json:"redis"`
 
