@@ -11,22 +11,11 @@ import (
 )
 
 var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
-var ecip1099FBlockMordor uint64 = 2520000   // mordor
+var ecip1099FBlockMordor uint64 = 2520000 // mordor testnet
 
-var hasher *etchash.Etchash = nil
+var hasher = etchash.New(&ecip1099FBlockClassic)
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
-	if hasher == nil {
-		if s.config.Network == "classic" {
-			hasher = etchash.New(&ecip1099FBlockClassic)
-		} else if s.config.Network == "mordor" {
-			hasher = etchash.New(&ecip1099FBlockMordor)
-		} else {
-			// unknown network
-			log.Printf("Unknown network configuration %s", s.config.Network)
-			return false, false
-		}
-	}
 	// Now, the function received some work with login id and worker name and all information, ready to be processed
 	// and checked if it is a valid work or not, and if it is a block or not and write to db accordingly
 	nonceHex := params[0]

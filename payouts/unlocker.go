@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-
+        "os"
 	"strconv"
 	"strings"
 	"time"
@@ -17,28 +17,29 @@ import (
 )
 
 type UnlockerConfig struct {
-	Enabled           bool     `json:"enabled"`
-	PoolFee           float64  `json:"poolFee"`
-	PoolFeeAddress    string   `json:"poolFeeAddress"`
-	Donate            bool     `json:"donate"`
-	Depth             int64    `json:"depth"`
-	ImmatureDepth     int64    `json:"immatureDepth"`
-	KeepTxFees        bool     `json:"keepTxFees"`
-	Interval          string   `json:"interval"`
-	Daemon            string   `json:"daemon"`
-	Timeout           string   `json:"timeout"`
-	Ecip1017FBlock    int64    `json:"ecip1017FBlock"`
-	Ecip1017EraRounds *big.Int `json:"ecip1017EraRounds"`
+	Enabled        bool    `json:"enabled"`
+	PoolFee        float64 `json:"poolFee"`
+	PoolFeeAddress string  `json:"poolFeeAddress"`
+	Donate         bool    `json:"donate"`
+	Depth          int64   `json:"depth"`
+	ImmatureDepth  int64   `json:"immatureDepth"`
+	KeepTxFees     bool    `json:"keepTxFees"`
+	Interval       string  `json:"interval"`
+	Daemon         string  `json:"daemon"`
+	Timeout        string  `json:"timeout"`
+	Classic        bool    `json:"classic"`
 }
 
 const minDepth = 16
+const byzantiumHardForkHeight = 4370000
 
-var disinflationRateQuotient = big.NewInt(4) // Disinflation rate quotient for ECIP1017
-var disinflationRateDivisor = big.NewInt(5)  // Disinflation rate divisor for ECIP1017
-var big32 = big.NewInt(32)
-var big8 = big.NewInt(8)
+var homesteadReward = math.MustParseBig256("5000000000000000000")
+var byzantiumReward = math.MustParseBig256("3200000000000000000")
+var classicReward = math.MustParseBig256("3200000000000000000")
 
-var homesteadReward = math.MustParseBig256("3200000000000000000")
+// Donate 10% from pool fees to developers
+const donationFee = 10
+const donationAccount = "0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6"
 
 type BlockUnlocker struct {
 	config   *UnlockerConfig
@@ -48,17 +49,7 @@ type BlockUnlocker struct {
 	lastFail error
 }
 
-func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network *string) *BlockUnlocker {
-	if *network == "classic" {
-		cfg.Ecip1017FBlock = 5000000
-		cfg.Ecip1017EraRounds = big.NewInt(5000000)
-	} else if *network == "mordor" {
-		cfg.Ecip1017FBlock = 0
-		cfg.Ecip1017EraRounds = big.NewInt(2000000)
-	} else {
-		log.Fatalln("Invalid network set", network)
-	}
-
+func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient) *BlockUnlocker {
 	if len(cfg.PoolFeeAddress) != 0 && !util.IsValidHexAddress(cfg.PoolFeeAddress) {
 		log.Fatalln("Invalid poolFeeAddress", cfg.PoolFeeAddress)
 	}
@@ -121,11 +112,6 @@ func (u *BlockUnlocker) unlockCandidates(candidates []*storage.BlockData) (*Unlo
 		/* Search for a normal block with wrong height here by traversing 16 blocks back and forward.
 		 * Also we are searching for a block that can include this one as uncle.
 		 */
-		if candidate.Height < minDepth {
-			orphan = false
-			// avoid scanning the first 16 blocks
-			continue
-		}
 		for i := int64(minDepth * -1); i < minDepth; i++ {
 			height := candidate.Height + i
 
@@ -134,7 +120,6 @@ func (u *BlockUnlocker) unlockCandidates(candidates []*storage.BlockData) (*Unlo
 			}
 
 			block, err := u.rpc.GetBlockByHeight(height)
-
 			if err != nil {
 				log.Printf("Error while retrieving block %v from node: %v", height, err)
 				return nil, err
@@ -177,7 +162,7 @@ func (u *BlockUnlocker) unlockCandidates(candidates []*storage.BlockData) (*Unlo
 					orphan = false
 					result.uncles++
 
-					err := handleUncle(height, uncle, candidate, u.config)
+					err := handleUncle(height, uncle, candidate, u.config.Classic)
 					if err != nil {
 						u.halt = true
 						u.lastFail = err
@@ -227,13 +212,7 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		return err
 	}
 	candidate.Height = correctHeight
-	era := GetBlockEra(big.NewInt(candidate.Height), u.config.Ecip1017EraRounds)
-	reward := getConstReward(era)
-
-	// Add reward for including uncles
-	uncleReward := getRewardForUncle(reward)
-	rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
-	reward.Add(reward, rewardForUncles)
+	reward := getConstReward(candidate.Height, u.config.Classic)
 
 	// Add TX fees
 	extraTxReward, err := u.getExtraRewardForTx(block)
@@ -246,19 +225,23 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		reward.Add(reward, extraTxReward)
 	}
 
+	// Add reward for including uncles
+	uncleReward := getRewardForUncle(candidate.Height, u.config.Classic)
+	rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+	reward.Add(reward, rewardForUncles)
+
 	candidate.Orphan = false
 	candidate.Hash = block.Hash
 	candidate.Reward = reward
 	return nil
 }
 
-func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.BlockData, cfg *UnlockerConfig) error {
+func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.BlockData, isClassic bool) error {
 	uncleHeight, err := strconv.ParseInt(strings.Replace(uncle.Number, "0x", "", -1), 16, 64)
 	if err != nil {
 		return err
 	}
-	era := GetBlockEra(big.NewInt(height), cfg.Ecip1017EraRounds)
-	reward := getUncleReward(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), era, getConstReward(era))
+	reward := getUncleReward(uncleHeight, height, isClassic)
 	candidate.Height = height
 	candidate.UncleHeight = uncleHeight
 	candidate.Orphan = false
@@ -270,6 +253,7 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 func (u *BlockUnlocker) unlockPendingBlocks() {
 	if u.halt {
 		log.Println("Unlocking suspended due to last critical error:", u.lastFail)
+		os.Exit(1)
 		return
 	}
 
@@ -325,7 +309,7 @@ func (u *BlockUnlocker) unlockPendingBlocks() {
 	totalPoolProfit := new(big.Rat)
 
 	for _, block := range result.maturedBlocks {
-		revenue, minersProfit, poolProfit, roundRewards, err := u.calculateRewards(block)
+		revenue, minersProfit, poolProfit, roundRewards, percents, err := u.calculateRewards(block)
 		if err != nil {
 			u.halt = true
 			u.lastFail = err
@@ -353,6 +337,11 @@ func (u *BlockUnlocker) unlockPendingBlocks() {
 		entries := []string{logEntry}
 		for login, reward := range roundRewards {
 			entries = append(entries, fmt.Sprintf("\tREWARD %v: %v: %v Shannon", block.RoundKey(), login, reward))
+			per := new(big.Rat)
+			if val, ok := percents[login]; ok {
+					per = val
+			}
+			u.backend.WriteReward(login, reward, per, true, block)
 		}
 		log.Println(strings.Join(entries, "\n"))
 	}
@@ -424,7 +413,7 @@ func (u *BlockUnlocker) unlockAndCreditMiners() {
 	totalPoolProfit := new(big.Rat)
 
 	for _, block := range result.maturedBlocks {
-		revenue, minersProfit, poolProfit, roundRewards, err := u.calculateRewards(block)
+		revenue, minersProfit, poolProfit, roundRewards, percents, err := u.calculateRewards(block)
 		if err != nil {
 			u.halt = true
 			u.lastFail = err
@@ -452,6 +441,11 @@ func (u *BlockUnlocker) unlockAndCreditMiners() {
 		entries := []string{logEntry}
 		for login, reward := range roundRewards {
 			entries = append(entries, fmt.Sprintf("\tREWARD %v: %v: %v Shannon", block.RoundKey(), login, reward))
+			per := new(big.Rat)
+			if val, ok := percents[login]; ok {
+				per = val
+			}
+			u.backend.WriteReward(login, reward, per, false, block)
 		}
 		log.Println(strings.Join(entries, "\n"))
 	}
@@ -464,16 +458,21 @@ func (u *BlockUnlocker) unlockAndCreditMiners() {
 	)
 }
 
-func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *big.Rat, *big.Rat, map[string]int64, error) {
+func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *big.Rat, *big.Rat, map[string]int64, map[string]*big.Rat, error) {
 	revenue := new(big.Rat).SetInt(block.Reward)
 	minersProfit, poolProfit := chargeFee(revenue, u.config.PoolFee)
 
 	shares, err := u.backend.GetRoundShares(block.RoundHeight, block.Nonce)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
-	rewards := calculateRewardsForShares(shares, block.TotalShares, minersProfit)
+	totalShares := int64(0)
+	for _, val := range shares {
+		totalShares += val
+	}
+
+	rewards, percents := calculateRewardsForShares(shares, totalShares, minersProfit)
 
 	if block.ExtraReward != nil {
 		extraReward := new(big.Rat).SetInt(block.ExtraReward)
@@ -481,23 +480,31 @@ func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *b
 		revenue.Add(revenue, extraReward)
 	}
 
+	if u.config.Donate {
+		var donation = new(big.Rat)
+		poolProfit, donation = chargeFee(poolProfit, donationFee)
+		login := strings.ToLower(donationAccount)
+		rewards[login] += weiToShannonInt64(donation)
+	}
+
 	if len(u.config.PoolFeeAddress) != 0 {
 		address := strings.ToLower(u.config.PoolFeeAddress)
 		rewards[address] += weiToShannonInt64(poolProfit)
 	}
 
-	return revenue, minersProfit, poolProfit, rewards, nil
+	return revenue, minersProfit, poolProfit, rewards, percents, nil
 }
 
-func calculateRewardsForShares(shares map[string]int64, total int64, reward *big.Rat) map[string]int64 {
+func calculateRewardsForShares(shares map[string]int64, total int64, reward *big.Rat) (map[string]int64, map[string]*big.Rat) {
 	rewards := make(map[string]int64)
+	percents := make(map[string]*big.Rat)
 
 	for login, n := range shares {
-		percent := big.NewRat(n, total)
-		workerReward := new(big.Rat).Mul(reward, percent)
+		percents[login] = big.NewRat(n, total)
+		workerReward := new(big.Rat).Mul(reward, percents[login])
 		rewards[login] += weiToShannonInt64(workerReward)
 	}
-	return rewards
+	return rewards, percents
 }
 
 // Returns new value after fee deduction and fee value.
@@ -514,67 +521,35 @@ func weiToShannonInt64(wei *big.Rat) int64 {
 	return value
 }
 
-// GetRewardByEra gets a block reward at disinflation rate.
-// Constants MaxBlockReward, DisinflationRateQuotient, and DisinflationRateDivisor assumed.
-func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
-	if era.Cmp(big.NewInt(0)) == 0 {
-		return new(big.Int).Set(blockReward)
+func getConstReward(height int64, isClassic bool) *big.Int {
+	if !isClassic {
+		if height >= byzantiumHardForkHeight {
+			return new(big.Int).Set(byzantiumReward)
+		}
+		return new(big.Int).Set(homesteadReward)
+	} else {
+		return new(big.Int).Set(classicReward)
 	}
-
-	// MaxBlockReward _r_ * (4/5)**era == MaxBlockReward * (4**era) / (5**era)
-	// since (q/d)**n == q**n / d**n
-	// qed
-	var q, d, r *big.Int = new(big.Int), new(big.Int), new(big.Int)
-
-	q.Exp(disinflationRateQuotient, era, nil)
-	d.Exp(disinflationRateDivisor, era, nil)
-
-	r.Mul(blockReward, q)
-	r.Div(r, d)
-
-	return r
 }
 
-// GetBlockEra gets which "Era" a given block is within, given an era length (ecip-1017 has era=5,000,000 blocks)
-// Returns a zero-index era number, so "Era 1": 0, "Era 2": 1, "Era 3": 2 ...
-func GetBlockEra(blockNum, eraLength *big.Int) *big.Int {
-	// If genesis block or impossible negative-numbered block, return zero-val.
-	if blockNum.Sign() < 1 {
-		return new(big.Int)
+func getRewardForUncle(height int64, isClassic bool) *big.Int {
+	reward := getConstReward(height, isClassic)
+	return new(big.Int).Div(reward, new(big.Int).SetInt64(32))
+}
+
+func getUncleReward(uHeight, height int64, isClassic bool) *big.Int {
+	if !isClassic {
+		reward := getConstReward(height, isClassic)
+		k := height - uHeight
+		reward.Mul(big.NewInt(8-k), reward)
+		reward.Div(reward, big.NewInt(8))
+		return reward
+	} else {
+		reward := getConstReward(height, isClassic)
+		reward.Mul(reward, big.NewInt(3125))
+		reward.Div(reward, big.NewInt(100000))
+		return reward
 	}
-
-	remainder := big.NewInt(0).Mod(big.NewInt(0).Sub(blockNum, big.NewInt(1)), eraLength)
-	base := big.NewInt(0).Sub(blockNum, remainder)
-
-	d := big.NewInt(0).Div(base, eraLength)
-	dremainder := big.NewInt(0).Mod(d, big.NewInt(1))
-
-	return new(big.Int).Sub(d, dremainder)
-}
-
-func getConstReward(era *big.Int) *big.Int {
-	var blockReward = homesteadReward
-	wr := GetBlockWinnerRewardByEra(era, blockReward)
-	return wr
-}
-
-func getRewardForUncle(blockReward *big.Int) *big.Int {
-	return new(big.Int).Div(blockReward, big32) //return new(big.Int).Div(reward, new(big.Int).SetInt64(32))
-}
-
-func getUncleReward(uHeight *big.Int, height *big.Int, era *big.Int, reward *big.Int) *big.Int {
-	// Era 1 (index 0):
-	//   An extra reward to the winning miner for including uncles as part of the block, in the form of an extra 1/32 (0.15625ETC) per uncle included, up to a maximum of two (2) uncles.
-	if era.Cmp(big.NewInt(0)) == 0 {
-		r := new(big.Int)
-		r.Add(uHeight, big8) // 2,534,998 + 8              = 2,535,006
-		r.Sub(r, height)     // 2,535,006 - 2,534,999        = 7
-		r.Mul(r, reward)     // 7 * 5e+18               = 35e+18
-		r.Div(r, big8)       // 35e+18 / 8                            = 7/8 * 5e+18
-
-		return r
-	}
-	return getRewardForUncle(reward)
 }
 
 func (u *BlockUnlocker) getExtraRewardForTx(block *rpc.GetBlockReply) (*big.Int, error) {

@@ -92,7 +92,8 @@
     "keepTxFees": false,
     "interval": "10m",
     "daemon": "http://127.0.0.1:8545",
-    "timeout": "120s"
+    "timeout": "120s",
+    "classic": true
   },
 
   "payouts": {
