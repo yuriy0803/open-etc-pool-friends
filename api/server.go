@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+  "fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/robfig/cron"
+  "github.com/robfig/cron"
 
-	"github.com/yuriy0803/open-etc-pool-friends/storage"
-	"github.com/yuriy0803/open-etc-pool-friends/util"
+	"github.com/etclabscore/open-etc-pool/storage"
+	"github.com/etclabscore/open-etc-pool/util"
 )
 
 type ApiConfig struct {
@@ -101,7 +101,7 @@ func (s *ApiServer) Start() {
 			}
 		}
 	}()
-
+ 
 	go func() {
 		c := cron.New()
 
@@ -230,7 +230,7 @@ func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	if stats != nil {
 		reply["now"] = util.MakeTimestamp()
 		reply["stats"] = stats["stats"]
-		reply["poolCharts"] = stats["poolCharts"]
+    reply["poolCharts"] = stats["poolCharts"]
 		reply["hashrate"] = stats["hashrate"]
 		reply["minersTotal"] = stats["minersTotal"]
 		reply["maturedTotal"] = stats["maturedTotal"]
@@ -245,9 +245,6 @@ func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ApiServer) MinersIndex(w http.ResponseWriter, r *http.Request) {
-
-	// TODO: Want to get the most used server from workers, so it can be deisplayed in miners page
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Cache-Control", "no-cache")
@@ -352,8 +349,8 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 			stats[key] = value
 		}
 		stats["pageSize"] = s.config.Payments
-		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
-		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
+    stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
+    stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
 		reply = &Entry{stats: stats, updatedAt: now}
 		s.miners[login] = reply
 	}

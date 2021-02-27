@@ -2,7 +2,6 @@ import Ember from 'ember';
 import config from '../config/environment';
 
 export default Ember.Controller.extend({
-  intl: Ember.inject.service(),
   get config() {
     return config.APP;
   },
@@ -66,26 +65,6 @@ export default Ember.Controller.extend({
     }
   }),
 
-
-  languages: Ember.computed('model', {
-    get() {
-      return this.get('model.languages');
-    }
-  }),
-
-  selectedLanguage: Ember.computed({
-    get() {
-      var langs = this.get('languages');
-      var lang = Ember.$.cookie('lang');
-      for (var i = 0; i < langs.length; i++) {
-        if (langs[i].value == lang) {
-          return langs[i].name;
-        }
-      }
-      return lang;
-    }
-  }),
-
   roundVariance: Ember.computed('model', {
     get() {
       var percent = this.get('model.stats.roundShares') / this.get('difficulty');
@@ -98,7 +77,7 @@ export default Ember.Controller.extend({
 
   nextEpoch: Ember.computed('height', {
     get() {
-      var epochOffset = (30000 - (this.getWithDefault('height', 1) % 30000)) * 1000 * this.get('config').BlockTime;
+      var epochOffset = (60000 - (this.getWithDefault('height', 1) % 60000)) * 1000 * this.get('config').BlockTime;
       return Date.now() + epochOffset;
     }
   })

@@ -14,7 +14,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
-	"github.com/yuriy0803/open-etc-pool-friends/util"
+	"github.com/etclabscore/open-etc-pool/util"
 )
 
 type RPCClient struct {
@@ -99,7 +99,7 @@ func (r *RPCClient) GetWork() ([]string, error) {
 }
 
 func (r *RPCClient) GetPendingBlock() (*GetBlockReplyPart, error) {
-	rpcResp, err := r.doPost(r.Url, "eth_getBlockByNumber", []interface{}{"latest", true})
+	rpcResp, err := r.doPost(r.Url, "eth_getBlockByNumber", []interface{}{"pending", false})
 	if err != nil {
 		return nil, err
 	}

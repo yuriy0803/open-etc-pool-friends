@@ -1,12 +1,11 @@
 package payouts
 
 import (
+	"github.com/etclabscore/open-etc-pool/rpc"
+	"github.com/etclabscore/open-etc-pool/storage"
 	"math/big"
 	"os"
 	"testing"
-
-	"github.com/yuriy0803/open-etc-pool-friends/rpc"
-	"github.com/yuriy0803/open-etc-pool-friends/storage"
 )
 
 func TestMain(m *testing.M) {
@@ -65,75 +64,77 @@ func TestWeiToShannonInt64(t *testing.T) {
 		t.Error("Must charge original value")
 	}
 }
-func TestGetClassicUncleReward(t *testing.T) {
-	rewards := make(map[int64]string)
-	expectedRewards := map[int64]string{
-		1: "125000000000000000",
+
+func TestGetBlockEra(t *testing.T) {
+	blockNum := big.NewInt(11700000)
+	eraLength := big.NewInt(5000000)
+	era := GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(2)) != 0 {
+		t.Error("Should return Era 2", "era", era)
 	}
-	for i := int64(1); i < 2; i++ {
-		rewards[i] = getUncleReward(1, i+1, true).String()
+	// handle negative blockNum
+	blockNum = big.NewInt(-50000)
+	era = GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(0)) != 0 {
+		t.Error("Should return Era 0", "era", era)
 	}
-	for i, reward := range rewards {
-		if expectedRewards[i] != rewards[i] {
-			t.Errorf("Incorrect uncle reward for %v, expected %v vs %v", i, expectedRewards[i], reward)
-		}
-	}
-}
-func TestGetUncleReward(t *testing.T) {
-	rewards := make(map[int64]string)
-	expectedRewards := map[int64]string{
-		1: "4375000000000000000",
-		2: "3750000000000000000",
-		3: "3125000000000000000",
-		4: "2500000000000000000",
-		5: "1875000000000000000",
-		6: "1250000000000000000",
-		7: "625000000000000000",
-	}
-	for i := int64(1); i < 8; i++ {
-		rewards[i] = getUncleReward(1, i+1, false).String()
-	}
-	for i, reward := range rewards {
-		if expectedRewards[i] != rewards[i] {
-			t.Errorf("Incorrect uncle reward for %v, expected %v vs %v", i, expectedRewards[i], reward)
-		}
+	// handle negative blockNum
+	blockNum = big.NewInt(5000001)
+	era = GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(1)) != 0 {
+		t.Error("Should return Era 1", "era", era)
 	}
 }
 
-func TestGetByzantiumUncleReward(t *testing.T) {
-	rewards := make(map[int64]string)
-	expectedRewards := map[int64]string{
-		1: "2625000000000000000",
-		2: "2250000000000000000",
-		3: "1875000000000000000",
-		4: "1500000000000000000",
-		5: "1125000000000000000",
-		6: "750000000000000000",
-		7: "375000000000000000",
+func TestGetBlockWinnerRewardByEra(t *testing.T) {
+	baseReward := big.NewInt(5000000000000000000)
+	era := big.NewInt(0)
+	blockReward := GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(5000000000000000000)) != 0 {
+		t.Error("Should return blockReward 5000000000000000000", "reward", blockReward)
 	}
-	for i := int64(1); i < 8; i++ {
-		rewards[i] = getUncleReward(byzantiumHardForkHeight, byzantiumHardForkHeight+i, false).String()
+	era = big.NewInt(1)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(4000000000000000000)) != 0 {
+		t.Error("Should return blockReward 4000000000000000000", "reward", blockReward)
 	}
-	for i, reward := range rewards {
-		if expectedRewards[i] != rewards[i] {
-			t.Errorf("Incorrect uncle reward for %v, expected %v vs %v", i, expectedRewards[i], reward)
-		}
+	era = big.NewInt(2)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(3200000000000000000)) != 0 {
+		t.Error("Should return blockReward 3200000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(3)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(2560000000000000000)) != 0 {
+		t.Error("Should return blockReward 2560000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(4)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(2048000000000000000)) != 0 {
+		t.Error("Should return blockReward 2048000000000000000", "reward", blockReward)
 	}
 }
 
-func TestGetRewardForUngle(t *testing.T) {
-	reward := getRewardForUncle(1, false).String()
-	expectedReward := "156250000000000000"
-	if expectedReward != reward {
-		t.Errorf("Incorrect uncle bonus for height %v, expected %v vs %v", 1, expectedReward, reward)
+func TestGetRewardForUncle(t *testing.T) {
+	baseReward := big.NewInt(4000000000000000000)
+	uncleReward := getRewardForUncle(baseReward)
+	if uncleReward.Cmp(big.NewInt(125000000000000000)) != 0 {
+		t.Error("Should return uncleReward 125000000000000000", "reward", uncleReward)
 	}
-}
-
-func TestGetByzantiumRewardForUngle(t *testing.T) {
-	reward := getRewardForUncle(byzantiumHardForkHeight, false).String()
-	expectedReward := "93750000000000000"
-	if expectedReward != reward {
-		t.Errorf("Incorrect uncle bonus for height %v, expected %v vs %v", byzantiumHardForkHeight, expectedReward, reward)
+	baseReward = big.NewInt(3200000000000000000)
+	uncleReward = getRewardForUncle(baseReward)
+	if uncleReward.Cmp(big.NewInt(100000000000000000)) != 0 {
+		t.Error("Should return uncleReward 100000000000000000", "reward", uncleReward)
+	}
+	baseReward = big.NewInt(2560000000000000000)
+	uncleReward = getRewardForUncle(baseReward)
+	if uncleReward.Cmp(big.NewInt(80000000000000000)) != 0 {
+		t.Error("Should return uncleReward 80000000000000000", "reward", uncleReward)
+	}
+	baseReward = big.NewInt(2048000000000000000)
+	uncleReward = getRewardForUncle(baseReward)
+	if uncleReward.Cmp(big.NewInt(64000000000000000)) != 0 {
+		t.Error("Should return uncleReward 64000000000000000", "reward", uncleReward)
 	}
 }
 

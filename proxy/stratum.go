@@ -9,7 +9,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/yuriy0803/open-etc-pool-friends/util"
+	"github.com/etclabscore/open-etc-pool/util"
 )
 
 const (
@@ -20,11 +20,11 @@ func (s *ProxyServer) ListenTCP() {
 	timeout := util.MustParseDuration(s.config.Proxy.Stratum.Timeout)
 	s.timeout = timeout
 
-	addr, err := net.ResolveTCPAddr("tcp", s.config.Proxy.Stratum.Listen)
+	addr, err := net.ResolveTCPAddr("tcp4", s.config.Proxy.Stratum.Listen)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
-	server, err := net.ListenTCP("tcp", addr)
+	server, err := net.ListenTCP("tcp4", addr)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -66,7 +66,6 @@ func (s *ProxyServer) handleTCPClient(cs *Session) error {
 	cs.enc = json.NewEncoder(cs.conn)
 	connbuff := bufio.NewReaderSize(cs.conn, MaxReqSize)
 	s.setDeadline(cs.conn)
-
 	for {
 		data, isPrefix, err := connbuff.ReadLine()
 		if isPrefix {
@@ -103,20 +102,6 @@ func (s *ProxyServer) handleTCPClient(cs *Session) error {
 func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 	// Handle RPC methods
 	switch req.Method {
-	// claymore -esm 1
-	case "eth_login":
-		var params []string
-		err := json.Unmarshal(req.Params, &params)
-		if err != nil {
-			log.Println("Malformed stratum request params from", cs.ip)
-			return err
-		}
-		reply, errReply := s.handleLoginRPC(cs, params, req.Worker)
-		if errReply != nil {
-			return cs.sendTCPError(req.Id, errReply)
-		}
-		return cs.sendTCPResult(req.Id, reply)
-	// claymore -esm 0
 	case "eth_submitLogin":
 		var params []string
 		err := json.Unmarshal(req.Params, &params)

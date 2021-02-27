@@ -1,97 +1,122 @@
-## Open Source Perkle (ETC 2021) Mining Pool
+## Open Source Ethereum Classic Mining Pool
 
+Donations
+ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
 
-### Features  
+### WARNING: This code is currently configured for the Ethereum Classic main network
+
+### Features
 
 Telegram  https://t.me/poolnode
 
-**This pool is being further developed to provide an easy to use pool for Perkle miners. Testing and bug submissions are welcome!**
+**This pool is being further developed to provide an easy to use pool for Ethereum Classic miners. This software is functional however an optimised release of the pool is expected soon. Testing and bug submissions are welcome!**
 
-* Updated to work with Perkle 0.2.1
 * Support for HTTP and Stratum mining
 * Detailed block stats with luck percentage and full reward
 * Failover geth instances: geth high availability built in
 * Modern beautiful Ember.js frontend
 * Separate stats for workers: can highlight timed-out workers so miners can perform maintenance of rigs
 * JSON-API for stats
-* PPLNS block reward
-* Multi-tx payout at once
-* Beautiful front-end highcharts embedded
-
-#### Proxies
-
-* [Ether-Proxy](https://github.com/sammy007/ether-proxy) HTTP proxy with web interface
-* [Stratum Proxy](https://github.com/Atrides/eth-proxy) for Ethereum
-
-## Guide to make your very own Perkle mining pool
 
 ### Building on Linux
 
 Dependencies:
 
-  * go >= 1.10
+  * go >= 1.13
+  * core-geth
   * redis-server >= 2.8.0
   * nodejs >= 4 LTS
   * nginx
-  * geth (core-geth)
 
-**I highly recommend to use Ubuntu 16.04 LTS.**
+**I highly recommend to use Ubuntu 20.04 LTS.**
 
-### Install go lang
+First install  [core-geth](https://github.com/etclabscore/core-geth/releases).
 
-    $ sudo apt-get install -y build-essential golang-1.10-go unzip
-    $ sudo ln -s /usr/lib/go-1.10/bin/go /usr/local/bin/go
+Clone & compile:
 
-### Install redis-server
+    git config --global http.https://gopkg.in.followRedirects true
+    git clone https://github.com/yuriy0803/open-etc-pool-friends.git
+    cd open-etc-pool
+    make
 
-    $ sudo apt-get install redis-server
+Install redis-server.
 
-It is recommended to bind your DB address on 127.0.0.1 or on internal ip. Also, please set up the password for advanced security!!!
+### Running Pool
 
-### Install nginx
+    ./build/bin/open-etc-pool-friends config.json
 
-    $ sudo apt-get install nginx
+You can use Ubuntu upstart - check for sample config in <code>upstart.conf</code>.
 
-sample config located at configs/nginx.default.example (HINT, edit and move to /etc/nginx/sites-available/default)
+### Building Frontend
 
-### Install NODE
+Install nodejs. I suggest using LTS version >= 4.x from https://github.com/nodesource/distributions or from your Linux distribution or simply install nodejs on Ubuntu Xenial 16.04.
 
-This will install the latest nodejs
+> NOTE: at this point keep your nodejs version <= 10.x.
 
-    $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    $ sudo apt-get install -y nodejs
+The frontend is a single-page Ember.js application that polls the pool API to render miner stats.
 
-### Install Perkle Node 
-See https://github.com/esprezzo/perkle
+    cd www
 
-### Install Perkle Pool
+Change <code>ApiUrl: '//example.net/'</code> in <code>www/config/environment.js</code> to match your domain name. Also don't forget to adjust other options.
 
-    $ git clone https://github.com/yuriy0803/open-etc-pool-friends
-    $ cd open-etc-pool-friends
-    $ make all
+Install deps
 
-If you see open-perkle-pool after ls ~/open-etc-pool-friends/build/bin/, the installation has completed.
+    sudo npm install -g ember-cli@2.13
+    npm install -g bower
+    sudo chown -R $USER:$GROUP ~/.npm
+    sudo chown -R $USER:$GROUP ~/.config
+    npm install
+    bower install
 
-    $ ls ~/open-etc-pool-friends/build/bin/
+Build.
 
-### Set up Perkle pool
+    ./build.sh
 
-    $ mv config.example.json config.json
-    $ nano config.json
+Configure nginx to serve API on <code>/api</code> subdirectory.
+Configure nginx to serve <code>www/dist</code> as static website.
 
-Set up based on commands below.
+#### Serving API using nginx
+
+Create an upstream for API:
+
+    upstream api {
+        server 127.0.0.1:8080;
+    }
+
+and add this setting after <code>location /</code>:
+
+    location /api {
+        proxy_pass http://api;
+    }
+
+#### Customization
+
+You can customize the layout using built-in web server with live reload:
+
+    ember server --port 8082 --environment development
+
+**Don't use built-in web server in production**.
+
+Check out <code>www/app/templates</code> directory and edit these templates
+in order to customise the frontend.
+
+### Configuration
+
+Configuration is actually simple, just read it twice and think twice before changing defaults.
+
+**Don't copy config directly from this manual. Use the example config from the package,
+otherwise you will get errors on start because of JSON comments.**
 
 ```javascript
 {
-  // The number of cores of CPU.
+  // Set to the number of CPU cores of your server
   "threads": 2,
   // Prefix for keys in redis store
   "coin": "etc",
   // Give unique name to each instance
   "name": "main",
-  // PPLNS rounds
-  "pplns": 9000,
-
+  // mordor OR classic
+  "network": "classic",
   "proxy": {
     "enabled": true,
 
@@ -120,7 +145,7 @@ Set up based on commands below.
     // Try to get new job from geth in this interval
     "blockRefreshInterval": "120ms",
     "stateUpdateInterval": "3s",
-    // If there are many rejects because of heavy hash, difficulty should be increased properly.
+    // Require this share difficulty from miners
     "difficulty": 2000000000,
 
     /* Reply error to miner instead of job if redis is unavailable.
@@ -182,11 +207,6 @@ Set up based on commands below.
     "payments": 50,
     // Max numbers of blocks to display in frontend
     "blocks": 50,
-    // Frontend Chart related settings
-    "poolCharts":"0 */20 * * * *",
-    "poolChartsNum":74,
-    "minerCharts":"0 */20 * * * *",
-    "minerChartsNum":74
 
     /* If you are running API node on a different server where this module
       is reading data from redis writeable slave, you must run an api instance with this option enabled in order to purge hashrate stats from main redis node.
@@ -206,12 +226,12 @@ Set up based on commands below.
   "upstream": [
     {
       "name": "main",
-      "url": "http://127.0.0.1:8501",
+      "url": "http://127.0.0.1:8545",
       "timeout": "10s"
     },
     {
       "name": "backup",
-      "url": "http://127.0.0.2:8501",
+      "url": "http://127.0.0.2:8545",
       "timeout": "10s"
     }
   ],
@@ -219,10 +239,9 @@ Set up based on commands below.
   // This is standard redis connection options
   "redis": {
     // Where your redis instance is listening for commands
-    // NOTE THAT THE POOL IS CONFIGURED FOR Redis database "1"
     "endpoint": "127.0.0.1:6379",
     "poolSize": 10,
-    "database": 1,
+    "database": 0,
     "password": ""
   },
 
@@ -231,9 +250,9 @@ Set up based on commands below.
     "enabled": false,
     // Pool fee percentage
     "poolFee": 1.0,
-    // the address is for pool fee. Personal wallet is recommended to prevent from server hacking.
+    // Pool fees beneficiary address (leave it blank to disable fee withdrawals)
     "poolFeeAddress": "",
-    // Amount of donation to a pool maker. 10 percent of pool fee is donated to a pool maker now. If pool fee is 1 percent, 0.1 percent which is 10 percent of pool fee should be donated to a pool maker.
+    // Donate 10% from pool fees to developers
     "donate": true,
     // Unlock only if this number of blocks mined back
     "depth": 120,
@@ -244,34 +263,33 @@ Set up based on commands below.
     // Run unlocker in this interval
     "interval": "10m",
     // Geth instance node rpc endpoint for unlocking blocks
-    "daemon": "http://127.0.0.1:8501",
+    "daemon": "http://127.0.0.1:8545",
     // Rise error if can't reach geth in this amount of time
     "timeout": "10s"
   },
 
   // Pay out miners using this module
   "payouts": {
-    "enabled": true,
+    "enabled": false,
     // Require minimum number of peers on node
-    "requirePeers": 5,
+    "requirePeers": 25,
     // Run payouts in this interval
     "interval": "12h",
     // Geth instance node rpc endpoint for payouts processing
-    "daemon": "http://127.0.0.1:8501",
+    "daemon": "http://127.0.0.1:8545",
     // Rise error if can't reach geth in this amount of time
     "timeout": "10s",
-    // Address with pool coinbase wallet address.
+    // Address with pool balance
     "address": "0x0",
     // Let geth to determine gas and gasPrice
     "autoGas": true,
     // Gas amount and price for payout tx (advanced users only)
     "gas": "21000",
     "gasPrice": "50000000000",
-    // The minimum distribution of mining reward. It is 1 CLO now.
-    "threshold": 1000000000,
+    // Send payment only if miner's balance is >= 0.5 Ether
+    "threshold": 500000000,
     // Perform BGSAVE on Redis after successful payouts session
     "bgsave": false
-    "concurrentTx": 10
   }
 }
 ```
@@ -285,142 +303,6 @@ I recommend this deployment strategy:
 * Unlocker and payouts instance - 1x each (strict!)
 * API instance - 1x
 
-
-### Run Pool
-It is required to run pool by serviced. If it is not, the terminal could be stopped, and pool doesn’t work.
-
-    $ sudo nano /etc/systemd/system/etherpool.service
-
-Copy the following example
-
-```
-[Unit]
-Description=Etherpool
-After=perkle.target
-
-[Service]
-Type=simple
-ExecStart=/home/<your-user-name>/open-etc-pool-friends/build/bin/open-etc-pool-friends /home/<your-user-name>/open-etc-pool-friends/config.json
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Then run pool by the following commands
-
-    $ sudo systemctl enable etherpool
-    $ sudo systemctl start etherpool
-
-If you want to debug the node command
-
-    $ sudo systemctl status etherpool
-
-Backend operation has completed so far.
-
-### Open Firewall
-
-Firewall should be opened to operate this service. Whether Ubuntu firewall is basically opened or not, the firewall should be opened based on your situation.
-You can open firewall by opening 80,443,8080,8888,8008.
-
-## Install Frontend
-
-### Modify configuration file
-
-    $ nano ~/open-etc-pool-friends/www/config/environment.js
-
-Make some modifications in these settings.
-
-    BrowserTitle: 'Perkle Mining Pool',
-    ApiUrl: '//your-pool-domain/',
-    HttpHost: 'http://your-pool-domain',
-    StratumHost: 'your-pool-domain',
-    PoolFee: '1%',
-
-The frontend is a single-page Ember.js application that polls the pool API to render miner stats.
-
-    $ cd ~/open-etc-pool-friends/www
-    $ sudo npm install -g ember-cli@2.9.1
-    $ sudo npm install -g bower
-    $ sudo chown -R $USER:$GROUP ~/.npm
-    $ sudo chown -R $USER:$GROUP ~/.config
-    $ npm install
-    $ bower install
-    $ ./build.sh
-    $ cp -R ~/open-etc-pool-friends/www/dist ~/www
-
-As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
-
-Set up nginx.
-
-    $ sudo nano /etc/nginx/sites-available/default
-
-Modify based on configuration file.
-
-    # Default server configuration
-    # nginx example
-
-    upstream api {
-        server 127.0.0.1:8080;
-    }
-
-    server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        root /home/<your-user-name>/www;
-
-        # Add index.php to the list if you are using PHP
-        index index.html index.htm index.nginx-debian.html;
-
-        server_name _;
-
-        location / {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ =404;
-        }
-
-        location /api {
-                proxy_pass http://api;
-        }
-
-    }
-
-After setting nginx is completed, run the command below.
-
-    $ sudo service nginx restart
-
-Type your homepage address or IP address on the web.
-If you face screen without any issues, pool installation has completed.
-
-### Extra) How To Secure the pool frontend with Let's Encrypt (https)
-
-This guide was originally referred from [digitalocean - How To Secure Nginx with Let's Encrypt on Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04)
-
-First, install the Certbot's Nginx package with apt-get
-
-```
-$ sudo add-apt-repository ppa:certbot/certbot
-$ sudo apt-get update
-$ sudo apt-get install python-certbot-nginx
-```
-
-And then open your nginx setting file, make sure the server name is configured!
-
-```
-$ sudo nano /etc/nginx/sites-available/default
-. . .
-server_name <your-pool-domain>;
-. . .
-```
-
-Change the _ to your pool domain, and now you can obtain your auto-renewaled ssl certificate for free!
-
-```
-$ sudo certbot --nginx -d <your-pool-domain>
-```
-
-Now you can access your pool's frontend via https! Share your pool link!
-
 ### Notes
 
 * Unlocking and payouts are sequential, 1st tx go, 2nd waiting for 1st to confirm and so on. You can disable that in code. Carefully read `docs/PAYOUTS.md`.
@@ -428,21 +310,12 @@ Now you can access your pool's frontend via https! Share your pool link!
 * You must restart module if you see errors with the word *suspended*.
 * Don't run payouts and unlocker modules as part of mining node. Create separate configs for both, launch independently and make sure you have a single instance of each module running.
 * If `poolFeeAddress` is not specified all pool profit will remain on coinbase address. If it specified, make sure to periodically send some dust back required for payments.
-* DO NOT OPEN YOUR RPC OR REDIS ON 0.0.0.0!!! It will eventually cause coin theft.
 
-### Credits
+### Mordor
 
-Made by sammy007. Licensed under GPLv3.
-Modified by Akira Takizawa & The Ellaism Project & The Esprezzo Team.
+To use this pool on the mordor testnet two settings require changing to "mordor"
 
-#### Contributors
+network in your config.json (this sets backend (validation,unlocker) to mordor paramaters)
+APP.Network in your www/config/environment.js (this sets the frontend to mordor paramaters)
+rerun ./build.sh
 
-[Alex Leverington](https://github.com/subtly)
-
-### Donations
-
-ETH/ETC/ETSC/CLO: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
-
-![](https://cdn.pbrd.co/images/GP5tI1D.png)
-
-Highly appreciated.

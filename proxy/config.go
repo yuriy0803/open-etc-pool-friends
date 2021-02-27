@@ -1,10 +1,10 @@
 package proxy
 
 import (
-	"github.com/yuriy0803/open-etc-pool-friends/api"
-	"github.com/yuriy0803/open-etc-pool-friends/payouts"
-	"github.com/yuriy0803/open-etc-pool-friends/policy"
-	"github.com/yuriy0803/open-etc-pool-friends/storage"
+	"github.com/etclabscore/open-etc-pool/api"
+	"github.com/etclabscore/open-etc-pool/payouts"
+	"github.com/etclabscore/open-etc-pool/policy"
+	"github.com/etclabscore/open-etc-pool/storage"
 )
 
 type Config struct {
@@ -16,9 +16,10 @@ type Config struct {
 
 	Threads int `json:"threads"`
 
-	Coin  string         `json:"coin"`
-	Pplns int64          `json:"pplns"`
-	Redis storage.Config `json:"redis"`
+	Network string         `json:"network"`
+	Coin    string         `json:"coin"`
+  Pplns   int64          `json:"pplns"`
+	Redis   storage.Config `json:"redis"`
 
 	BlockUnlocker payouts.UnlockerConfig `json:"unlocker"`
 	Payouts       payouts.PayoutsConfig  `json:"payouts"`
@@ -39,7 +40,6 @@ type Proxy struct {
 	Difficulty           int64  `json:"difficulty"`
 	StateUpdateInterval  string `json:"stateUpdateInterval"`
 	HashrateExpiration   string `json:"hashrateExpiration"`
-	StratumHostname      string `json:"stratumHostname"`
 
 	Policy policy.Config `json:"policy"`
 
@@ -47,9 +47,18 @@ type Proxy struct {
 	HealthCheck bool  `json:"healthCheck"`
 
 	Stratum Stratum `json:"stratum"`
+
+	StratumNiceHash StratumNiceHash `json:"stratum_nice_hash"`
 }
 
 type Stratum struct {
+	Enabled bool   `json:"enabled"`
+	Listen  string `json:"listen"`
+	Timeout string `json:"timeout"`
+	MaxConn int    `json:"maxConn"`
+}
+
+type StratumNiceHash struct {
 	Enabled bool   `json:"enabled"`
 	Listen  string `json:"listen"`
 	Timeout string `json:"timeout"`
