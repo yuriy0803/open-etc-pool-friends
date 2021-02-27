@@ -4,16 +4,13 @@
 
 .PHONY: all test clean
 
-GOBIN = ./build/bin
-GOGET = env GO111MODULE=on go get
-GOTEST = env GO111MODULE=on go test
+GOBIN = build/bin
 
 all:
-	build/env.sh $(GOGET) -v ./...
+	build/env.sh go get -v ./...
 
 test: all
-	build/env.sh $(GOTEST) -v ./...
+	build/env.sh go test -v ./...
 
 clean:
-	env GO111MODULE=on go clean -cache
 	rm -fr build/_workspace/pkg/ $(GOBIN)/*
