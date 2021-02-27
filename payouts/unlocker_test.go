@@ -1,8 +1,8 @@
 package payouts
 
 import (
-	"github.com/etclabscore/open-etc-pool/rpc"
-	"github.com/etclabscore/open-etc-pool/storage"
+	"github.com/yuriy0803/open-etc-pool-friends/rpc"
+	"github.com/yuriy0803/open-etc-pool-friends/storage"
 	"math/big"
 	"os"
 	"testing"

@@ -12,9 +12,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/yuriy0803/go-ethereum/common/hexutil"
 
-	"github.com/etclabscore/open-etc-pool/util"
+	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
 type RPCClient struct {

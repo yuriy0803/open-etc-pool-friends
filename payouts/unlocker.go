@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/yuriy0803/go-ethereum/common/math"
 
-	"github.com/etclabscore/open-etc-pool/rpc"
-	"github.com/etclabscore/open-etc-pool/storage"
-	"github.com/etclabscore/open-etc-pool/util"
+	"github.com/yuriy0803/open-etc-pool-friends/rpc"
+	"github.com/yuriy0803/open-etc-pool-friends/storage"
+	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
 type UnlockerConfig struct {

@@ -4,10 +4,10 @@ import (
 	"log"
 	"regexp"
 	"strings"
-  "errors"
+        "errors"
 
-	"github.com/etclabscore/open-etc-pool/rpc"
-	"github.com/etclabscore/open-etc-pool/util"
+	"github.com/yuriy0803/open-etc-pool-friends/rpc"
+	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
 // Allow only lowercase hexadecimal with 0x prefix
