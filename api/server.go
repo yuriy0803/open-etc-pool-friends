@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-  "fmt"
+	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-  "github.com/robfig/cron"
+	"github.com/robfig/cron"
 
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
@@ -101,7 +101,7 @@ func (s *ApiServer) Start() {
 			}
 		}
 	}()
- 
+
 	go func() {
 		c := cron.New()
 
@@ -165,6 +165,7 @@ func (s *ApiServer) collectMinerCharts(login string, hash int64, largeHash int64
 
 func (s *ApiServer) listen() {
 	r := mux.NewRouter()
+	r.HandleFunc("/api/finders", s.FindersIndex)
 	r.HandleFunc("/api/stats", s.StatsIndex)
 	r.HandleFunc("/api/miners", s.MinersIndex)
 	r.HandleFunc("/api/blocks", s.BlocksIndex)
@@ -213,6 +214,25 @@ func (s *ApiServer) collectStats() {
 	log.Printf("Stats collection finished %s", time.Since(start))
 }
 
+func (s *ApiServer) FindersIndex(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+
+	reply := make(map[string]interface{})
+	stats := s.getStats()
+	if stats != nil {
+		reply["now"] = util.MakeTimestamp()
+		reply["finders"] = stats["finders"]
+	}
+
+	err := json.NewEncoder(w).Encode(reply)
+	if err != nil {
+		log.Println("Error serializing API response: ", err)
+	}
+}
+
 func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -230,7 +250,7 @@ func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	if stats != nil {
 		reply["now"] = util.MakeTimestamp()
 		reply["stats"] = stats["stats"]
-    reply["poolCharts"] = stats["poolCharts"]
+		reply["poolCharts"] = stats["poolCharts"]
 		reply["hashrate"] = stats["hashrate"]
 		reply["minersTotal"] = stats["minersTotal"]
 		reply["maturedTotal"] = stats["maturedTotal"]
@@ -349,8 +369,8 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 			stats[key] = value
 		}
 		stats["pageSize"] = s.config.Payments
-    stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
-    stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
+		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
+		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
 		reply = &Entry{stats: stats, updatedAt: now}
 		s.miners[login] = reply
 	}

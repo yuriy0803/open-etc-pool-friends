@@ -923,6 +923,7 @@ func (r *RedisClient) CollectStats(smallWindow time.Duration, maxBlocks, maxPaym
 		tx.HGet(r.formatKey("paymentsTotal"), "all")
 		tx.ZRevRangeWithScores(r.formatKey("payments", "all"), 0, maxPayments-1)
 		tx.LLen(r.formatKey("lastshares"))
+		tx.ZRevRangeWithScores(r.formatKey("finders"), 0, -1)
 		return nil
 	})
 
@@ -948,6 +949,9 @@ func (r *RedisClient) CollectStats(smallWindow time.Duration, maxBlocks, maxPaym
 	payments := convertPaymentsResults(cmds[10].(*redis.ZSliceCmd))
 	stats["payments"] = payments
 	stats["paymentsTotal"], _ = cmds[9].(*redis.StringCmd).Int64()
+
+	finders := convertFindersResults(cmds[12].(*redis.ZSliceCmd))
+	stats["finders"] = finders
 
 	totalHashrate, miners := convertMinersStats(window, cmds[1].(*redis.ZSliceCmd))
 	stats["miners"] = miners
@@ -1260,6 +1264,17 @@ func convertPaymentsResults(raw *redis.ZSliceCmd) []map[string]interface{} {
 	var reverse []map[string]interface{}
 	for i := len(result) - 1; i >= 0; i-- {
 		reverse = append(reverse, result[i])
+	}
+	return result
+}
+
+func convertFindersResults(raw *redis.ZSliceCmd) []map[string]interface{} {
+	var result []map[string]interface{}
+	for _, v := range raw.Val() {
+		miner := make(map[string]interface{})
+		miner["blocks"] = int64(v.Score)
+		miner["address"] = v.Member.(string)
+		result = append(result, miner)
 	}
 	return result
 }
