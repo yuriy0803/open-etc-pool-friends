@@ -8,6 +8,10 @@ export default Ember.Route.extend({
     this.get('intl').setLocale('en-us');
   },
 
+  toggleMenu: function() {
+  Ember.$('.navbar-collapse.in').attr("aria-expanded", false).removeClass("in");
+  },
+
 	model: function() {
     var url = config.APP.ApiUrl + 'api/stats';
     return Ember.$.getJSON(url).then(function(data) {
