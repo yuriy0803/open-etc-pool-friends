@@ -38,7 +38,7 @@ var disinflationRateDivisor = big.NewInt(5)  // Disinflation rate divisor for EC
 var big32 = big.NewInt(32)
 var big8 = big.NewInt(8)
 
-var homesteadReward = math.MustParseBig256("4000000000000000000")
+var homesteadReward = math.MustParseBig256("5000000000000000000")
 
 type BlockUnlocker struct {
 	config   *UnlockerConfig
