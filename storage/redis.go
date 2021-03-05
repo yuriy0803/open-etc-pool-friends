@@ -61,6 +61,7 @@ type SumRewardData struct {
 	Reward   int64  `json:"reward"`
 	Name     string `json:"name"`
 	Offset   int64  `json:"offset"`
+	Blocks   int64  `json:"blocks"`
 }
 
 type RewardData struct {
@@ -120,6 +121,7 @@ type Miner struct {
 	HR        int64 `json:"hr"`
 	Offline   bool  `json:"offline"`
 	startedAt int64
+	Blocks    int64 `json:"blocks"`
 }
 
 type Worker struct {
@@ -391,6 +393,7 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 		tx.LRange(r.formatKey("lastshares"), 0, r.pplns)
 		return nil
 	})
+	r.WriteBlocksFound(ms, ts, login, id, params[0], diff)
 	if err != nil {
 		return false, err
 	} else {
@@ -439,6 +442,10 @@ func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string
 	tx.ZAdd(r.formatKey("hashrate", login), redis.Z{Score: float64(ts), Member: join(diff, id, ms)})
 	tx.Expire(r.formatKey("hashrate", login), expire) // Will delete hashrates for miners that gone
 	tx.HSet(r.formatKey("miners", login), "lastShare", strconv.FormatInt(ts, 10))
+}
+
+func (r *RedisClient) WriteBlocksFound(ms, ts int64, login, id, share string, diff int64) {
+	r.client.ZAdd(r.formatKey("worker", "blocks", login), redis.Z{Score: float64(ts), Member: join(diff, share, id, ms)})
 }
 
 func (r *RedisClient) formatKey(args ...interface{}) string {
@@ -985,6 +992,7 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 		tx.ZRangeWithScores(r.formatKey("hashrate", login), 0, -1)
 		tx.ZRevRangeWithScores(r.formatKey("rewards", login), 0, 39)
 		tx.ZRevRangeWithScores(r.formatKey("rewards", login), 0, -1)
+		tx.ZRangeWithScores(r.formatKey("worker", "blocks", login), 0, -1)
 		return nil
 	})
 
@@ -996,7 +1004,7 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	currentHashrate := int64(0)
 	online := int64(0)
 	offline := int64(0)
-	workers := convertWorkersStats(smallWindow, cmds[1].(*redis.ZSliceCmd))
+	workers := convertWorkersStats(smallWindow, cmds[1].(*redis.ZSliceCmd), cmds[4].(*redis.ZSliceCmd))
 
 	for id, worker := range workers {
 		timeOnline := now - worker.startedAt
@@ -1021,6 +1029,19 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 			offline++
 		} else {
 			online++
+		}
+
+		blocks := cmds[4].(*redis.ZSliceCmd).Val()
+
+		for _, val := range blocks {
+			parts := strings.Split(val.Member.(string), ":")
+			rig := parts[2]
+			if id == rig {
+				str := fmt.Sprint(val.Member.(string))
+				if worker.LastBeat < (now - largeWindow) {
+					tx.ZRem(r.formatKey("worker", "blocks", login), str)
+				}
+			}
 		}
 
 		currentHashrate += worker.HR
@@ -1048,8 +1069,10 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 
 		for _, dore := range dorew {
 			dore.Reward += 0
+			dore.Blocks += 0
 			if reward.Timestamp > now-dore.Interval {
 				dore.Reward += reward.Reward
+				dore.Blocks++
 			}
 		}
 	}
@@ -1220,9 +1243,17 @@ func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 
 // Build per login workers's total shares map {'rig-1': 12345, 'rig-2': 6789, ...}
 // TS => diff, id, ms
-func convertWorkersStats(window int64, raw *redis.ZSliceCmd) map[string]Worker {
+func convertWorkersStats(window int64, raw *redis.ZSliceCmd, blocks *redis.ZSliceCmd) map[string]Worker {
 	now := util.MakeTimestamp() / 1000
 	workers := make(map[string]Worker)
+
+	for _, v := range blocks.Val() {
+		parts := strings.Split(v.Member.(string), ":")
+		id := parts[2]
+		worker := workers[id]
+		worker.Blocks++
+		workers[id] = worker
+	}
 
 	for _, v := range raw.Val() {
 		parts := strings.Split(v.Member.(string), ":")
