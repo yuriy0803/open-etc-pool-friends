@@ -197,6 +197,7 @@ func (s *ProxyServer) broadcastNewJobs() {
 	count := len(s.sessions)
 	log.Printf("Broadcasting new job to %v stratum miners", count)
 
+	s.backend.NumberStratumWorker(count)
 	start := time.Now()
 	bcast := make(chan int, 1024)
 	n := 0

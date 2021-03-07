@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yuriy0803/go-etchash"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/yuriy0803/go-etchash"
 )
 
 var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
@@ -36,6 +36,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
@@ -56,6 +57,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 
 	if !hasher.Verify(share) {
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
 	}
 
@@ -88,5 +90,6 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 			log.Println("Failed to insert share data into backend:", err)
 		}
 	}
+	s.backend.WriteWorkerShareStatus(login, id, true, false, false)
 	return false, true
 }
