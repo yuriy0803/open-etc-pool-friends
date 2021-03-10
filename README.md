@@ -36,7 +36,7 @@ Clone & compile:
 
     
     git clone https://github.com/yuriy0803/open-etc-pool-friends.git
-    cd open-etc-pool
+    cd pen-etc-pool-friends
     make
 
 Install redis-server.
