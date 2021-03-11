@@ -2,10 +2,18 @@
   {{#if model.rewards}}
   <h4>Your Latest Rewards</h4>
   <table class="table table-condensed table-striped">
+      <thead>
+      <tr>
+        <th>Time</th>
+        <th>Blocks</th>
+        <th>Reward</th>
+      </tr>
+    </thead>  
   {{#each model.sumrewards as |sumreward|}}
   <tr>
     <td>{{sumreward.name}}</td>
-    <td>{{format-balance sumreward.reward}}</td>
+    <td>{{sumreward.blocks}}</td>    
+    <td>{{format-balance sumreward.reward}}</td>    
   </tr>
   {{/each}}
    </table>
@@ -31,7 +39,7 @@
                         <span class="label label-success">{{format-balance tx.reward}}</span>
                 {{/if}}
 	  </td>
-          <td>{{format-number tx.percent style='percent' maximumFractionDigits='2'}}</td>
+          <td>{{format-number tx.percent style='percent' maximumFractionDigits='6'}}</td>
         </tr>
       {{/each}}
     </tbody>
