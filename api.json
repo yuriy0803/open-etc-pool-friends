@@ -1,9 +1,8 @@
 {
-	"threads": 2,
+	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-        "pplns": 0,
-	"network": "classic",
+  "pplns": 9000,
 
 	"proxy": {
 		"enabled": true,
@@ -93,7 +92,7 @@
 		"depth": 120,
 		"immatureDepth": 20,
 		"keepTxFees": false,
-		"interval": "1m",
+		"interval": "10m",
 		"daemon": "http://192.168.178.26:8545",
 		"timeout": "10s"
 	},
