@@ -440,15 +440,10 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 }
 
 func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, expire time.Duration) {
-	/* # Note To Me:
-				Will have to write to get from redis the current value for round
-				shares and increase by 1, then include the new number to be added to redis
-	*/
-
-// Moved get hostname to stratums
-
-
-	tx.LPush(r.formatKey("lastshares"), login)
+	times := int(diff / 1000000000)
+	for i := 0; i < times; i++ {
+		tx.LPush(r.formatKey("lastshares"), login)
+	}
 	tx.LTrim(r.formatKey("lastshares"), 0, r.pplns)
 	tx.HIncrBy(r.formatKey("shares", "roundCurrent"), login, diff)
 	tx.ZAdd(r.formatKey("hashrate"), redis.Z{Score: float64(ts), Member: join(diff, login, id, ms)})
