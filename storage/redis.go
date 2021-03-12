@@ -440,10 +440,22 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 }
 
 func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, expire time.Duration) {
+<<<<<<< HEAD
 	times := int(diff / 1000000000)
 	for i := 0; i < times; i++ {
 		tx.LPush(r.formatKey("lastshares"), login)
 	}
+=======
+	/* # Note To Me:
+				Will have to write to get from redis the current value for round
+				shares and increase by 1, then include the new number to be added to redis
+	*/
+
+// Moved get hostname to stratums
+
+
+	tx.LPush(r.formatKey("lastshares"), login)
+>>>>>>> parent of 159b730 (Update redis.go)
 	tx.LTrim(r.formatKey("lastshares"), 0, r.pplns)
 	tx.HIncrBy(r.formatKey("shares", "roundCurrent"), login, diff)
 	tx.ZAdd(r.formatKey("hashrate"), redis.Z{Score: float64(ts), Member: join(diff, login, id, ms)})
@@ -1083,6 +1095,7 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 			worker.ValidPercent = toFixed(0, 1)
 			worker.StalePercent = toFixed(0, 1)
 			worker.InvalidPercent = toFixed(0, 1)
+<<<<<<< HEAD
 		}
 		w_stat := int64(0) //test worker large hashrate indicator
 		if worker.HR >= worker.TotalHR {
@@ -1092,6 +1105,17 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 			w_stat = 0
 			worker.WorkerStatus = w_stat
 		}
+=======
+		}
+		w_stat := int64(0) //test worker large hashrate indicator
+		if worker.HR >= worker.TotalHR {
+			w_stat = 1
+			worker.WorkerStatus = w_stat
+		} else if worker.HR < worker.TotalHR {
+			w_stat = 0
+			worker.WorkerStatus = w_stat
+		}
+>>>>>>> parent of 159b730 (Update redis.go)
 		///test small hr
 		tot_w := r.client.HGet(r.formatKey("minerShare", login, id), "hashrate")
 
