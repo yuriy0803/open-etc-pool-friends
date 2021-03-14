@@ -2,7 +2,7 @@
 	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-        "pplns": 9000,
+    "pplns": 9000,
 	"network": "classic",
 
 	"proxy": {
