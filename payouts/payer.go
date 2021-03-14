@@ -5,10 +5,10 @@ import (
 	"log"
 	"math/big"
 	"os"
-  "os/exec"
+	"os/exec"
 	"strconv"
+	"sync"
 	"time"
-  "sync"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
@@ -30,9 +30,9 @@ type PayoutsConfig struct {
 	GasPrice     string `json:"gasPrice"`
 	AutoGas      bool   `json:"autoGas"`
 	// In Shannon
-	Threshold    int64  `json:"threshold"`
-	BgSave       bool   `json:"bgsave"`
-	ConcurrentTx int    `json:"concurrentTx"`
+	Threshold    int64 `json:"threshold"`
+	BgSave       bool  `json:"bgsave"`
+	ConcurrentTx int   `json:"concurrentTx"`
 }
 
 func (self PayoutsConfig) GasHex() string {
@@ -108,7 +108,7 @@ func (u *PayoutsProcessor) Start() {
 func (u *PayoutsProcessor) process() {
 	if u.halt {
 		log.Println("Payments suspended due to last critical error:", u.lastFail)
-    os.Exit(1)
+		os.Exit(1)
 		return
 	}
 	mustPay := 0
@@ -233,7 +233,7 @@ func (u *PayoutsProcessor) process() {
 					break
 				}
 			}
-      			wg.Done()
+			wg.Done()
 		}(txHash, login, &wg)
 
 		if waitingCount > u.config.ConcurrentTx {

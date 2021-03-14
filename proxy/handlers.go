@@ -1,10 +1,10 @@
 package proxy
 
 import (
+	"errors"
 	"log"
 	"regexp"
 	"strings"
-        "errors"
 
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
@@ -91,7 +91,7 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		if !ok {
 			cs.lastErr = errors.New("High rate of invalid shares")
 		}
-   }(s, cs, login, id, params)
+	}(s, cs, login, id, params)
 
 	return true, nil
 }

@@ -6,14 +6,27 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/ethash"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/yuriy0803/go-etchash"
 )
 
-var hasher = ethash.New()
+var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
+var ecip1099FBlockMordor uint64 = 2520000   // mordor
+
+var hasher *etchash.Etchash = nil
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
-
+	if hasher == nil {
+		if s.config.Network == "classic" {
+			hasher = etchash.New(&ecip1099FBlockClassic)
+		} else if s.config.Network == "mordor" {
+			hasher = etchash.New(&ecip1099FBlockMordor)
+		} else {
+			// unknown network
+			log.Printf("Unknown network configuration %s", s.config.Network)
+			return false, false
+		}
+	}
 	nonceHex := params[0]
 	hashNoNonce := params[1]
 	mixDigest := params[2]

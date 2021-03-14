@@ -2,7 +2,8 @@
 	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-        "pplns": 9000,
+    "pplns": 9000,
+	"network": "classic",
 
 	"proxy": {
 		"enabled": true,
@@ -16,6 +17,7 @@
 		"hashrateExpiration": "3h",
 
 		"healthCheck": true,
+		"debug": true,
 		"maxFails": 100,
 
 		"stratum": {
