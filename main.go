@@ -14,6 +14,7 @@ import (
 	"github.com/yvasiyarov/gorelic"
 
 	"github.com/yuriy0803/open-etc-pool-friends/api"
+	"github.com/yuriy0803/open-etc-pool-friends/exchange"
 	"github.com/yuriy0803/open-etc-pool-friends/payouts"
 	"github.com/yuriy0803/open-etc-pool-friends/proxy"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
@@ -39,6 +40,11 @@ func startBlockUnlocker() {
 
 func startPayoutsProcessor() {
 	u := payouts.NewPayoutsProcessor(&cfg.Payouts, backend)
+	u.Start()
+}
+
+func startExchangeProcessor() {
+	u := exchange.StartExchangeProcessor(&cfg.Exchange, backend)
 	u.Start()
 }
 
@@ -82,7 +88,7 @@ func main() {
 
 	startNewrelic()
 
-	backend = storage.NewRedisClient(&cfg.Redis, cfg.Coin, cfg.Pplns)
+	backend = storage.NewRedisClient(&cfg.Redis, cfg.Coin, cfg.Pplns, cfg.CoinName)
 	pong, err := backend.Check()
 	if err != nil {
 		log.Printf("Can't establish connection to backend: %v", err)
@@ -101,6 +107,9 @@ func main() {
 	}
 	if cfg.Payouts.Enabled {
 		go startPayoutsProcessor()
+	}
+	if cfg.Exchange.Enabled {
+		go startExchangeProcessor()
 	}
 	quit := make(chan bool)
 	<-quit

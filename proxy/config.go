@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"github.com/yuriy0803/open-etc-pool-friends/api"
+	"github.com/yuriy0803/open-etc-pool-friends/exchange"
 	"github.com/yuriy0803/open-etc-pool-friends/payouts"
 	"github.com/yuriy0803/open-etc-pool-friends/policy"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
@@ -16,13 +17,16 @@ type Config struct {
 
 	Threads int `json:"threads"`
 
-	Network string         `json:"network"`
-	Coin    string         `json:"coin"`
-	Pplns   int64          `json:"pplns"`
-	Redis   storage.Config `json:"redis"`
+	Network  string         `json:"network"`
+	Coin     string         `json:"coin"`
+	Pplns    int64          `json:"pplns"`
+	Redis    storage.Config `json:"redis"`
+	CoinName string         `json:"coin-name"`
 
 	BlockUnlocker payouts.UnlockerConfig `json:"unlocker"`
 	Payouts       payouts.PayoutsConfig  `json:"payouts"`
+
+	Exchange exchange.ExchangeConfig `json:"exchange"`
 
 	NewrelicName    string `json:"newrelicName"`
 	NewrelicKey     string `json:"newrelicKey"`

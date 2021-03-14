@@ -2,8 +2,9 @@
 	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-  "pplns": 9000,
+    "pplns": 9000,
 	"network": "classic",
+	"coin-name":"etc",
 
 	"proxy": {
 		"enabled": true,
@@ -86,6 +87,13 @@
 		"database": 0,
 		"password": ""
 	},
+  
+	"exchange": {
+		   "enabled": true,
+		   "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
+		   "timeout": "50s",
+		   "refreshInterval": "900s"
+    },
 
 	"unlocker": {
 		"enabled": true,

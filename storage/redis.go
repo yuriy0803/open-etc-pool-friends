@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"math/big"
 	"sort"
@@ -22,9 +23,10 @@ type Config struct {
 }
 
 type RedisClient struct {
-	client *redis.Client
-	prefix string
-	pplns  int64
+	client   *redis.Client
+	prefix   string
+	pplns    int64
+	CoinName string
 }
 
 type PoolCharts struct {
@@ -137,14 +139,14 @@ type Worker struct {
 	WorkerStatushas int64   `json:"w_stat_s"`
 }
 
-func NewRedisClient(cfg *Config, prefix string, pplns int64) *RedisClient {
+func NewRedisClient(cfg *Config, prefix string, pplns int64, CoinName string) *RedisClient {
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Endpoint,
 		Password: cfg.Password,
 		DB:       cfg.Database,
 		PoolSize: cfg.PoolSize,
 	})
-	return &RedisClient{client: client, prefix: prefix, pplns: pplns}
+	return &RedisClient{client: client, prefix: prefix, pplns: pplns, CoinName: CoinName}
 }
 
 func (r *RedisClient) Client() *redis.Client {
@@ -949,6 +951,7 @@ func (r *RedisClient) CollectStats(smallWindow time.Duration, maxBlocks, maxPaym
 		tx.ZRevRangeWithScores(r.formatKey("payments", "all"), 0, maxPayments-1)
 		tx.LLen(r.formatKey("lastshares"))
 		tx.ZRevRangeWithScores(r.formatKey("finders"), 0, -1)
+		tx.HGetAllMap(r.formatKey("exchange", r.CoinName))
 		return nil
 	})
 
@@ -982,6 +985,10 @@ func (r *RedisClient) CollectStats(smallWindow time.Duration, maxBlocks, maxPaym
 	stats["miners"] = miners
 	stats["minersTotal"] = len(miners)
 	stats["hashrate"] = totalHashrate
+
+	exchangedata, _ := cmds[13].(*redis.StringStringMapCmd).Result()
+	stats["exchangedata"] = exchangedata
+
 	return stats, nil
 }
 
@@ -1582,4 +1589,39 @@ func (r *RedisClient) NumberStratumWorker(count int) {
 		//tx.HSet(r.formatKey("WorkersTotal"), "workers", int64(count))
 		return nil
 	})
+}
+
+func (r *RedisClient) StoreExchangeData(ExchangeData []map[string]interface{}) {
+
+	tx := r.client.Multi()
+	defer tx.Close()
+
+	log.Printf("ExchangeData: %s", ExchangeData)
+
+	for _, coindata := range ExchangeData {
+		for key, value := range coindata {
+
+			cmd := tx.HSet(r.formatKey("exchange", coindata["symbol"]), fmt.Sprintf("%v", key), fmt.Sprintf("%v", value))
+			err := cmd.Err()
+			if err != nil {
+				log.Printf("Error while Storing %s : Key-%s , value-%s , Error : %v", coindata["symbol"], key, value, err)
+			}
+
+		}
+	}
+	log.Printf("Writing Exchange Data ")
+	return
+}
+
+func (r *RedisClient) GetExchangeData(coinsymbol string) (map[string]string, error) {
+
+	cmd := r.client.HGetAllMap(r.formatKey("exchange", coinsymbol))
+
+	result, err := cmd.Result()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
 }
