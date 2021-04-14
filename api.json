@@ -64,14 +64,18 @@
 		"poolCharts":"*/20 * * * *",
 		"poolChartsNum":74,
 		"minerCharts":"*/20 * * * *",
-		"minerChartsNum":74
+    "minerChartsNum":74,
+    "netCharts":"*/20 * * * *",
+    "netChartsNum":74,
+    "shareCharts":"*/20 * * * *",
+    "shareChartsNum":74
 	},
 
 	"upstreamCheckInterval": "5s",
 	"upstream": [
 		{
 			"name": "main",
-			"url": "http://192.168.178.26:8545",
+			"url": "http://192.168.178.30:8545",
 			"timeout": "10s"
 		},
 		{
@@ -103,7 +107,7 @@
 		"immatureDepth": 20,
 		"keepTxFees": false,
 		"interval": "10m",
-		"daemon": "http://192.168.178.26:8545",
+		"daemon": "http://192.168.178.30:8545",
 		"timeout": "10s"
 	},
 
@@ -113,7 +117,7 @@
 		"interval": "20m",
 		"daemon": "http://192.168.178.26:8545",
 		"timeout": "10s",
-		"address": "0xf8d10632dedf8cb9033b1438187a618d08734cc8",
+		"address": "0x9dd0226060b6d9644066029f4993CB2A40cF775D",
 		"gas": "21000",
 		"gasPrice": "50000000000",
 		"autoGas": true,
