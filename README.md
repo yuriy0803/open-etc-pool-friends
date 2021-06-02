@@ -116,7 +116,7 @@ otherwise you will get errors on start because of JSON comments.**
   // Give unique name to each instance
   "name": "main",
   // mordor OR classic
-  "network": "classic",
+  //"network": "classic",
   "proxy": {
     "enabled": true,
 
