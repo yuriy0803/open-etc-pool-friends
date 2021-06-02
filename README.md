@@ -1,4 +1,4 @@
-## Open Source Ethereum Classic Mining Pool PPLNS
+## Open Source Ethereum Mining Pool PPLNS
 
 Donations
 ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
@@ -116,7 +116,7 @@ otherwise you will get errors on start because of JSON comments.**
   // Give unique name to each instance
   "name": "main",
   // mordor OR classic
-  "network": "classic",
+  //"network": "classic",
   "proxy": {
     "enabled": true,
 
