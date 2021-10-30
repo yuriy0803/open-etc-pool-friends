@@ -14,7 +14,7 @@ var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
 var ecip1099FBlockMordor uint64 = 2520000   // mordor
 var uip1FEpoch uint64 = 22                  // ubiq mainnet
 
-var hasher = etchash.New(&ecip1099FBlockMordor, nil)
+var hasher *etchash.Etchash = nil
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
 	if hasher == nil {
