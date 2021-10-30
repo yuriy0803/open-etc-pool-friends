@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/yuriy0803/go-etchash"
+	"github.com/etclabscore/go-etchash"
 )
 
 var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
