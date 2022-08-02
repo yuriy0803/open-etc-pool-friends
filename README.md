@@ -44,7 +44,7 @@ Install redis-server.
 
 ### Running Pool
 
-    ./build/bin/open-etc-pool-friends config.json
+    ./build/bin/open-etc-pool-friends api.json
 
 You can use Ubuntu upstart - check for sample config in <code>upstart.conf</code>.
 
