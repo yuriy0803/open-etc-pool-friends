@@ -66,10 +66,10 @@ Install deps
 
     sudo npm install -g ember-cli@2.13
     npm install -g bower
-    sudo chown -R $USER:$GROUP ~/.npm
-    sudo chown -R $USER:$GROUP ~/.config
     npm install
     bower install
+    sudo chown -R $USER:$GROUP ~/.npm
+    sudo chown -R $USER:$GROUP ~/.config
 
 Build.
      
