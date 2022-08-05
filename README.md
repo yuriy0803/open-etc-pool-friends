@@ -72,6 +72,7 @@ Install deps
     bower install
 
 Build.
+     
      chmod 755 build.sh
     ./build.sh
 
