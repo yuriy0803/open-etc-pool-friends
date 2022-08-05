@@ -40,6 +40,7 @@ Clone & compile:
     cd open-etc-pool-friends
     cd build
     chmod 755 env.sh
+    cd ..
     make
 
 Install redis-server.
