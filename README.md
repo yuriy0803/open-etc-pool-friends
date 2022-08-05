@@ -38,6 +38,8 @@ Clone & compile:
     
     git clone https://github.com/yuriy0803/open-etc-pool-friends.git
     cd open-etc-pool-friends
+    cd build
+    chmod 755 env.sh
     make
 
 Install redis-server.
@@ -70,7 +72,7 @@ Install deps
     bower install
 
 Build.
-
+     chmod 755 build.sh
     ./build.sh
 
 Configure nginx to serve API on <code>/api</code> subdirectory.
