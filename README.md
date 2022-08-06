@@ -71,6 +71,8 @@ Install deps
     bower install
     sudo chown -R $USER:$GROUP ~/.npm
     sudo chown -R $USER:$GROUP ~/.config
+    ember install ember-truth-helpers
+    npm install jdenticon@2.1.0
 
 Build.
      
