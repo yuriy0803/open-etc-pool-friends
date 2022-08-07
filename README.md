@@ -65,7 +65,7 @@ The frontend is a single-page Ember.js application that polls the pool API to re
 
 Change <code>ApiUrl: '//example.net/'</code> in <code>www/config/environment.js</code> to match your domain name. Also don't forget to adjust other options.
 
-Install deps.
+Install deps
 
    sudo npm install -g ember-cli@2.13
    sudo npm install -g bower
