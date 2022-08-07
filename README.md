@@ -67,14 +67,14 @@ Change <code>ApiUrl: '//example.net/'</code> in <code>www/config/environment.js<
 
 Install deps
 
-   sudo npm install -g ember-cli@2.13
-   sudo npm install -g bower
-   sudo chown -R $USER:$GROUP ~/.npm
-   sudo chown -R $USER:$GROUP ~/.config
-   npm install
-   bower install
-   ember install ember-truth-helpers
-   npm install jdenticon@2.1.0
+    $ sudo npm install -g ember-cli@2.13
+    $ sudo npm install -g bower
+    $ sudo chown -R $USER:$GROUP ~/.npm
+    $ sudo chown -R $USER:$GROUP ~/.config
+    $ npm install
+    $ bower install
+    $ ember install ember-truth-helpers
+    $ npm install jdenticon@2.1.0
 
 Build.
      
