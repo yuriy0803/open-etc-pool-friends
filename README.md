@@ -35,6 +35,8 @@ First install  [core-geth](https://github.com/etclabscore/core-geth/releases).
 
 Clone & compile:
 
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    sudo apt-get install -y nodejs
     
     git clone https://github.com/yuriy0803/open-etc-pool-friends.git
     cd open-etc-pool-friends
