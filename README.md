@@ -8,7 +8,7 @@
 
 ### Email: office.poolnode@gmail.com
 
-### [Youtube](https://www.youtube.com/channel/UCeSEGwWB8LWtu7BM8OpH6yA).
+### [YouTube](https://www.youtube.com/channel/UCeSEGwWB8LWtu7BM8OpH6yA).
 
 
 **This pool is being further developed to provide an easy to use pool for Ethereum Classic miners. This software is functional however an optimised release of the pool is expected soon. Testing and bug submissions are welcome!**
