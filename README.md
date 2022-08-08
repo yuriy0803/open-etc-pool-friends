@@ -262,11 +262,11 @@ otherwise you will get errors on start because of JSON comments.**
     "password": ""
   },
 
-	"exchange": {
-		   "enabled": true,
-		   "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
-		   "timeout": "50s",
-		   "refreshInterval": "900s"
+  "exchange": {
+    "enabled": true,
+     "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
+     "timeout": "50s",
+     "refreshInterval": "900s"
     },
 
   // This module periodically remits ether to miners
