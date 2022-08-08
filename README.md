@@ -130,6 +130,7 @@ otherwise you will get errors on start because of JSON comments.**
   "network": "classic",
   // exchange api coingecko
   "coin-name":"etc",
+  
   "proxy": {
     "enabled": true,
 
