@@ -3,7 +3,7 @@
 Donations
 ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
 
-### WARNING: This code is currently configured for the ETCHASH main network
+### Supports Ethereum Classic, Mordor, Ethereum, Ropsten & Ubiq.
 
 ### Features
 
