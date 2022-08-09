@@ -19,7 +19,7 @@
 * Separate stats for workers: can highlight timed-out workers so miners can perform maintenance of rigs
 * JSON-API for stats
 * New vue based UI
-* Supports Ethereum Classic, Mordor, Ethereum, Ropsten & Ubiq.
+* Supports Ethereum Classic, Mordor, Ethereum, Ropsten
 
 ### Building on Linux
 
