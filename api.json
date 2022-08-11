@@ -64,11 +64,11 @@
 		"poolCharts":"*/20 * * * *",
 		"poolChartsNum":74,
 		"minerCharts":"*/20 * * * *",
-    "minerChartsNum":74,
-    "netCharts":"*/20 * * * *",
-    "netChartsNum":74,
-    "shareCharts":"*/20 * * * *",
-    "shareChartsNum":74
+                "minerChartsNum":74,
+                "netCharts":"*/20 * * * *",
+                "netChartsNum":74,
+                "shareCharts":"*/20 * * * *",
+                "shareChartsNum":74
 	},
 
 	"upstreamCheckInterval": "5s",
