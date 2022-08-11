@@ -126,6 +126,8 @@ otherwise you will get errors on start because of JSON comments.**
   "coin": "etc",
   // Give unique name to each instance
   "name": "main",
+  // shares or (solo "pplns": 0,)
+  "pplns": 9000,
   // mordor, classic, ethereum, ropsten or ubiq
   "network": "classic",
   // exchange api coingecko
