@@ -6,15 +6,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/etclabscore/go-etchash"
+	"github.com/ethereum/go-ethereum/common"
 )
 
-var ecip1099FBlockClassic uint64 = 11700000 // classic mainnet
-var ecip1099FBlockMordor uint64 = 2520000   // mordor
-var uip1FEpoch uint64 = 22                  // ubiq mainnet
-
-var hasher *etchash.Etchash = nil
+var (
+	maxUint256                             = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
+	ecip1099FBlockClassic uint64           = 11700000 // classic mainnet
+	ecip1099FBlockMordor  uint64           = 2520000  // mordor
+	uip1FEpoch            uint64           = 22       // ubiq mainnet
+	hasher                *etchash.Etchash = nil
+)
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
 	if hasher == nil {
