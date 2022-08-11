@@ -113,7 +113,7 @@
 
 	"payouts": {
 		"enabled": false,
-		"requirePeers": 25,
+		"requirePeers": 1,
 		"interval": "20m",
 		"daemon": "http://192.168.178.26:8545",
 		"timeout": "10s",
