@@ -75,7 +75,7 @@
 	"upstream": [
 		{
 			"name": "main",
-			"url": "http://192.168.178.30:8545",
+			"url": "http://127.0.0.1:8545",
 			"timeout": "10s"
 		},
 		{
@@ -107,7 +107,7 @@
 		"immatureDepth": 20,
 		"keepTxFees": false,
 		"interval": "10m",
-		"daemon": "http://192.168.178.30:8545",
+		"daemon": "http://127.0.0.1:8545",
 		"timeout": "10s"
 	},
 
@@ -115,7 +115,7 @@
 		"enabled": false,
 		"requirePeers": 1,
 		"interval": "20m",
-		"daemon": "http://192.168.178.30:8545",
+		"daemon": "http://127.0.0.1:8545",
 		"timeout": "10s",
 		"address": "0x9dd0226060b6d9644066029f4993CB2A40cF775D",
 		"gas": "21000",
