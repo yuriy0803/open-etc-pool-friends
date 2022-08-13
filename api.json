@@ -115,7 +115,7 @@
 		"enabled": false,
 		"requirePeers": 1,
 		"interval": "20m",
-		"daemon": "http://192.168.178.26:8545",
+		"daemon": "http://192.168.178.30:8545",
 		"timeout": "10s",
 		"address": "0x9dd0226060b6d9644066029f4993CB2A40cF775D",
 		"gas": "21000",
