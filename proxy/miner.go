@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yuriy0803/poolhash"
+    "github.com/yuriy0803/poolhash"
 	"github.com/ethereum/go-ethereum/common"
 )
 

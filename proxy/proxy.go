@@ -42,9 +42,9 @@ type Session struct {
 
 	// Stratum
 	sync.Mutex
-	conn           net.Conn
-	login          string
-  lastErr error
+	conn    net.Conn
+	login   string
+	lastErr error
 }
 
 func NewProxy(cfg *Config, backend *storage.RedisClient) *ProxyServer {

@@ -52,7 +52,6 @@ type Proxy struct {
 	Debug       bool  `json:"debug"`
 
 	Stratum Stratum `json:"stratum"`
-
 }
 
 type Stratum struct {

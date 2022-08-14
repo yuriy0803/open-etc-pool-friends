@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"bufio"
-  "crypto/tls"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"io"
@@ -37,7 +37,7 @@ func (s *ProxyServer) ListenTCP() {
 			conn.(*net.TCPConn).SetKeepAlive(true)
 		}
 	}
- 
+
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
