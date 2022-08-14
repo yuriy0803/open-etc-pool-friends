@@ -53,17 +53,9 @@ type Proxy struct {
 
 	Stratum Stratum `json:"stratum"`
 
-	StratumNiceHash StratumNiceHash `json:"stratum_nice_hash"`
 }
 
 type Stratum struct {
-	Enabled bool   `json:"enabled"`
-	Listen  string `json:"listen"`
-	Timeout string `json:"timeout"`
-	MaxConn int    `json:"maxConn"`
-}
-
-type StratumNiceHash struct {
 	Enabled bool   `json:"enabled"`
 	Listen  string `json:"listen"`
 	Timeout string `json:"timeout"`
