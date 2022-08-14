@@ -669,10 +669,10 @@ func getConstRewardUbiq(height int64) *big.Int {
 		reward = big.NewInt(4e+18)
 		// Year 4
 	}
-	// If Orion use new MP
-	if headerNumber.Cmp(big.NewInt(1791793)) >= 0 {
-		reward = big.NewInt(15e+17)
-	}
+   // If Orion use new MP
+  if headerNumber.Cmp(big.NewInt(1791793)) >= 0 {
+    reward = big.NewInt(15e+17)
+  }
 
 	return reward
 }

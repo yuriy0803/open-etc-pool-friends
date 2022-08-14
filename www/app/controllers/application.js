@@ -43,10 +43,21 @@ export default Ember.Controller.extend({
         return parseFloat(this.get('model.exchangedata.current_price'));
     }
   }),
+   
+  blockTime: Ember.computed('model.nodes', {
+    get() {
+      var node = this.get('bestNode');
+      if (node && node.blocktime) {
+        return node.blocktime;
+      }
+      return config.APP.BlockTime;
+    }
+  }),
   
   hashrate: Ember.computed('difficulty', {
     get() {
-      return this.getWithDefault('difficulty', 0) / config.APP.BlockTime;
+     var blockTime = this.get('blockTime');
+      return this.getWithDefault('difficulty', 0) / blockTime;
     }
   }),
 
@@ -89,7 +100,7 @@ export default Ember.Controller.extend({
 
   nextEpoch: Ember.computed('height', {
     get() {
-      var epochOffset = (60000 - (this.getWithDefault('height', 1) % 60000)) * 1000 * this.get('config').BlockTime;
+      var epochOffset = (60000 - (this.getWithDefault('height', 1) % 60000)) * 1000 * this.get('blockTime');
       return Date.now() + epochOffset;
     }
   })
