@@ -34,13 +34,6 @@ type ProxyServer struct {
 	sessionsMu sync.RWMutex
 	sessions   map[*Session]struct{}
 	timeout    time.Duration
-	Extranonce string
-}
-
-type jobDetails struct {
-	JobID      string
-	SeedHash   string
-	HeaderHash string
 }
 
 type Session struct {
@@ -49,11 +42,9 @@ type Session struct {
 
 	// Stratum
 	sync.Mutex
-	conn           *net.TCPConn
+	conn           net.Conn
 	login          string
   lastErr error
-	subscriptionID string
-	JobDeatils     jobDetails
 }
 
 func NewProxy(cfg *Config, backend *storage.RedisClient) *ProxyServer {
