@@ -25,6 +25,7 @@
 			"enabled": true,
 			"listen": "0.0.0.0:8008",
 			"maxConn": 8192,
+			"timeout": "120s",
 			"tls": false,
                         "certFile": "/path/to/cert.pem",
                         "keyFile": "/path/to/key.pem"
