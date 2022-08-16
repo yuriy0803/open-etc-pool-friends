@@ -72,10 +72,6 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 	exist, validShare := s.processShare(login, id, cs.ip, t, params)
 	ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
 
-	if s.config.Proxy.Debug {
-		log.Printf("Valid share from %s@%s", login, cs.ip)
-	}
-
 	if exist {
 		log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
 		return false, &ErrorReply{Code: 22, Message: "Duplicate share"}
@@ -89,7 +85,10 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		}
 		return false, nil
 	}
-	log.Printf("Valid share from %s@%s", login, cs.ip)
+
+	if s.config.Proxy.Debug {
+		log.Printf("Valid share from %s@%s", login, cs.ip)
+	}
 
 	if !ok {
 		return true, &ErrorReply{Code: -1, Message: "High rate of invalid shares"}
