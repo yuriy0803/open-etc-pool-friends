@@ -309,6 +309,8 @@ otherwise you will get errors on start because of JSON comments.**
     "address": "0x0",
     // Let parity to determine gas and gasPrice
     "autoGas": true,
+    // Sends as EIP1559 TX
+    "maxPriorityFee": "2000000000",
     // Gas amount and price for payout tx (advanced users only)
     "gas": "21000",
     "gasPrice": "50000000000",
