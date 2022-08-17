@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"errors"
 	"log"
 	"regexp"
 	"strings"
@@ -21,6 +22,8 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	}
 
 	login := strings.ToLower(params[0])
+	login = strings.Split(login, ".")[0]
+
 	if !util.IsValidHexAddress(login) {
 		return false, &ErrorReply{Code: -1, Message: "Invalid login"}
 	}
@@ -68,33 +71,36 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		log.Printf("Malformed PoW result from %s@%s %v", login, cs.ip, params)
 		return false, &ErrorReply{Code: -1, Message: "Malformed PoW result"}
 	}
-	t := s.currentBlockTemplate()
-	exist, validShare := s.processShare(login, id, cs.ip, t, params)
-	ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
+	go func(s *ProxyServer, cs *Session, login, id string, params []string) {
+		t := s.currentBlockTemplate()
+		exist, validShare := s.processShare(login, id, cs.ip, t, params)
+		ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
 
-	if exist {
-		log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
-		return false, &ErrorReply{Code: 22, Message: "Duplicate share"}
-	}
-
-	if !validShare {
-		log.Printf("Invalid share from %s@%s", login, cs.ip)
-		// Bad shares limit reached, return error and close
-		if !ok {
-			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
+		if exist {
+			log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
+			cs.lastErr = errors.New("Duplicate share")
 		}
-		return false, nil
-	}
 
-	if s.config.Proxy.Debug {
-		log.Printf("Valid share from %s@%s", login, cs.ip)
-	}
+		if !validShare {
+			log.Printf("Invalid share from %s@%s", login, cs.ip)
+			// Bad shares limit reached, return error and close
+			if !ok {
+				cs.lastErr = errors.New("Invalid share")
+			}
+		}
 
-	if !ok {
-		return true, &ErrorReply{Code: -1, Message: "High rate of invalid shares"}
-	}
+		if s.config.Proxy.Debug {
+			log.Printf("Valid share from %s@%s", login, cs.ip)
+		}
+
+		if !ok {
+			cs.lastErr = errors.New("High rate of invalid shares")
+		}
+	}(s, cs, login, id, params)
+
 	return true, nil
 }
+
 func (s *ProxyServer) handleGetBlockByNumberRPC() *rpc.GetBlockReplyPart {
 	t := s.currentBlockTemplate()
 	var reply *rpc.GetBlockReplyPart

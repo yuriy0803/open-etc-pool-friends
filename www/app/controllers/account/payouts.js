@@ -3,6 +3,7 @@ import Ember from 'ember';
 export default Ember.Controller.extend({
   applicationController: Ember.inject.controller('application'),
   stats: Ember.computed.reads('applicationController.model.stats'),
+  config: Ember.computed.reads('applicationController.config'),
   intl: Ember.inject.service(),
 
   chartPaymentText: Ember.computed('model', {
@@ -64,7 +65,7 @@ export default Ember.Controller.extend({
                 },
                 tooltip: {
                     formatter: function() {
-                        return "<b>" + Highcharts.dateFormat('%Y-%m-%d', new Date(this.x)) + "<b><br>Payment&nbsp;<b>" + this.y.toFixed(8) + "&nbsp;ESN</b>";
+                        return "<b>" + Highcharts.dateFormat('%d-%m-%Y', new Date(this.x)) + "<b><br>Payment&nbsp;<b>" + this.y.toFixed(8) + "<b><br>" + e.get('config.Unit');
                     },
                     useHTML: true
                 },

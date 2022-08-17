@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-    "github.com/yuriy0803/poolhash"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/yuriy0803/etchash"
 )
 
 var (
@@ -19,6 +19,7 @@ var (
 )
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
+
 	if hasher == nil {
 		if s.config.Network == "classic" {
 			hasher = etchash.New(&ecip1099FBlockClassic, nil)
@@ -34,6 +35,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 			return false, false
 		}
 	}
+
 	nonceHex := params[0]
 	hashNoNonce := params[1]
 	mixDigest := params[2]

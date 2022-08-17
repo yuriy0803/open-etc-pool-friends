@@ -66,7 +66,7 @@ func (s *ProxyServer) ListenTCP() {
 		accept <- n
 		go func(cs *Session) {
 			err = s.handleTCPClient(cs)
-			if err != nil {
+			if err != nil || cs.lastErr != nil {
 				s.removeSession(cs)
 				conn.Close()
 			}
@@ -222,7 +222,7 @@ func (s *ProxyServer) broadcastNewJobs() {
 		go func(cs *Session) {
 			err := cs.pushNewJob(&reply)
 			<-bcast
-			if err != nil {
+			if err != nil || cs.lastErr != nil {
 				log.Printf("Job transmit error to %v@%v: %v", cs.login, cs.ip, err)
 				s.removeSession(cs)
 			} else {

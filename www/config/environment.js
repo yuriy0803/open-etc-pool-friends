@@ -27,6 +27,7 @@ module.exports = function(environment) {
   
         // The ETC network used (classic, mordor)
         Network: 'classic',
+        Unit: 'ETC',
 
         // Fee and payout details
         PoolFee: '1%',
