@@ -2,7 +2,7 @@
 	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-        "pplns": 9000,
+    "pplns": 9000,
 	"network": "classic",
 	"coin-name":"etc",
 
@@ -27,14 +27,15 @@
 			"timeout": "120s",
 			"maxConn": 8192,
 			"tls": false,
-                        "certFile": "/path/to/cert.pem",
-                        "keyFile": "/path/to/key.pem"
+            "certFile": "/path/to/cert.pem",
+            "keyFile": "/path/to/key.pem"
 		},
 
 		"policy": {
 			"workers": 8,
 			"resetInterval": "60m",
 			"refreshInterval": "1m",
+			"blacklist_file" : "/home/pool/open-etc-pool-friends/stratum_blacklist.json",
 
 			"banning": {
 				"enabled": false,
@@ -67,11 +68,11 @@
 		"poolCharts":"*/20 * * * *",
 		"poolChartsNum":74,
 		"minerCharts":"*/20 * * * *",
-                "minerChartsNum":74,
-                "netCharts":"*/20 * * * *",
-                "netChartsNum":74,
-                "shareCharts":"*/20 * * * *",
-                "shareChartsNum":74
+        "minerChartsNum":74,
+        "netCharts":"*/20 * * * *",
+        "netChartsNum":74,
+        "shareCharts":"*/20 * * * *",
+        "shareChartsNum":74
 	},
 
 	"upstreamCheckInterval": "5s",

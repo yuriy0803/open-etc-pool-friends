@@ -65,6 +65,15 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		mixDigest:   common.HexToHash(mixDigest),
 	}
 
+	//this is to stop people in wallet blacklist, from getting shares into the db.
+	//rare instances of hacks require letting the hacks waste thier money on occassion
+	if !s.policy.ApplyLoginWalletPolicy(login) {
+		// check to see if this wallet login is blocked
+		log.Printf("Blacklisted wallet share, skipped from %v", login)
+		return false, false
+		//return codes need work here, a lot of it.
+	}
+
 	if !hasher.Verify(share) {
 		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false

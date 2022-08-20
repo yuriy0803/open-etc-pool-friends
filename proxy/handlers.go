@@ -30,6 +30,11 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	if !s.policy.ApplyLoginPolicy(login, cs.ip) {
 		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
 	}
+	//save for later, too broad right now, bans the ip the wallet comes from, (bad if more then one miner proxies there)
+	//	if !s.policy.ApplyLoginWalletPolicy(login) {
+	//		// check to see if this wallet login is blocked in json file
+	//		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
+	//	}
 	cs.login = login
 	s.registerSession(cs)
 	log.Printf("Stratum miner connected %v@%v", login, cs.ip)
@@ -71,24 +76,38 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		log.Printf("Malformed PoW result from %s@%s %v", login, cs.ip, params)
 		return false, &ErrorReply{Code: -1, Message: "Malformed PoW result"}
 	}
+
 	go func(s *ProxyServer, cs *Session, login, id string, params []string) {
 		t := s.currentBlockTemplate()
+
+		//MFO: 	This function (s.processShare) will process a share as per hasher.Verify function of github.com/ethereum/ethash
+		//	output of this function is either:
+		//		true,true   	(Exists) which means share already exists and it is validShare
+		//		true,false		(Exists & invalid)which means share already exists and it is invalidShare or it is a block <-- should not ever happen
+		//		false,false		(stale/invalid)which means share is new, and it is not a block, might be a stale share or invalidShare
+		//		false,true		(valid)which means share is new, and it is a block or accepted share
+		//		false,false,false	(blacklisted wallet attached to share) see json file
+		//	When this function finishes, the results is already recorded in the db for valid shares or blocks.
 		exist, validShare := s.processShare(login, id, cs.ip, t, params)
 		ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
 
+		// if true,true or true,false
 		if exist {
 			log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
 			cs.lastErr = errors.New("Duplicate share")
 		}
 
+		// if false, false
 		if !validShare {
+			//MFO: Here we have an invalid share
 			log.Printf("Invalid share from %s@%s", login, cs.ip)
 			// Bad shares limit reached, return error and close
 			if !ok {
 				cs.lastErr = errors.New("Invalid share")
 			}
 		}
-
+		//MFO: Here we have a valid share and it is already recorded in DB by miner.go
+		// if false, true
 		if s.config.Proxy.Debug {
 			log.Printf("Valid share from %s@%s", login, cs.ip)
 		}
