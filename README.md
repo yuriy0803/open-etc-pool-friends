@@ -180,6 +180,8 @@ otherwise you will get errors on start because of JSON comments.**
       "workers": 8,
       "resetInterval": "60m",
       "refreshInterval": "1m",
+      //blacklist Wallet
+      "blacklist_file" : "/home/pool/open-etc-pool-friends/stratum_blacklist.json",
 
       "banning": {
         "enabled": false,
