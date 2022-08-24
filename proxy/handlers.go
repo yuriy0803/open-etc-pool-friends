@@ -20,9 +20,15 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	if len(params) == 0 {
 		return false, &ErrorReply{Code: -1, Message: "Invalid params"}
 	}
+	//If login contain information about workers name "walletId.workerName"
+	login := params[0]
+	if strings.Contains(login, ".") {
+		var workerParams = strings.Split(login, ".")
+		login = workerParams[0]
+		id = workerParams[1]
+	}
 
-	login := strings.ToLower(params[0])
-	login = strings.Split(login, ".")[0]
+	login = strings.ToLower(login)
 
 	if !util.IsValidHexAddress(login) {
 		return false, &ErrorReply{Code: -1, Message: "Invalid login"}
@@ -35,7 +41,14 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	//		// check to see if this wallet login is blocked in json file
 	//		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
 	//	}
+
+	if !workerPattern.MatchString(id) {
+		id = "0"
+	}
+
+	cs.worker = id
 	cs.login = login
+
 	s.registerSession(cs)
 	log.Printf("Stratum miner connected %v@%v", login, cs.ip)
 	return true, nil
@@ -58,13 +71,11 @@ func (s *ProxyServer) handleTCPSubmitRPC(cs *Session, id string, params []string
 	if !ok {
 		return false, &ErrorReply{Code: 25, Message: "Not subscribed"}
 	}
-	return s.handleSubmitRPC(cs, cs.login, id, params)
+	return s.handleSubmitRPC(cs, cs.login, cs.worker, params)
 }
 
 func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []string) (bool, *ErrorReply) {
-	if !workerPattern.MatchString(id) {
-		id = "0"
-	}
+
 	if len(params) != 3 {
 		s.policy.ApplyMalformedPolicy(cs.ip)
 		log.Printf("Malformed params from %s@%s %v", login, cs.ip, params)

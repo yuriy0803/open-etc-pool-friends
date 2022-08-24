@@ -45,6 +45,7 @@ type Session struct {
 	sync.Mutex
 	conn    net.Conn
 	login   string
+	worker  string
 	lastErr error
 }
 
