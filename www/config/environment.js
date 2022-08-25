@@ -25,8 +25,7 @@ module.exports = function(environment) {
         StratumHost: 'example.net',
         StratumPort: 8008,
   
-        // The ETC network used (classic, mordor)
-        Network: 'classic',
+        // The ETC network
         Unit: 'ETC',
 
         // Fee and payout details
