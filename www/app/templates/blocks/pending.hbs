@@ -8,6 +8,7 @@
         <th>Login</th>
         <th>Time Found</th>
         <th>Variance</th>
+        <th>Shares/Diff</th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,7 @@
           <span class="label label-info">{{format-number block.variance style='percent'}}</span>
           {{/if}}
         </td>
+        <td>{{format-hashrate block.shareDiff}}</td>
       </tr>
       {{/each}}
     </tbody>

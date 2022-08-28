@@ -20,6 +20,7 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	if len(params) == 0 {
 		return false, &ErrorReply{Code: -1, Message: "Invalid params"}
 	}
+
 	//If login contain information about workers name "walletId.workerName"
 	login := params[0]
 	if strings.Contains(login, ".") {
@@ -36,11 +37,6 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	if !s.policy.ApplyLoginPolicy(login, cs.ip) {
 		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
 	}
-	//save for later, too broad right now, bans the ip the wallet comes from, (bad if more then one miner proxies there)
-	//	if !s.policy.ApplyLoginWalletPolicy(login) {
-	//		// check to see if this wallet login is blocked in json file
-	//		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
-	//	}
 
 	if !workerPattern.MatchString(id) {
 		id = "0"

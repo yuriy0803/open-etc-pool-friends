@@ -29,6 +29,7 @@
         <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (30m): <span>{{format-hashrate model.currentHashrate}}</span></div>
         <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (3h): <span>{{format-hashrate model.hashrate}}</span></div>
         <div style="display: block;"><i class="fa fa-gears"></i> Personal Luck: <span>{{format-number PersonalLuck style='percent'}}</span></div>
+        <div style="display: block;"><i class="fa fa-gears"></i> Shares found: <span>{{format-hashrate model.stats.lastShareDiff}}</span></div>
         
       </div>
       <div class="col-md-4 stats">
