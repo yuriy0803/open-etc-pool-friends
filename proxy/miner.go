@@ -6,35 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/yuriy0803/etchash"
+	"github.com/ubiq/go-ubiq/common"
+	"github.com/yuriy0803/ubqhash"
 )
 
-var (
-	maxUint256                             = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
-	ecip1099FBlockClassic uint64           = 11700000 // classic mainnet
-	ecip1099FBlockMordor  uint64           = 2520000  // mordor
-	uip1FEpoch            uint64           = 22       // ubiq mainnet
-	hasher                *etchash.Etchash = nil
-)
+var hasher = ubqhash.New()
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
-
-	if hasher == nil {
-		if s.config.Network == "classic" {
-			hasher = etchash.New(&ecip1099FBlockClassic, nil)
-		} else if s.config.Network == "mordor" {
-			hasher = etchash.New(&ecip1099FBlockMordor, nil)
-		} else if s.config.Network == "ubiq" {
-			hasher = etchash.New(nil, &uip1FEpoch)
-		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" {
-			hasher = etchash.New(nil, nil)
-		} else {
-			// unknown network
-			log.Printf("Unknown network configuration %s", s.config.Network)
-			return false, false
-		}
-	}
 
 	nonceHex := params[0]
 	hashNoNonce := params[1]
