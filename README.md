@@ -264,8 +264,15 @@ otherwise you will get errors on start because of JSON comments.**
     "endpoint": "127.0.0.1:6379",
     "poolSize": 10,
     "database": 0,
-    "password": ""
-  },
+    "password": "",
+        "sentinelEnabled": false,
+        "masterName": "mymaster",
+        "sentinelAddrs": [
+            "127.0.0.1:26379",
+            "127.0.0.1:26389",
+            "127.0.0.1:26399"
+        ]
+	},
 
   "exchange": {
     "enabled": true,

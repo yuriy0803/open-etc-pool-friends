@@ -2,7 +2,7 @@
 	"threads": 4,
 	"coin": "etc",
 	"name": "main",
-    "pplns": 9000,
+        "pplns": 9000,
 	"network": "classic",
 	"coin-name":"etc",
 
@@ -27,8 +27,8 @@
 			"timeout": "120s",
 			"maxConn": 8192,
 			"tls": false,
-            "certFile": "/path/to/cert.pem",
-            "keyFile": "/path/to/key.pem"
+                        "certFile": "/path/to/cert.pem",
+                        "keyFile": "/path/to/key.pem"
 		},
 
 		"policy": {
@@ -68,11 +68,11 @@
 		"poolCharts":"*/20 * * * *",
 		"poolChartsNum":74,
 		"minerCharts":"*/20 * * * *",
-        "minerChartsNum":74,
-        "netCharts":"*/20 * * * *",
-        "netChartsNum":74,
-        "shareCharts":"*/20 * * * *",
-        "shareChartsNum":74
+                "minerChartsNum":74,
+                "netCharts":"*/20 * * * *",
+                "netChartsNum":74,
+                "shareCharts":"*/20 * * * *",
+                "shareChartsNum":74
 	},
 
 	"upstreamCheckInterval": "5s",
@@ -94,12 +94,12 @@
 		"poolSize": 10,
 		"database": 0,
 		"password": "",
-        "sentinelEnabled": false,
-        "masterName": "mymaster",
-        "sentinelAddrs": [
-            "127.0.0.1:26379",
-            "127.0.0.1:26389",
-            "127.0.0.1:26399"
+                "sentinelEnabled": false,
+                "masterName": "mymaster",
+                "sentinelAddrs": [
+            		"127.0.0.1:26379",
+           	        "127.0.0.1:26389",
+           	        "127.0.0.1:26399"
         ]
 	},
   
