@@ -23,6 +23,7 @@
         {{/if}}
         <div style="display: block;"><i class="fa fa-money"></i> Total Paid: <span>{{format-balance model.stats.paid}}</span></div>
         <div style="display: block;"><i class="fa fa-money"></i> Last 24h Reward: <span>{{format-balance model.24hreward}}</span></div>
+        <div style="display: block;"><i class="fa fa-calculator"></i>Earnings per day (3h avg):<span>{{format-number earnPerDay}}</span></div>
       </div>
       <div class="col-md-4 stats">
         {{#if model.stats.lastShare}}
