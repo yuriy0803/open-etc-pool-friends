@@ -20,16 +20,15 @@ import (
 const txCheckInterval = 5 * time.Second
 
 type PayoutsConfig struct {
-	Enabled        bool   `json:"enabled"`
-	RequirePeers   int64  `json:"requirePeers"`
-	Interval       string `json:"interval"`
-	Daemon         string `json:"daemon"`
-	Timeout        string `json:"timeout"`
-	Address        string `json:"address"`
-	Gas            string `json:"gas"`
-	GasPrice       string `json:"gasPrice"`
-	AutoGas        bool   `json:"autoGas"`
-	MaxPriorityFee string `json:"maxPriorityFee"`
+	Enabled      bool   `json:"enabled"`
+	RequirePeers int64  `json:"requirePeers"`
+	Interval     string `json:"interval"`
+	Daemon       string `json:"daemon"`
+	Timeout      string `json:"timeout"`
+	Address      string `json:"address"`
+	Gas          string `json:"gas"`
+	GasPrice     string `json:"gasPrice"`
+	AutoGas      bool   `json:"autoGas"`
 	// In Shannon
 	Threshold    int64 `json:"threshold"`
 	BgSave       bool  `json:"bgsave"`
@@ -43,11 +42,6 @@ func (self PayoutsConfig) GasHex() string {
 
 func (self PayoutsConfig) GasPriceHex() string {
 	x := util.String2Big(self.GasPrice)
-	return hexutil.EncodeBig(x)
-}
-
-func (self PayoutsConfig) MaxPriorityFeeHex() string {
-	x := util.String2Big(self.MaxPriorityFee)
 	return hexutil.EncodeBig(x)
 }
 
@@ -189,7 +183,7 @@ func (u *PayoutsProcessor) process() {
 		}
 
 		value := hexutil.EncodeBig(amountInWei)
-		txHash, err := u.rpc.SendTransaction(u.config.Address, login, u.config.GasHex(), u.config.GasPriceHex(), u.config.MaxPriorityFeeHex(), value, u.config.AutoGas)
+		txHash, err := u.rpc.SendTransaction(u.config.Address, login, u.config.GasHex(), u.config.GasPriceHex(), value, u.config.AutoGas)
 		if err != nil {
 			log.Printf("Failed to send payment to %s, %v Shannon: %v. Check outgoing tx for %s in block explorer and docs/PAYOUTS.md",
 				login, amount, err, login)

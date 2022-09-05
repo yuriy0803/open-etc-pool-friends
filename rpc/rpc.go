@@ -206,7 +206,7 @@ func (r *RPCClient) GetPeerCount() (int64, error) {
 	return strconv.ParseInt(strings.Replace(reply, "0x", "", -1), 16, 64)
 }
 
-func (r *RPCClient) SendTransaction(from, to, gas, gasPrice, maxPriorityFee, value string, autoGas bool) (string, error) {
+func (r *RPCClient) SendTransaction(from, to, gas, gasPrice, value string, autoGas bool) (string, error) {
 	params := map[string]string{
 		"from":  from,
 		"to":    to,
@@ -216,11 +216,8 @@ func (r *RPCClient) SendTransaction(from, to, gas, gasPrice, maxPriorityFee, val
 		// Sends as Legacy TX
 		params["gas"] = gas
 		params["gasPrice"] = gasPrice
-	} else {
-		// Sends as EIP1559 TX
-		params["gas"] = gas
-		params["maxPriorityFeePerGas"] = maxPriorityFee
 	}
+
 	rpcResp, err := r.doPost(r.Url, "eth_sendTransaction", []interface{}{params})
 	var reply string
 	if err != nil {
