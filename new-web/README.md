@@ -14,7 +14,7 @@ cp params/example.config.json params/config.json
 nano params/config.json
 ```
 
-See: [params/README.md](https://github.com/etclabscore/vue-core-pool/blob/master/params/README.md) for more details.
+See: [params/README.md](https://github.com/yuriy0803/open-etc-pool-friends/blob/master/new-web/params/README.md) for more details.
 
 ## Build Setup
 
