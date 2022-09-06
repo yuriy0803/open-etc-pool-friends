@@ -6,8 +6,8 @@ vue based frontend for core-pool
 
 ```bash
 # clone the repo
-git clone https://github.com/etclabscore/vue-core-pool.git
-cd vue-core-pool
+git clone https://github.com/yuriy0803/open-etc-pool-friends.git
+cd new-web
 
 # configure
 cp params/example.config.json params/config.json
@@ -40,7 +40,7 @@ For detailed explanation on how things work, check out [Nuxt.js docs](https://nu
 
 your.pool.domain.com {
   file_server
-  root * /home/etclabscore/vue-core-pool/dist
+  root * /home/pool/open-etc-pool-friends/new-web/dist
   try_files {path} /index.html
   encode gzip
 }
@@ -54,8 +54,8 @@ vue-core-pool is built using [Vue.js](https://vuejs.org/), [NuxtJS](https://nuxt
 
 ### index page
 
-![index/miners page](screenshots/01.png "index/miners page")
+![index/miners page](/screenshots/01.png?raw=true "index/miners page")
 
 ### pool blocks page
 
-![pool blocks page](screenshots/02.png "pool blocks page")
+![pool blocks page](/screenshots/02.png?raw=true "pool blocks page")
