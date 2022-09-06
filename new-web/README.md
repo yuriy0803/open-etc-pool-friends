@@ -58,4 +58,4 @@ vue-core-pool is built using [Vue.js](https://vuejs.org/), [NuxtJS](https://nuxt
 
 ### pool blocks page
 
-![pool blocks page](/screenshots/02.png?raw=true "pool blocks page")
+![pool blocks page](screenshots/02.png "pool blocks page")
