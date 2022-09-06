@@ -1,0 +1,96 @@
+{
+    "menu": {
+        "home": "Home",
+        "blocks": "Pool Blocks",
+        "payments": "Payments",
+        "help": "Help",
+        "miningPool": "mining pool",
+        "minimize": "Minimize"
+    },
+    "info": {
+        "pool": {
+            "title": "POOL",
+            "hashrate": "Hashrate",
+            "lastBlock": "Last Block",
+            "miners": "Online",
+            "fee": "Fee"
+        },
+        "network": {
+            "title": "NETWORK",
+            "height": "Block Height",
+            "difficulty": "Difficulty",
+            "hashrate": "Hashrate",
+            "epoch": "Epoch",
+            "dag": "DAG"
+        },
+        "hide": "Hide"
+    },
+    "pages": {
+        "home": {
+            "testnetAlert": "This pool is configured for the {title}. The {symbol} rewarded is testnet {symbol}.",
+            "minimumPayout": "Min. payout threshold: {threshold} {symbol}.",
+            "mode": "{mode} stable and profitable pool with regular payouts.",
+            "poweredBy": "Powered by",
+            "protocols": "Getwork & Stratum supported.",
+            "account": "Account",
+            "hashrate": "Hashrate",
+            "lastBeat": "Last Beat",
+            "noMiners": "No miners connected",
+            "minersPerPage": "Miners per page",
+            "search": "Search by account"
+        },
+        "blocks": {
+            "blocks": "Blocks",
+            "shares": "Shares/Diff",
+            "uncleRate": "Uncle Rate",
+            "orphanRate": "Orphan Rate",
+            "immature": "Immature",
+            "newBlocks": "New Blocks",
+            "noMatured": "No matured blocks",
+            "noImmature": "No immature blocks",
+            "noPending": "No pending blocks",
+            "blocksPerPage": "Blocks per page",
+            "search": "Search by number or hash",
+            "blockNumber": "Block Number",
+            "blockHash": "Block Hash",
+            "timeFound": "Time Found",
+            "variance": "Variance",
+            "reward": "Reward",
+            "type": "Type",
+            "block": "Block",
+            "uncle": "Uncle",
+            "orphan": "Orphan"
+        },
+        "payments": {
+            "latestPayments": "Latest Payments",
+            "noPayments": "No payments found",
+            "paymentsPerPage": "Payments per page",
+            "search": "Search by address or txn hash",
+            "time": "Time",
+            "address": "Address",
+            "txid": "Tx ID",
+            "amount": "Amount"
+        },
+        "account": {
+            "immatureBal": "IMMATURE BAL.",
+            "pendingBal": "PENDING BAL.",
+            "totalPaid": "TOTAL PAID",
+            "lastShare": "LAST SHARE",
+            "hashrate30min": "HASHRATE (30min)",
+            "hashrate3hour": "HASHRATE (3h)",
+            "blocksFound": "BLOCKS FOUND",
+            "workersOnline": "WORKERS ONLINE",
+            "roundShare": "YOUR ROUND SHARE",
+            "info": "Your average hashrate will be smoothly adjusted until you have shares to fullfill estimation window. There are two windows, long and short, first is equal to about 30 minutes and long window is usually equal to 3 hours. Dead (sick) workers will be highlighted in a table of workers if they didn't submit a share for 1/2 of short window, so you can perform maintenance of your rigs.",
+            "jsonApi": "Your bulk stats JSON API URL:",
+            "workers": "Workers",
+            "payments": "Payments",
+            "worker": {
+                "id": "ID",
+                "hashrateShort": "Hashrate (rough, short average)",
+                "hashrateLong": "Hashrate (accurate, long average)",
+                "lastShare": "Last Share"
+            }
+        }
+    }
+}

@@ -1,0 +1,96 @@
+{
+  "menu": {
+      "home": "开始",
+      "blocks": "区块",
+      "payments": "付款方式",
+      "help": "帮助",
+      "miningPool": "矿池",
+      "minimize": "最小化"
+  },
+  "info": {
+      "pool": {
+          "title": "名称",
+          "hashrate": "哈希率",
+          "lastBlock": "最新区块",
+          "miners": "矿工",
+          "fee": "费用"
+      },
+      "network": {
+          "title": "名称",
+          "height": "块高",
+          "difficulty": "难度",
+          "hashrate": "哈希率",
+          "epoch": "Epoch",
+          "dag": "DAG"
+      },
+      "hide": "隐藏"
+  },
+  "pages": {
+      "home": {
+          "testnetAlert": "已为{title}配置了该池。 奖励的{symbol}是测试网{symbol}。",
+          "minimumPayout": "最低付款额度：{threshold} {symbol}。",
+          "mode": "{mode}稳定且可盈利的定期付款池。",
+          "poweredBy": "基于",
+          "protocols": "支持Getwork和Stratum。",
+          "account": "帐户",
+          "hashrate": "哈希率",
+          "lastBeat": "最近上线",
+          "noMiners": "无连接矿工",
+          "minersPerPage": "每页矿工数",
+          "search": "搜索"
+      },
+      "blocks": {
+          "blocks": "区块",
+          "shares": "份额",
+          "uncleRate": "叔块率",
+          "orphanRate": "孤块率",
+          "immature": "待确认",
+          "newBlocks": "新区块",
+          "noMatured": "无已确认的区块",
+          "noImmature": "无待确认的区块",
+          "noPending": "无待处理的区块",
+          "blocksPerPage": "每页块数",
+          "search": "搜索",
+          "blockNumber": "块号",
+          "blockHash": "区块哈希",
+          "timeFound": "发现时间",
+          "variance": "回报方差",
+          "reward": "奖励",
+          "type": "类型",
+          "block": "区块",
+          "uncle": "叔块",
+          "orphan": "孤块"
+      },
+      "payments": {
+          "latestPayments": "最新付款",
+          "noPayments": "无付款记录",
+          "paymentsPerPage": "每页付款数",
+          "search": "搜索",
+          "time": "时间",
+          "address": "地址",
+          "txid": "交易编号",
+          "amount": "数量"
+      },
+      "account": {
+          "immatureBal": "未确认的余额",
+          "pendingBal": "待确认余额",
+          "totalPaid": "总支付",
+          "lastShare": "最近份额",
+          "hashrate30min": "哈希率（30分钟）",
+          "hashrate3hour": "哈希率（3小时）",
+          "blocksFound": "发现的块",
+          "workersOnline": "在线矿工",
+          "roundShare": "您的份额",
+          "info": "您的平均哈希率将被平滑地调整，直到您有要完全满足估计值的份额为止。有长、短两个时间窗口，前者通常等于3小时，后者等于大约30分钟。列表中会显示未在短窗口的1/2时间内提交份额的矿工，以便您进行矿机维护。",
+          "jsonApi": "您的批量统计信息JSON API URL:",
+          "workers": "矿工",
+          "payments": "付款方式",
+          "worker": {
+              "id": "ID",
+              "hashrateShort": "哈希率（粗略，短期平均）",
+              "hashrateLong": "哈希率（准确，长期平均）",
+              "lastShare": "最近份额"
+          }
+      }
+  }
+}

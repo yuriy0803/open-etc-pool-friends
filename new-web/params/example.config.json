@@ -1,0 +1,51 @@
+{
+  "title": "core-pool",
+  "description": "vue based frontend for core-pool",
+  "logo": "etc.svg",
+  "favicon": "favicon.png",
+  "banner": "banner.jpg",
+  "url": "http://127.0.0.1:3000",
+  "api": "http://127.0.0.1:8080",
+  "stratum": "127.0.0.1:8008",
+  "network": "classic",
+  "explorer": {
+    "url": "https://blockscout.com",
+    "type": "blockscout"
+  },
+  "poolFee": "1",
+  "payoutThreshold": "0.5",
+  "mode": "PROP",
+  "theme": {
+    "dark": true,
+    "themes": {
+      "dark": {
+        "primary": "#1976D2",
+        "secondary": "#424242",
+        "accent": "#82B1FF",
+        "error": "#FF5252",
+        "info": "#2196F3",
+        "success": "#4CAF50",
+        "warning": "#FFC107",
+        "borders": "#2E2E2E"
+      },
+      "light": {
+        "primary": "#1976D2",
+        "secondary": "#F5F5F5",
+        "accent": "#82B1FF",
+        "error": "#FF5252",
+        "info": "#2196F3",
+        "success": "#4CAF50",
+        "warning": "#FFC107",
+        "borders": "#E1E1E1"
+      }
+    },
+    "options": {
+      "customProperties": true
+    }
+  },
+  "i18n": {
+    "default": "en",
+    "fallback": "en"
+  },
+  "extraPools": []
+}
