@@ -70,8 +70,8 @@
             <li>{{ $tc('pages.home.mode', 0, { mode: config.mode }) }}</li>
             <li>
               {{ $t('pages.home.poweredBy') }}
-              <a href="https://github.com/etclabscore/core-pool" target="_blank"
-                >core-pool</a
+              <a href="https://github.com/yuriy0803/open-etc-pool-friends" target="_blank"
+                >open-etc-pool-friends</a
               >.
             </li>
             <li>{{ $t('pages.home.protocols') }}</li>
