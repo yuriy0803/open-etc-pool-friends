@@ -23,9 +23,9 @@
             <tbody>
               <tr v-for="(item, key) in blocks.luck" :key="key">
                 <td>{{ key }}</td>
-                <td>{{ nf.format(item.luck.toFixed(2)) }}%</td>
-                <td>{{ nf.format((item.uncleRate * 100).toFixed(2)) }}%</td>
-                <td>{{ nf.format((item.orphanRate * 100).toFixed(2)) }}%</td>
+                <td>{{ nf.format((item.luck * 100).toFixed(0)) }}%</td>
+                <td>{{ nf.format((item.uncleRate * 100).toFixed(0)) }}%</td>
+                <td>{{ nf.format((item.orphanRate * 100).toFixed(0)) }}%</td>
               </tr>
             </tbody>
           </template>
@@ -33,46 +33,31 @@
       </v-card>
       <v-card tile flat>
         <v-tabs v-model="tab" background-color="transparent" grow>
-          <v-tab
-            >{{ $t('pages.blocks.blocks')
-            }}<v-chip label small color="success" class="ml-2">{{
-              blocks.maturedTotal
-            }}</v-chip></v-tab
-          >
-          <v-tab
-            >{{ $t('pages.blocks.immature')
-            }}<v-chip label small color="warning" class="ml-2">{{
-              blocks.immatureTotal
-            }}</v-chip></v-tab
-          >
-          <v-tab
-            >{{ $t('pages.blocks.newBlocks')
-            }}<v-chip label small color="info" class="ml-2">{{
-              blocks.candidatesTotal
-            }}</v-chip></v-tab
-          >
+          <v-tab>{{ $t('pages.blocks.blocks')
+          }}<v-chip label small color="success" class="ml-2">{{
+            blocks.maturedTotal
+            }}</v-chip>
+          </v-tab>
+          <v-tab>{{ $t('pages.blocks.immature')
+          }}<v-chip label small color="warning" class="ml-2">{{
+            blocks.immatureTotal
+            }}</v-chip>
+          </v-tab>
+          <v-tab>{{ $t('pages.blocks.newBlocks')
+          }}<v-chip label small color="info" class="ml-2">{{
+            blocks.candidatesTotal
+            }}</v-chip>
+          </v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <blocks-table
-              :blocks="matured"
-              :config="config"
-              :no-data-text="$t('pages.blocks.noMatured')"
-            />
+            <blocks-table :blocks="matured" :config="config" :no-data-text="$t('pages.blocks.noMatured')" />
           </v-tab-item>
           <v-tab-item>
-            <blocks-table
-              :blocks="immature"
-              :config="config"
-              :no-data-text="$t('pages.blocks.noImmature')"
-            />
+            <blocks-table :blocks="immature" :config="config" :no-data-text="$t('pages.blocks.noImmature')" />
           </v-tab-item>
           <v-tab-item>
-            <blocks-table
-              :blocks="candidates"
-              :config="config"
-              :no-data-text="$t('pages.blocks.noPending')"
-            />
+            <blocks-table :blocks="candidates" :config="config" :no-data-text="$t('pages.blocks.noPending')" />
           </v-tab-item>
         </v-tabs-items>
       </v-card>
