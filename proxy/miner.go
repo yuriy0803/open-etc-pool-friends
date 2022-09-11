@@ -23,6 +23,8 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	if hasher == nil {
 		if s.config.Network == "classic" {
 			hasher = etchash.New(&ecip1099FBlockClassic, nil)
+		} else if s.config.Network == "etica" {
+			hasher = etchash.New(nil, nil)
 		} else if s.config.Network == "mordor" {
 			hasher = etchash.New(&ecip1099FBlockMordor, nil)
 		} else if s.config.Network == "ubiq" {
@@ -79,12 +81,12 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	if s.config.Proxy.Debug {
 		log.Printf("Difficulty pool Port/Shares found/Block difficulty  = %d / %d / %d from %v@%v", shareDiff, actualDiff, t.Difficulty, login, ip)
 	}
-
+	
 	if !isShare {
 		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
 	}
-
+	
 	isBlock, _ := hasher.Verify(block)
 
 	if isBlock {
