@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/etclabscore/core-geth/common/math"
 
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
@@ -626,7 +626,7 @@ func getConstReward(era *big.Int) *big.Int {
 	return wr
 }
 
-//etchash
+// etchash
 func getRewardForUncle(blockReward *big.Int) *big.Int {
 	return new(big.Int).Div(blockReward, big32) //return new(big.Int).Div(reward, new(big.Int).SetInt64(32))
 }
@@ -669,10 +669,10 @@ func getConstRewardUbiq(height int64) *big.Int {
 		reward = big.NewInt(4e+18)
 		// Year 4
 	}
-   // If Orion use new MP
-  if headerNumber.Cmp(big.NewInt(1791793)) >= 0 {
-    reward = big.NewInt(15e+17)
-  }
+	// If Orion use new MP
+	if headerNumber.Cmp(big.NewInt(1791793)) >= 0 {
+		reward = big.NewInt(15e+17)
+	}
 
 	return reward
 }
