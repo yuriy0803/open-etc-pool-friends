@@ -76,6 +76,8 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	} else if network == "ropsten" {
 		cfg.ByzantiumFBlock = big.NewInt(1700000)
 		cfg.ConstantinopleFBlock = big.NewInt(4230000)
+	} else if network == "callisto" {
+		// nothing needs configuring here, simply proceed.
 	} else if network == "ubiq" {
 		// nothing needs configuring here, simply proceed.
 	} else {
@@ -268,6 +270,13 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
 
+	} else if u.config.Network == "callisto" {
+		reward = getConstRewardcallisto(candidate.Height)
+		// Add reward for including uncles
+		uncleReward := new(big.Int).Div(reward, big32)
+		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+		reward.Add(reward, rewardForUncles)
+
 	} else if u.config.Network == "ethereum" || u.config.Network == "ropsten" {
 		reward = getConstRewardEthereum(candidate.Height, u.config)
 		// Add reward for including uncles
@@ -306,6 +315,8 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleReward(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), era, getConstReward(era))
 	} else if cfg.Network == "ubiq" {
 		reward = getUncleRewardUbiq(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
+	} else if cfg.Network == "callisto" {
+		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardcallisto(height))
 	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
 	}
@@ -677,6 +688,20 @@ func getConstRewardUbiq(height int64) *big.Int {
 	return reward
 }
 
+func calcBigNumber(reward float64) *big.Int {
+	bigReward := new(big.Float).Mul(big.NewFloat(reward), big.NewFloat(1e+18))
+	bigRewardInt := new(big.Int)
+	bigReward.Int(bigRewardInt)
+	return bigRewardInt
+}
+
+// callisto
+func getConstRewardcallisto(height int64) *big.Int {
+	// Rewards)
+	// callisto
+	return calcBigNumber(38.88)
+}
+
 // ubqhash
 func getUncleRewardUbiq(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
 
@@ -710,7 +735,7 @@ func getConstRewardEthereum(height int64, cfg *UnlockerConfig) *big.Int {
 	return reward
 }
 
-// ethash
+// ethash callisto
 func getUncleRewardEthereum(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
 	r := new(big.Int)
 	r.Add(uHeight, big8)

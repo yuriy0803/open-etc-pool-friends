@@ -25,6 +25,8 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 			hasher = etchash.New(&ecip1099FBlockClassic, nil)
 		} else if s.config.Network == "mordor" {
 			hasher = etchash.New(&ecip1099FBlockMordor, nil)
+		} else if s.config.Network == "callisto" {
+			hasher = etchash.New(nil, nil)
 		} else if s.config.Network == "ubiq" {
 			hasher = etchash.New(nil, &uip1FEpoch)
 		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" {
