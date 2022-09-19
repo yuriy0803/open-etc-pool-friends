@@ -1,9 +1,12 @@
 ## Open Source Ethereum Mining Pool PPLNS / SOLO
 
 ### Donations
-* ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
 
+* 1Pool ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
 
+* miningcrypto.live ETC: 0x2Be9A2d9E586C0f6476ff2b1f074c4BE9Ddb7549
+
+0x2Be9A2d9E586C0f6476ff2b1f074c4BE9Ddb7549
 ### Features
 
 ### Email: office.poolnode@gmail.com
