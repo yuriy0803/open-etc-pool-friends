@@ -28,7 +28,7 @@
 
 Dependencies:
 
-  * go >= 1.13
+  * go >= 1.19
   * core-geth
   * redis-server >= 2.8.0
   * nodejs >= 4 LTS
