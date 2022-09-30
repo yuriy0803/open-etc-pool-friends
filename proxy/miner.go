@@ -23,6 +23,8 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	if hasher == nil {
 		if s.config.Network == "classic" {
 			hasher = etchash.New(&ecip1099FBlockClassic, nil)
+		} else if s.config.Network == "etica" {
+			hasher = etchash.New(nil, nil)
 		} else if s.config.Network == "mordor" {
 			hasher = etchash.New(&ecip1099FBlockMordor, nil)
 		} else if s.config.Network == "callisto" {
