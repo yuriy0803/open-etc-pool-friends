@@ -78,8 +78,6 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 		cfg.ConstantinopleFBlock = big.NewInt(4230000)
 	} else if network == "callisto" {
 		// nothing needs configuring here, simply proceed.
-	} else if network == "etica" {
-		cfg.ConstantinopleFBlock = big.NewInt(0)
 	} else if network == "ubiq" {
 		// nothing needs configuring here, simply proceed.
 	} else {
@@ -279,7 +277,7 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
 
-	} else if u.config.Network == "ethereum" || u.config.Network == "ropsten" || u.config.Network == "etica" {
+	} else if u.config.Network == "ethereum" || u.config.Network == "ropsten" {
 		reward = getConstRewardEthereum(candidate.Height, u.config)
 		// Add reward for including uncles
 		uncleReward := new(big.Int).Div(reward, big32)
@@ -319,7 +317,7 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleRewardUbiq(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
 	} else if cfg.Network == "callisto" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardcallisto(height))
-	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" || cfg.Network == "etica" {
+	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
 	}
 	candidate.Height = height
@@ -396,7 +394,6 @@ func (u *BlockUnlocker) unlockPendingBlocks() {
 			log.Printf("Failed to calculate rewards for round %v: %v", block.RoundKey(), err)
 			return
 		}
-		log.Printf("RoundRewards 2 %v", roundRewards)
 		err = u.backend.WriteImmatureBlock(block, roundRewards)
 		if err != nil {
 			u.halt = true
@@ -494,7 +491,6 @@ func (u *BlockUnlocker) unlockAndCreditMiners() {
 	totalPoolProfit := new(big.Rat)
 
 	for _, block := range result.maturedBlocks {
-		log.Printf("Blocks 2 %v", block)
 		revenue, minersProfit, poolProfit, roundRewards, percents, err := u.calculateRewards(block)
 		if err != nil {
 			u.halt = true
@@ -728,9 +724,9 @@ func getConstRewardEthereum(height int64, cfg *UnlockerConfig) *big.Int {
 	// Select the correct block reward based on chain progression
 	blockReward := frontierBlockReward
 	headerNumber := big.NewInt(height)
-	//if cfg.ByzantiumFBlock.Cmp(headerNumber) <= 0 {
-	//	blockReward = byzantiumBlockReward
-	//}
+	if cfg.ByzantiumFBlock.Cmp(headerNumber) <= 0 {
+		blockReward = byzantiumBlockReward
+	}
 	if cfg.ConstantinopleFBlock.Cmp(headerNumber) <= 0 {
 		blockReward = constantinopleBlockReward
 	}

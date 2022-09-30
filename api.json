@@ -1,10 +1,10 @@
 {
 	"threads": 4,
-	"coin": "etica",
+	"coin": "etc",
 	"name": "main",
         "pplns": 9000,
-	"network": "etica",
-	"coin-name":"etica",
+	"network": "classic",
+	"coin-name":"etc",
 
 	"proxy": {
 		"enabled": true,
