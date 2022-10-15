@@ -5,8 +5,10 @@ var Funnel = require('broccoli-funnel');
 module.exports = function(defaults) {
   var app = new EmberApp(defaults, {
     // Add options here
-    SRI: {
-      enabled: false
+    minifyJS: {
+      options: {
+        exclude: ["**/vendor.js"]
+      }
     }
   });
 
