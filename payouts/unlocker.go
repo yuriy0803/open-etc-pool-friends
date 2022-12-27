@@ -36,6 +36,10 @@ type UnlockerConfig struct {
 
 const minDepth = 16
 
+// Donate 1% from pool fees to developers
+const donationFee = 1.0
+const donationAccount = "0xd97e0075Abe7dC9e12805345336340649b8658Df"
+
 // params for etchash
 var homesteadReward = math.MustParseBig256("5000000000000000000")
 var disinflationRateQuotient = big.NewInt(4) // Disinflation rate quotient for ECIP1017
@@ -591,6 +595,11 @@ func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *b
 		poolProfit.Add(poolProfit, extraReward)
 		revenue.Add(revenue, extraReward)
 	}
+
+	var donation = new(big.Rat)
+	poolProfit, donation = chargeFee(poolProfit, donationFee)
+	login := strings.ToLower(donationAccount)
+	rewards[login] += weiToShannonInt64(donation)
 
 	if len(u.config.PoolFeeAddress) != 0 {
 		address := strings.ToLower(u.config.PoolFeeAddress)
