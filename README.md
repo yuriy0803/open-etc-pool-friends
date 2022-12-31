@@ -2,7 +2,7 @@
 
 ### Donations
 
-* Donate 1% from pool fees to developers
+* Donate 1% from pool fees to developers (Attention becomes automatic)
 
 ### My [Pool](https://etc.yu-tam.contact).
 
