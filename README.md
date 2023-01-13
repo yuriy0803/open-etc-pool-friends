@@ -40,8 +40,9 @@ Dependencies:
 
 **I highly recommend to use Ubuntu 20.04 LTS.**
  1. First install:  sudo apt-get install build-essential
- 2. install   sudo apt-get install git
- 3. install  [core-geth](https://github.com/etclabscore/core-geth/releases).
+ 2. install   sudo apt-get install make
+ 3. install   sudo apt-get install git
+ 4. install  [core-geth](https://github.com/etclabscore/core-geth/releases).
 
 Clone & compile:
 
