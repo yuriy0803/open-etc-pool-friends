@@ -51,16 +51,16 @@ Clone & compile:
     
     git clone https://github.com/yuriy0803/open-etc-pool-friends.git
     cd open-etc-pool-friends
-    cd build
-    chmod 755 env.sh
-    cd ..
-    make
+   
+    go build
+
+
 
 Install redis-server.
 
 ### Running Pool
 
-    ./build/bin/open-etc-pool-friends api.json
+    ./open-etc-pool-friends api.json
 
 You can use Ubuntu upstart - check for sample config in <code>upstart.conf</code>.
 
