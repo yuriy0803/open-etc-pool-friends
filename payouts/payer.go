@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/etclabscore/core-geth/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"

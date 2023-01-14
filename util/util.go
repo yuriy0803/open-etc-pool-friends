@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/etclabscore/core-geth/common"
-	"github.com/etclabscore/core-geth/common/hexutil"
-	"github.com/etclabscore/core-geth/common/math"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
 )
 
 var Ether = math.BigPow(10, 18)

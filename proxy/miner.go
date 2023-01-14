@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/etclabscore/core-geth/common"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/yuriy0803/etchash"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
