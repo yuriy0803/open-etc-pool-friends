@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/etclabscore/core-geth/common/math"
+	"github.com/ethereum/go-ethereum/common/math"
 
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
