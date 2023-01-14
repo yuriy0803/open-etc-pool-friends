@@ -6,7 +6,8 @@ go 1.15
 require (
 	github.com/btcsuite/btcd v0.21.0-beta // indirect
 	github.com/edsrzf/mmap-go v1.0.0
-	github.com/yuriy0803/etchash v0.0.0-20210517131846-9a3cc202249e
+	github.com/etclabscore/go-etchash v0.0.0-20210517131846-9a3cc202249e
+  github.com/yuriy0803/etchash@v0.0.0-20230113224804-d6bba643cea9
 	github.com/ethereum/go-ethereum v1.10.3
 	github.com/garyburd/redigo v1.6.2 // indirect
 	github.com/gorilla/mux v1.8.0
