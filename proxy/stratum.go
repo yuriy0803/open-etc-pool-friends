@@ -357,51 +357,7 @@ func (cs *Session) sendTCPResult(id json.RawMessage, result interface{}) error {
 // cache stale jobs
 
 
-func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
-	cs.Lock()
-	defer cs.Unlock()
 
-	if cs.stratumMode() == NiceHash {
-		cs.cacheStales(10, 3)
-
-		t := result.(*[]string)
-		cs.JobDetails = jobDetails{
-			JobID:      randomHex(8),
-			SeedHash:   (*t)[1],
-			HeaderHash: (*t)[0],
-			Height:     (*t)[3],
-		}
-
-		// strip 0x prefix
-		if cs.JobDetails.SeedHash[0:2] == "0x" {
-			cs.JobDetails.SeedHash = cs.JobDetails.SeedHash[2:]
-			cs.JobDetails.HeaderHash = cs.JobDetails.HeaderHash[2:]
-		}
-
-		a := s.currentBlockTemplate()
-
-		resp := JSONStratumReq{
-			Method: "mining.notify",
-			Params: []interface{}{
-				cs.JobDetails.JobID,
-				cs.JobDetails.SeedHash,
-				cs.JobDetails.HeaderHash,
-				// If set to true, then miner needs to clear queue of jobs and immediatelly
-				// start working on new provided job, because all old jobs shares will
-				// result with stale share error.
-				//
-				// if true, NiceHash charges "Extra Rewards" for frequent job changes
-				// if false, the stale rate might be higher because miners take too long to switch jobs
-				//
-				// It's undetermined what's more cost-effective
-				false,
-			},
-
-			Height: util.ToHex1(int64(a.Height)),
-			Algo:   "etchash",
-		}
-		return cs.enc.Encode(&resp)
-	}
 	// FIXME: Temporarily add ID for Claymore compliance
 	message := JSONPushMessage{Version: "2.0", Result: result, Id: 0}
 	return cs.enc.Encode(&message)
