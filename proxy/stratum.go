@@ -359,9 +359,7 @@ func (cs *Session) sendTCPResult(id json.RawMessage, result interface{}) error {
 
 
 	// FIXME: Temporarily add ID for Claymore compliance
-	message := JSONPushMessage{Version: "2.0", Result: result, Id: 0}
-	return cs.enc.Encode(&message)
-}
+	
 
 func (cs *Session) sendTCPError(id json.RawMessage, reply *ErrorReply) error {
 	cs.Lock()
