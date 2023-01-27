@@ -355,24 +355,7 @@ func (cs *Session) sendTCPResult(id json.RawMessage, result interface{}) error {
 }
 
 // cache stale jobs
-func (cs *Session) cacheStales(max, n int) {
-	l := len(cs.staleJobIDs)
-	// remove outdated stales except last n caches if l > max
-	if l > max {
-		save := cs.staleJobIDs[l-n : l]
-		del := cs.staleJobIDs[0 : l-n]
-		for _, v := range del {
-			delete(cs.staleJobs, v)
-		}
-		cs.staleJobIDs = save
-	}
-	// save stales cache
-	cs.staleJobs[cs.JobDetails.JobID] = staleJob{
-		cs.JobDetails.SeedHash,
-		cs.JobDetails.HeaderHash,
-	}
-	cs.staleJobIDs = append(cs.staleJobIDs, cs.JobDetails.JobID)
-}
+
 
 func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
 	cs.Lock()
