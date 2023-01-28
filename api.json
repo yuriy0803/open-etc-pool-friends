@@ -65,13 +65,13 @@
 		"luckWindow": [64, 128, 256],
 		"payments": 30,
 		"blocks": 50,
-		"poolCharts":"*/20 * * * *",
+		"poolCharts":":"0 */20 * * * *",
 		"poolChartsNum":74,
-		"minerCharts":"*/20 * * * *",
+		"minerCharts":"0 */20 * * * *",
                 "minerChartsNum":74,
-                "netCharts":"*/20 * * * *",
+                "netCharts":"0 */20 * * * *",
                 "netChartsNum":74,
-                "shareCharts":"*/20 * * * *",
+                "shareCharts":"0 */20 * * * *",
                 "shareChartsNum":74
 	},
 
