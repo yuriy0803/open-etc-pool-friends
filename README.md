@@ -44,7 +44,7 @@ Dependencies:
     $ sudo apt-get install golang
     
 ### Install npm
-    sudo apt-get  install npm
+    sudo apt-get install npm
 
 ### Install redis-server
 
