@@ -102,7 +102,7 @@ WantedBy=multi-user.target
 
 ```
     
-Then run multi-geth by the following commands
+Then run core-geth by the following commands
 
     $ sudo systemctl enable geth
     $ sudo systemctl start geth
@@ -197,7 +197,14 @@ RestartSec=3
 [Install]
 WantedBy=multi-user.target
 ```
+Then run api by the following commands
 
+    $ sudo systemctl enable geth
+    $ sudo systemctl start geth
+
+If you want to debug the node command
+
+    $ sudo systemctl status geth
 
 As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
 
