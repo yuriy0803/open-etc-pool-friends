@@ -42,6 +42,9 @@ Dependencies:
 
     $ sudo apt-get update && apt-get upgrade
     $ sudo apt-get install golang
+    
+### Install npm
+    sudo apt-get  install npm
 
 ### Install redis-server
 
