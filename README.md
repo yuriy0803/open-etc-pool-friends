@@ -181,16 +181,20 @@ Copy the following example
 
 ```
 [Unit]
-Description=Etherpool
-After=callisto.target
+Description=geth
+After=network-online.target
 
 [Service]
-Type=simple
 ExecStart=/home/pool/open-etc-pool-friends /home/pool/api.json
+
+User=pool
+
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
-```
+
 
 As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
 
