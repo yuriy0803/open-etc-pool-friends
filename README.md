@@ -204,7 +204,7 @@ Then run api by the following commands
 
 If you want to debug the node command
 
-    $ sudo systemctl status geth
+    $ sudo systemctl status api
 
 As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
 
