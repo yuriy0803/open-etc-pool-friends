@@ -61,14 +61,15 @@ This will install the latest nodejs
 
     $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     $ sudo apt-get install -y nodejs
+    
+### Run core-geth   
 
 **I highly recommend to use Ubuntu 20.04 LTS.**
  1. First install:  sudo apt-get install build-essential
  2. install   sudo apt-get install make
  3. install   sudo apt-get install git
  4. install  [core-geth](https://github.com/etclabscore/core-geth/releases).
- 
- ### Run core-geth
+
  
  Run console 
  
