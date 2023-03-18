@@ -224,7 +224,7 @@ Modify based on configuration file.
     server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        root /home/<your-user-name>/www;
+        root /var/www/etc2pool;
 
         # Add index.php to the list if you are using PHP
         index index.html index.htm index.nginx-debian.html;
