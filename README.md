@@ -41,7 +41,7 @@ Dependencies:
 ### Install go lang
 
     $ sudo apt-get update && apt-get upgrade
-    $ sudo apt-get install golang-go
+    $ sudo apt-get install golang
 
 ### Install redis-server
 
