@@ -143,7 +143,6 @@ The frontend is a single-page Ember.js application that polls the pool API to re
 
     ./open-etc-pool-friends api.json
 
-You can use Ubuntu upstart - check for sample config in <code>upstart.conf</code>.
 
 ### Building Frontend
 
