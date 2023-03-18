@@ -183,7 +183,7 @@ Copy the following example
 
 ```
 [Unit]
-Description=geth
+Description=api
 After=network-online.target
 
 [Service]
@@ -199,8 +199,8 @@ WantedBy=multi-user.target
 ```
 Then run api by the following commands
 
-    $ sudo systemctl enable geth
-    $ sudo systemctl start geth
+    $ sudo systemctl enable api
+    $ sudo systemctl start api
 
 If you want to debug the node command
 
