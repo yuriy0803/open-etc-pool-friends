@@ -38,16 +38,83 @@ Dependencies:
   * nodejs >= 4 LTS
   * nginx
 
+### Install go lang
+
+    $ sudo apt update
+    $ sudo apt install golang-go
+
+### Install redis-server
+
+    $ sudo apt-get install redis-server
+
+It is recommended to bind your DB address on 127.0.0.1 or on internal ip. Also, please set up the password for advanced security!!!
+
+### Install nginx
+
+    $ sudo apt-get install nginx
+
+Search on Google for nginx-setting
+
+### Install NODE
+
+This will install the latest nodejs
+
+    $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    $ sudo apt-get install -y nodejs
+
 **I highly recommend to use Ubuntu 20.04 LTS.**
  1. First install:  sudo apt-get install build-essential
  2. install   sudo apt-get install make
  3. install   sudo apt-get install git
  4. install  [core-geth](https://github.com/etclabscore/core-geth/releases).
+ 
+ ### Run core-geth
+ 
+ Run console 
+ 
+ New Wallet
+ 
+ geth account new --datadir /home/pool/classic/.ethereum/
+
+If you use Ubuntu, it is easier to control services by using serviced.
+
+    $ sudo nano /etc/systemd/system/geth.service
+    
+ Copy the following example
+
+```
+
+[Unit]
+Description=geth
+After=network-online.target
+
+[Service]
+ExecStart=/home/pool/core-geth/build/bin/geth --datadir /home/pool/classic/.ethereum/ --syncmode "snap" --http --http.api eth,net,web3,txpool,miner --miner.etherbase=0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --mine --cache=8000 --maxpeers 100 --password="/home/pool/.pw" --allow-insecure-unlock --http.port "8545" --nat "any" --unlock 0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --miner.extradata ys --classic --snapshot=false --port 30305
+
+User=pool
+
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+    
+Then run multi-geth by the following commands
+
+    $ sudo systemctl enable geth
+    $ sudo systemctl start geth
+
+If you want to debug the node command
+
+    $ sudo systemctl status geth
+    
+### Open Firewall
+
+Firewall should be opened to operate this service. Whether Ubuntu firewall is basically opened or not, the firewall should be opened based on your situation.
+You can open firewall by opening 80,443,8008,30305.
+
 
 Clone & compile:
-
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    sudo apt-get install -y nodejs
     
     git clone https://github.com/yuriy0803/open-etc-pool-friends.git
     cd open-etc-pool-friends
@@ -55,8 +122,20 @@ Clone & compile:
     go build
 
 
+## Install Frontend
 
-Install redis-server.
+### Modify configuration file
+
+    $ nano ~/open-etc-pool-friends/www/config/environment.js
+
+Make some modifications in these settings.
+
+    ApiUrl: '//your-pool-domain/',
+    HttpHost: 'http://your-pool-domain',
+    StratumHost: 'your-pool-domain',
+    PoolFee: '1%',
+
+The frontend is a single-page Ember.js application that polls the pool API to render miner stats.
 
 ### Running Pool
 
@@ -91,24 +170,70 @@ Build.
      
      chmod 755 build.sh
     ./build.sh
+    
+    
+### Run Pool
+It is required to run pool by serviced. If it is not, the terminal could be stopped, and pool doesn’t work.
 
-Configure nginx to serve API on <code>/api</code> subdirectory.
-Configure nginx to serve <code>www/dist</code> as static website.
+    $ sudo nano /etc/systemd/system/api.service
 
-#### Serving API using nginx
+Copy the following example
 
-Create an upstream for API:
+```
+[Unit]
+Description=Etherpool
+After=callisto.target
+
+[Service]
+Type=simple
+ExecStart=/home/pool/open-etc-pool-friends /home/pool/api.json
+
+[Install]
+WantedBy=multi-user.target
+```
+
+As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
+
+Set up nginx.
+
+    $ sudo nano /etc/nginx/sites-available/default
+
+Modify based on configuration file.
+
+    # Default server configuration
+    # nginx example
 
     upstream api {
         server 127.0.0.1:8080;
     }
 
-and add this setting after <code>location /</code>:
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /home/<your-user-name>/www;
 
-    location /api {
-        proxy_pass http://api;
+        # Add index.php to the list if you are using PHP
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+
+        location /api {
+                proxy_pass http://api;
+        }
+
     }
 
+After setting nginx is completed, run the command below.
+
+    $ sudo service nginx restart
+    
+    
 #### Customization
 
 You can customize the layout using built-in web server with live reload:
