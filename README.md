@@ -174,7 +174,7 @@ Build.
     ./build.sh
     
     
-### Run Pool
+### Run Pool api.json
 It is required to run pool by serviced. If it is not, the terminal could be stopped, and pool doesn’t work.
 
     $ sudo nano /etc/systemd/system/api.service
