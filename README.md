@@ -73,9 +73,9 @@ This will install the latest nodejs
  Run console 
  
  New Wallet
- 
+ ```
  geth account new --datadir /home/pool/classic/.ethereum/
-
+```
 If you use Ubuntu, it is easier to control services by using serviced.
 
     $ sudo nano /etc/systemd/system/geth.service
