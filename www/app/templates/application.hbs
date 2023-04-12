@@ -53,6 +53,27 @@
         {{/active-li}}
       </ul>
     </div>
+<script>
+    $('.navbar-collapse a').click(function () {
+        $(".navbar-collapse").collapse('hide');
+        $("#navBtn").attr('aria-expanded', false);
+    });
+</script>
+
+<script>
+    $(document).mouseup(function (e)
+    {  
+        var container = $(".collapse");
+        if (!container.is(e.target) // if the target of the click isn't the container...
+            && container.has(e.target).length === 0) // ... nor a descendant of the container
+        {
+           // $(".collapse").slideUp();
+            // remove class
+            $("#navBtn").attr('aria-expanded', false);
+            $("#navbarSupportedContent").removeClass("show");
+        }
+    }); 
+</script>
   </div>
 </div>
 
