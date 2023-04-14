@@ -8,8 +8,6 @@
 
 * open-etc-pool-friends wallet ETC: 0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6
 
-* miningcrypto.live wallet ETC: 0x2Be9A2d9E586C0f6476ff2b1f074c4BE9Ddb7549
-
 ### Features
 
 ### Email: office.poolnode@gmail.com
@@ -507,4 +505,32 @@ To use this pool on the mordor testnet two settings require changing to "mordor"
 network in your config.json (this sets backend (validation,unlocker) to mordor paramaters)
 APP.Network in your www/config/environment.js (this sets the frontend to mordor paramaters)
 rerun ./build.sh
+
+
+### Extra) How To Secure the pool frontend with Let's Encrypt (https)
+
+First, install the Certbot's Nginx package with apt-get
+
+```
+$ sudo apt-get update
+$ sudo apt-get install python3-certbot-nginx
+```
+
+And then open your nginx setting file, make sure the server name is configured!
+
+```
+$ sudo nano /etc/nginx/sites-available/default
+. . .
+server_name <your-pool-domain>;
+. . .
+```
+
+Change the _ to your pool domain, and now you can obtain your auto-renewaled ssl certificate for free!
+
+```
+$ sudo certbot --nginx -d <your-pool-domain>
+```
+
+Now you can access your pool's frontend via https! Share your pool link!
+
 
