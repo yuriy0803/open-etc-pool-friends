@@ -276,27 +276,52 @@ func (r *RedisClient) WriteShareCharts(time1 int64, time2, login string, valid, 
 	return cmd.Err()
 }
 
+// GetPoolCharts retrieves a list of pool charts from Redis.
+// The `poolHashLen` argument determines the maximum number of pool charts to retrieve.
+// The function returns a slice of `PoolCharts` structures representing the pool charts and an error (if any).
 func (r *RedisClient) GetPoolCharts(poolHashLen int64) (stats []*PoolCharts, err error) {
-
+	// Begin a Redis transaction
 	tx := r.client.Multi()
 	defer tx.Close()
 
+	// Compute the current timestamp (in seconds)
 	now := util.MakeTimestamp() / 1000
 
+	// Execute the Redis transaction
 	cmds, err := tx.Exec(func() error {
+		// Remove all pool charts that are older than 48 hours (172800 seconds)
 		tx.ZRemRangeByScore(r.formatKey("charts", "pool"), "-inf", fmt.Sprint("(", now-172800))
-		tx.ZRevRangeWithScores(r.formatKey("charts", "pool"), 0, poolHashLen)
+
+		// Retrieve the most recent `poolHashLen` pool charts in descending order of timestamp
+		zRangeCmd := tx.ZRevRangeWithScores(r.formatKey("charts", "pool"), 0, poolHashLen)
+
+		// Return any error that occurred during the transaction
+		if zRangeCmd.Err() != nil {
+			return zRangeCmd.Err()
+		}
+
 		return nil
 	})
 
+	// Handle any errors that occurred during the Redis transaction
 	if err != nil {
 		return nil, err
 	}
 
-	stats = convertPoolChartsResults(cmds[1].(*redis.ZSliceCmd))
+	// Check that the result of the second Redis command is a `ZSliceCmd`
+	zSliceCmd, ok := cmds[1].(*redis.ZSliceCmd)
+	if !ok {
+		return nil, fmt.Errorf("invalid command result type: %T", cmds[1])
+	}
+
+	// Convert the Redis result into a slice of `PoolCharts` structures
+	stats = convertPoolChartsResults(zSliceCmd)
+
 	return stats, nil
 }
 
+// convertPoolChartsResults is a helper function that converts a `ZSliceCmd` result from Redis
+// into a slice of `PoolCharts` structures.
 func convertPoolChartsResults(raw *redis.ZSliceCmd) []*PoolCharts {
 	var result []*PoolCharts
 	for _, v := range raw.Val() {
@@ -308,12 +333,16 @@ func convertPoolChartsResults(raw *redis.ZSliceCmd) []*PoolCharts {
 		pc.PoolHash, _ = strconv.ParseInt(str[strings.LastIndex(str, ":")+1:], 10, 64)
 		result = append(result, &pc)
 	}
+
+	// Reverse the order of the `PoolCharts` slice (to put the most recent chart first)
 	var reverse []*PoolCharts
 	for i := len(result) - 1; i >= 0; i-- {
 		reverse = append(reverse, result[i])
 	}
+
 	return reverse
 }
+
 
 func (r *RedisClient) GetNetCharts(netHashLen int64) (stats []*NetCharts, err error) {
     tx := r.client.Multi()
