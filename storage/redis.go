@@ -1772,7 +1772,6 @@ func (r *RedisClient) NumberStratumWorker(count int) {
 }
 
 func (r *RedisClient) StoreExchangeData(ExchangeData []map[string]interface{}) {
-
 	tx := r.client.Multi()
 	defer tx.Close()
 
@@ -1780,13 +1779,11 @@ func (r *RedisClient) StoreExchangeData(ExchangeData []map[string]interface{}) {
 
 	for _, coindata := range ExchangeData {
 		for key, value := range coindata {
-
-			cmd := tx.HSet(r.formatKey("exchange", coindata["symbol"]), fmt.Sprintf("%v", key), fmt.Sprintf("%v", value))
+			cmd := tx.HSet(r.formatKey("exchange", coindata["symbol"].(string)), fmt.Sprintf("%v", key), fmt.Sprintf("%v", value))
 			err := cmd.Err()
 			if err != nil {
-				log.Printf("Error while Storing %s : Key-%s , value-%s , Error : %v", coindata["symbol"], key, value, err)
+				log.Printf("Error while Storing %s : Key-%s , value-%s , Error : %v", coindata["symbol"].(string), key, value, err)
 			}
-
 		}
 	}
 	log.Printf("Writing Exchange Data ")
@@ -1794,14 +1791,10 @@ func (r *RedisClient) StoreExchangeData(ExchangeData []map[string]interface{}) {
 }
 
 func (r *RedisClient) GetExchangeData(coinsymbol string) (map[string]string, error) {
-
 	cmd := r.client.HGetAllMap(r.formatKey("exchange", coinsymbol))
-
 	result, err := cmd.Result()
-
 	if err != nil {
 		return nil, err
 	}
-
 	return result, err
 }
