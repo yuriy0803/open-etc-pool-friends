@@ -316,43 +316,53 @@ func convertPoolChartsResults(raw *redis.ZSliceCmd) []*PoolCharts {
 }
 
 func (r *RedisClient) GetNetCharts(netHashLen int64) (stats []*NetCharts, err error) {
+    tx := r.client.Multi()
+    defer tx.Close()
 
-	tx := r.client.Multi()
-	defer tx.Close()
+    now := util.MakeTimestamp() / 1000
 
-	now := util.MakeTimestamp() / 1000
+    cmds, err := tx.Exec(func() error {
+        if err := tx.ZRemRangeByScore(r.formatKey("charts", "difficulty"), "-inf", fmt.Sprint("(", now-172800)).Err(); err != nil {
+            return err
+        }
+        zRangeCmd := tx.ZRevRangeWithScores(r.formatKey("charts", "difficulty"), 0, netHashLen)
+        if zRangeCmd.Err() != nil {
+            return zRangeCmd.Err()
+        }
+        return nil
+    })
+    if err != nil {
+        return nil, err
+    }
 
-	cmds, err := tx.Exec(func() error {
-		tx.ZRemRangeByScore(r.formatKey("charts", "difficulty"), "-inf", fmt.Sprint("(", now-172800))
-		tx.ZRevRangeWithScores(r.formatKey("charts", "difficulty"), 0, netHashLen)
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	stats = convertNetChartsResults(cmds[1].(*redis.ZSliceCmd))
-	return stats, nil
+    zSliceCmd, ok := cmds[1].(*redis.ZSliceCmd)
+    if !ok {
+        return nil, fmt.Errorf("invalid command result type: %T", cmds[1])
+    }
+    stats, err = convertNetChartsResults(zSliceCmd)
+    if err != nil {
+        return nil, err
+    }
+    return stats, nil
 }
 
-func convertNetChartsResults(raw *redis.ZSliceCmd) []*NetCharts {
-	var result []*NetCharts
-	for _, v := range raw.Val() {
-		// "Timestamp:TimeFormat:Hash"
-		pc := NetCharts{}
-		pc.Timestamp = int64(v.Score)
-		str := v.Member.(string)
-		pc.TimeFormat = str[strings.Index(str, ":")+1 : strings.LastIndex(str, ":")]
-		pc.NetHash, _ = strconv.ParseInt(str[strings.LastIndex(str, ":")+1:], 10, 64)
-		result = append(result, &pc)
-	}
+func convertNetChartsResults(raw *redis.ZSliceCmd) ([]*NetCharts, error) {
+    var result []*NetCharts
+    for _, v := range raw.Val() {
+        // "Timestamp:TimeFormat:Hash"
+        pc := NetCharts{}
+        pc.Timestamp = int64(v.Score)
+        str := v.Member.(string)
+        pc.TimeFormat = str[strings.Index(str, ":")+1 : strings.LastIndex(str, ":")]
+        pc.NetHash, _ = strconv.ParseInt(str[strings.LastIndex(str, ":")+1:], 10, 64)
+        result = append(result, &pc)
+    }
 
-	var reverse []*NetCharts
-	for i := len(result) - 1; i >= 0; i-- {
-		reverse = append(reverse, result[i])
-	}
-	return reverse
+    var reverse []*NetCharts
+    for i := len(result) - 1; i >= 0; i-- {
+        reverse = append(reverse, result[i])
+    }
+    return reverse, nil
 }
 
 func convertMinerChartsResults(raw *redis.ZSliceCmd) []*MinerCharts {
