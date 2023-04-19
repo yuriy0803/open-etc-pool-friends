@@ -26,10 +26,13 @@ const (
 )
 
 func (s *ProxyServer) ListenTCP() {
+	// Parse timeout duration from configuration
 	s.timeout = util.MustParseDuration(s.config.Proxy.Stratum.Timeout)
 
 	var err error
 	var server net.Listener
+
+	// If TLS is enabled, load certificate and key file and create a TLS listener
 	if s.config.Proxy.Stratum.TLS {
 		var cert tls.Certificate
 		cert, err = tls.LoadX509KeyPair(s.config.Proxy.Stratum.CertFile, s.config.Proxy.Stratum.KeyFile)
@@ -39,6 +42,7 @@ func (s *ProxyServer) ListenTCP() {
 		tlsCfg := &tls.Config{Certificates: []tls.Certificate{cert}}
 		server, err = tls.Listen("tcp", s.config.Proxy.Stratum.Listen, tlsCfg)
 	} else {
+		// Otherwise, create a regular TCP listener
 		server, err = net.Listen("tcp", s.config.Proxy.Stratum.Listen)
 	}
 	if err != nil {
@@ -51,24 +55,27 @@ func (s *ProxyServer) ListenTCP() {
 	n := 0
 
 	for {
+		// Accept new incoming connections
 		conn, err := server.Accept()
 		if err != nil {
 			continue
 		}
 		ip, _, _ := net.SplitHostPort(conn.RemoteAddr().String())
 
+		// Apply IP banning and connection limiting policies
 		if s.policy.IsBanned(ip) || !s.policy.ApplyLimitPolicy(ip) {
 			conn.Close()
 			continue
 		}
 		n += 1
-		// make unique extranonce
+		// Generate a unique extranonce value for this session
 		extranonce := s.uniqExtranonce()
 		cs := &Session{conn: conn, ip: ip, Extranonce: extranonce, ExtranonceSub: false, stratum: -1}
-		// allocate stales cache
+		// Allocate a stale jobs cache for this session
 		cs.staleJobs = make(map[string]staleJob)
 
 		accept <- n
+		// Start a new goroutine to handle the session
 		go func(cs *Session) {
 			err = s.handleTCPClient(cs)
 			if err != nil {
@@ -80,57 +87,89 @@ func (s *ProxyServer) ListenTCP() {
 	}
 }
 
+// handleTCPClient reads incoming data from a client and handles it appropriately.
 func (s *ProxyServer) handleTCPClient(cs *Session) error {
+	// Create an encoder to send data to the client
 	cs.enc = json.NewEncoder(cs.conn)
+
+	// Create a buffer to read incoming data from the client
 	connbuff := bufio.NewReaderSize(cs.conn, MaxReqSize)
+
+	// Set a deadline for the connection
 	s.setDeadline(cs.conn)
 
 	for {
+		// Read a line of data from the client
 		data, isPrefix, err := connbuff.ReadLine()
+
+		// If the data is too large for the buffer, ban the client and return an error
 		if isPrefix {
 			log.Printf("Socket flood detected from %s", cs.ip)
 			s.policy.BanClient(cs.ip)
 			return err
-		} else if err == io.EOF {
+		}
+
+		// If the client disconnects, remove their session and break the loop
+		if err == io.EOF {
 			log.Printf("Client %s disconnected", cs.ip)
 			s.removeSession(cs)
 			break
-		} else if err != nil {
+		}
+
+		// If there was an error reading from the client, log the error and return it
+		if err != nil {
 			log.Printf("Error reading from socket: %v", err)
 			return err
 		}
 
+		// If the data is not empty, attempt to unmarshal it as a Stratum request
 		if len(data) > 1 {
 			var req StratumReq
 			err = json.Unmarshal(data, &req)
+
+			// If the data is malformed, apply the malformed policy, log the error, and return it
 			if err != nil {
 				s.policy.ApplyMalformedPolicy(cs.ip)
 				log.Printf("Malformed stratum request from %s: %v", cs.ip, err)
 				return err
 			}
+
+			// Set a new deadline for the connection
 			s.setDeadline(cs.conn)
+
+			// Handle the incoming message from the client
 			err = cs.handleTCPMessage(s, &req)
+
+			// If there was an error handling the message, return it
 			if err != nil {
 				return err
 			}
 		}
 	}
+
+	// Return nil when finished handling the client
 	return nil
 }
 
+// setStratumMode sets the stratum mode of the session based on the provided string.
+// If the string is "EthereumStratum/1.0.0", the stratum mode will be set to NiceHash.
+// Otherwise, the stratum mode will be set to EthProxy.
+// Returns an error if the string is empty or if an invalid stratum mode is provided.
 func (cs *Session) setStratumMode(str string) error {
 	switch str {
 	case "EthereumStratum/1.0.0":
 		cs.stratum = NiceHash
-		break
 	default:
 		cs.stratum = EthProxy
-		break
 	}
 	return nil
 }
 
+// stratumMode returns the current stratum mode of the session.
+// The returned value is an integer representing the current stratum mode,
+// where 0 represents EthProxy and 1 represents NiceHash.
 func (cs *Session) stratumMode() int {
+	// Returns the current stratum mode of the session.
 	return cs.stratum
 }
 
@@ -139,37 +178,42 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 	switch req.Method {
 	case "eth_submitLogin":
 		var params []string
-		err := json.Unmarshal(req.Params, &params)
-		if err != nil || len(params) < 1 {
-			log.Println("Malformed stratum request params from", cs.ip)
+		if err := json.Unmarshal(req.Params, &params); err != nil || len(params) < 1 {
+			log.Printf("Malformed stratum request params from %s: %v", cs.ip, err)
 			return err
 		}
-		reply, errReply := s.handleLoginRPC(cs, params, req.Worker)
-		if errReply != nil {
-			return cs.sendTCPError(req.Id, errReply)
+		reply, err := s.handleLoginRPC(cs, params, req.Worker)
+		if err != nil {
+			log.Printf("Error handling login RPC from %s: %v", cs.ip, err)
+			return cs.sendTCPError(req.Id, err)
 		}
 		cs.setStratumMode("EthProxy")
-		log.Println("EthProxy login", cs.ip)
+		log.Printf("EthProxy login from %s: %v", cs.ip, params[0])
 		return cs.sendTCPResult(req.Id, reply)
 
 	case "mining.subscribe":
-		var params []string
-		err := json.Unmarshal(req.Params, &params)
-		if err != nil || len(params) < 2 {
-			log.Println("Malformed stratum request params from", cs.ip)
+		params := []string{}
+		if err := json.Unmarshal(req.Params, &params); err != nil || len(params) < 2 {
+			log.Println("Malformed stratum request params from", cs.ip, err)
 			return err
 		}
 
 		if params[1] != "EthereumStratum/1.0.0" {
-			log.Println("Unsupported stratum version from ", cs.ip)
+			log.Println("Unsupported stratum version from", cs.ip)
 			return cs.sendStratumError(req.Id, "unsupported stratum version")
 		}
 
 		cs.ExtranonceSub = true
 		cs.setStratumMode("EthereumStratum/1.0.0")
 		log.Println("Nicehash subscribe", cs.ip)
+
 		result := cs.getNotificationResponse(s)
-		return cs.sendStratumResult(req.Id, result)
+		if err := cs.sendStratumResult(req.Id, result); err != nil {
+			log.Println("Failed to send stratum result:", err)
+			return err
+		}
+
+		return nil
 
 	default:
 		switch cs.stratumMode() {
