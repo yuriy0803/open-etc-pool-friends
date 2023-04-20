@@ -21,7 +21,6 @@ var hashPattern = regexp.MustCompile("^0x[0-9a-f]{64}$")
 // characters, each of which is a digit, a letter (upper or lower case), a hyphen, or an underscore
 var workerPattern = regexp.MustCompile("^[0-9a-zA-Z-_]{1,200}$")
 
-
 // Stratum
 func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (bool, *ErrorReply) {
 	// Check if params are valid
@@ -36,7 +35,7 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 		login = param[0]
 		id = param[1]
 	}
-	
+
 	// Convert login to lowercase and check if worker ID matches the worker pattern
 	login = strings.ToLower(login)
 	if !workerPattern.MatchString(id) {
@@ -94,10 +93,11 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		return false, &ErrorReply{Code: -1, Message: "Invalid params"}
 	}
 
+	// Add "0x" prefix to params if the stratum mode is NiceHash
 	stratumMode := cs.stratumMode()
 	if stratumMode == NiceHash {
-		for i := 0; i <= 2; i++ {
-			if params[i][0:2] != "0x" {
+		for i := 0; i < len(params); i++ {
+			if !strings.HasPrefix(params[i], "0x") {
 				params[i] = "0x" + params[i]
 			}
 		}
@@ -109,35 +109,57 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		log.Printf("Malformed PoW result from %s@%s %v", login, cs.ip, params)
 		return false, &ErrorReply{Code: -1, Message: "Malformed PoW result"}
 	}
-	t := s.currentBlockTemplate()
-	exist, validShare := s.processShare(login, id, cs.ip, t, params, stratumMode != EthProxy)
-	ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
 
-	if exist {
-		log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
-		// see https://github.com/sammy007/open-ethereum-pool/compare/master...nicehashdev:patch-1
-		if !ok {
-			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
+	// Process the share in a separate goroutine
+	go func(s *ProxyServer, cs *Session, login, id string, params []string) {
+		// Get the current block template
+		t := s.currentBlockTemplate()
+
+		// Check if the share already exists and if it's valid
+		exist, validShare := s.processShare(login, id, cs.ip, t, params, stratumMode != EthProxy)
+
+		// Apply the share policy to determine if the share should be accepted
+		ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
+
+		// Handle duplicate share
+		if exist {
+			log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
+			if !ok {
+				cs.disconnect()
+				return
+			}
+			return
 		}
-		return false, nil
-	}
 
-	if !validShare {
-		log.Printf("Invalid share from %s@%s", login, cs.ip)
-		// Bad shares limit reached, return error and close
-		if !ok {
-			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
+		// Handle invalid share
+		if !validShare {
+			log.Printf("Invalid share from %s@%s", login, cs.ip)
+			s.backend.WriteWorkerShareStatus(login, id, false, true, false)
+			// Bad shares limit reached, disconnect the session
+			if !ok {
+				cs.disconnect()
+				return
+			}
+			return
 		}
-		return false, nil
-	}
-	if s.config.Proxy.Debug {
-		log.Printf("Valid share from %s@%s", login, cs.ip)
-	}
 
-	if !ok {
-		return true, &ErrorReply{Code: -1, Message: "High rate of invalid shares"}
-	}
+		// Handle valid share
+		if s.config.Proxy.Debug {
+			log.Printf("Valid share from %s@%s", login, cs.ip)
+		}
+
+		// Apply the policy to determine if the session should be disconnected
+		if !ok {
+			cs.disconnect()
+			return
+		}
+	}(s, cs, login, id, params)
+
 	return true, nil
+}
+
+func (cs *Session) disconnect() {
+	cs.conn.Close()
 }
 
 // handleGetBlockByNumberRPC returns the pending block cache for the current block template.
