@@ -370,26 +370,26 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 			return cs.sendTCPError(req.Id, errReply)
 		}
 		return cs.sendTCPResult(req.Id, &reply)
-// Handle requests of type "eth_submitWork"
-case "eth_submitWork":
-	// Unmarshal the parameters from the request into a slice of strings
-	var params []string
-	err := json.Unmarshal(req.Params, &params)
-	// Check if there was an error unmarshaling the parameters or if they don't meet the required length and format criteria
-	if err != nil || len(params) < 3 || len(params[0]) != 18 || len(params[1]) != 66 || len(params[2]) != 66 {
-		// If there was an error, log the issue and return it
-		log.Println("Malformed stratum request params from", cs.ip)
-		return err
-	}
-	// If the parameters are valid, call the handler function for submitting work
-	reply, errReply := s.handleTCPSubmitRPC(cs, req.Worker, params)
-	// Check if there was an error handling the request
-	if errReply != nil {
-		// If there was, return the error
-		return cs.sendTCPError(req.Id, errReply)
-	}
-	// If the request was handled successfully, return the result
-	return cs.sendTCPResult(req.Id, &reply)
+	// Handle requests of type "eth_submitWork"
+	case "eth_submitWork":
+		// Unmarshal the parameters from the request into a slice of strings
+		var params []string
+		err := json.Unmarshal(req.Params, &params)
+		// Check if there was an error unmarshaling the parameters or if they don't meet the required length and format criteria
+		if err != nil || len(params) < 3 || len(params[0]) != 18 || len(params[1]) != 66 || len(params[2]) != 66 {
+			// If there was an error, log the issue and return it
+			log.Println("Malformed stratum request params from", cs.ip)
+			return err
+		}
+		// If the parameters are valid, call the handler function for submitting work
+		reply, errReply := s.handleTCPSubmitRPC(cs, req.Worker, params)
+		// Check if there was an error handling the request
+		if errReply != nil {
+			// If there was, return the error
+			return cs.sendTCPError(req.Id, errReply)
+		}
+		// If the request was handled successfully, return the result
+		return cs.sendTCPResult(req.Id, &reply)
 
 	case "eth_submitHashrate":
 		return cs.sendTCPResult(req.Id, true)
@@ -468,7 +468,7 @@ func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
 			},
 
 			Height: util.ToHex1(int64(a.Height)),
-			Algo:   "etchash",
+			Algo:   s.config.Network,
 		}
 		return cs.enc.Encode(&resp)
 	}
@@ -568,7 +568,7 @@ func (cs *Session) sendJob(s *ProxyServer, id json.RawMessage, newjob bool) erro
 		},
 
 		Height: util.ToHex1(int64(t.Height)),
-		Algo:   "etchash",
+		Algo:   s.config.Network,
 	}
 
 	return cs.sendTCPReq(resp)
