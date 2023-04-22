@@ -87,7 +87,7 @@ func (s *ProxyServer) handleTCPSubmitRPC(cs *Session, id string, params []string
 
 func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []string) (bool, *ErrorReply) {
 	// Check if the number of parameters is correct
-	if len(params) < 3 || len(params[0]) != 16 || len(params[1]) != 64 || len(params[2]) != 64 {
+	if len(params) != 3 {
 		s.policy.ApplyMalformedPolicy(cs.ip)
 		log.Printf("Malformed params from %s@%s %v", login, cs.ip, params)
 		return false, &ErrorReply{Code: -1, Message: "Invalid params"}
