@@ -123,3 +123,4 @@ func (r *RestClient) doPost(url string, method string) ([]byte, error) {
 	}
 
 	return nil, err
+}
