@@ -36,7 +36,9 @@ type UnlockerConfig struct {
 const minDepth = 16
 
 // params for ethereumPow
-var constReward = math.MustParseBig256("2000000000000000000") // 2 ETHW block Reward
+const byzantiumHardForkHeightethereumPow = 7280000
+
+var byzantiumEthereumpow = math.MustParseBig256("2000000000000000000")
 
 // Donate 1% from pool fees to developers
 const donationFee = 1.0
@@ -313,7 +315,7 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		reward.Add(reward, rewardForUncles)
 
 	} else if u.config.Network == "ethereumPow" {
-		reward := new(big.Int).Set(constReward)
+		reward = getConstRewardEthereumpow(candidate.Height)
 		// Add reward for including uncles
 		uncleReward := new(big.Int).Div(reward, big32)
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
@@ -364,7 +366,7 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 	} else if cfg.Network == "callisto" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardcallisto(height))
 	} else if cfg.Network == "ethereumPow" {
-		reward = getUncleRewardEthereumPow(uncleHeight, height)
+		reward = getUncleRewardEthereumpow(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardEthereumpow(height))
 	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" || cfg.Network == "ethereumFair" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
 	}
@@ -719,6 +721,13 @@ func getConstRewardExpanse(height int64) *big.Int {
 	return new(big.Int).Set(byzantiumExpanseReward)
 }
 
+func getConstRewardEthereumpow(height int64) *big.Int {
+	if height >= byzantiumHardForkHeight {
+		return new(big.Int).Set(byzantiumEthereumpow)
+	}
+	return new(big.Int).Set(byzantiumEthereumpow)
+}
+
 // ubqhash
 func getConstRewardUbiq(height int64) *big.Int {
 	// Rewards
@@ -837,9 +846,12 @@ func (u *BlockUnlocker) getExtraRewardForTx(block *rpc.GetBlockReply) (*big.Int,
 	return amount, nil
 }
 
-func getUncleRewardEthereumPow(uHeight, height int64) *big.Int {
-	reward := new(big.Int).Set(constReward)
-	reward.Mul(big.NewInt(uHeight+8-height), reward)
-	reward.Div(reward, big.NewInt(8))
-	return reward
+func getUncleRewardEthereumpow(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
+	r := new(big.Int)
+	r.Add(uHeight, big8)
+	r.Sub(r, height)
+	r.Mul(r, reward)
+	r.Div(r, big8)
+
+	return r
 }
