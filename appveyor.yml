@@ -1,6 +1,5 @@
 version: 1.0.{build}
 image:
-- Visual Studio 2017
 - Ubuntu
 
 environment:
@@ -8,26 +7,12 @@ environment:
     - ARCH: arm
     - ARCH: arm64
     - ARCH: amd64
-    - GETH_ARCH: amd64
-      GETH_CC: C:\msys64\mingw64\bin\gcc.exe
-      PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
-
-install:
-  - git submodule update --init --depth 1 --recursive
-  - go version
-
-matrix:
-  exclude:
-    - image: Visual Studio 2017
-      ARCH: arm
-    - image: Visual Studio 2017
-      ARCH: arm64
 
 build_script:
-  - ps: make
+  - ps: go build
 
 test_script:
-  - ps: make
+  - ps: go build
 
 deploy_script:
-  - ps: make
+  - ps: go build
