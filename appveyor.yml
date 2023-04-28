@@ -1,37 +1,25 @@
-version: "{build}"
+clone_depth: 5
+version: "{branch}.{build}"
 
-hosts:
-  quic.clemente.io: 127.0.0.1
-
-os: Windows Server 2019
-
-clone_folder: c:\gopath\src\github.com\mholt\caddy
+image:
+  - Visual Studio 2019
 
 environment:
-  GOPATH: c:\gopath
+  matrix:
+    - GETH_ARCH: amd64
+      GETH_CC: C:\msys64\mingw64\bin\gcc.exe
+      PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
 
 install:
-  - rmdir c:\go /s /q
-  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.18.windows-amd64.zip
-  - 7z x go1.11.windows-amd64.zip -y -oC:\ > NUL
-  - set PATH=%GOPATH%\bin;%PATH%
+  - git submodule update --init --depth 1 --recursive
   - go version
-  - go env
-  - go get -t ./...
-  - go get github.com/golang/lint/golint
-  - go get github.com/FiloSottile/vendorcheck
-  # Install gometalinter
-  - go get github.com/alecthomas/gometalinter
-
-build: off
-
-test_script:
-  - gometalinter --install
-  - gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
-  - vendorcheck ./...
-  - go test -race
-
-after_test:
-  - golint ./...
-
-deploy: off
+  
+  build_script:
+  - ps: $env:VERSION = "$(git describe --always)"
+  - go run build\ci.go install -dlgo -arch %GETH_ARCH% -cc %GETH_CC%
+  - 7z a open-etc-pool-friends-win64-%VERSION%.zip .\build\bin\geth.exe
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File open-etc-pool-friends-win64-$env:VERSION.zip.sha256
+  - 7z a open-etc-pool-friends-alltools-win64-%VERSION%.zip .\build\bin\*
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip | Out-File open-etc-pool-friends-alltools-win64-$env:VERSION.zip.sha256
