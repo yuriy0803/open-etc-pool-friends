@@ -10,7 +10,6 @@ environment:
 
 matrix:
   exclude:
-      ARCH: arm
       ARCH: arm64
 
 build_script:
