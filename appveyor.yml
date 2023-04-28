@@ -1,6 +1,5 @@
 version: 1.0.{build}
 image:
-- Visual Studio 2019
 - Ubuntu
 
 environment:
@@ -9,22 +8,8 @@ environment:
     - ARCH: arm64
     - ARCH: amd64
 
-matrix:
-  exclude:
-    - image: Visual Studio 2019
-      ARCH: arm
-    - image: Visual Studio 2019
-      ARCH: arm64
-
 build_script:
-  - ps: $env:VERSION = "$(git describe --always)"
-  - go run build\ci.go install -dlgo -arch %GETH_ARCH% -cc %GETH_CC%
-  - 7z a open-etc-pool-friends-win64-%VERSION%.zip .\build\bin\geth.exe
-  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256
-  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File open-etc-pool-friends-win64-$env:VERSION.zip.sha256
-  - 7z a open-etc-pool-friends-alltools-win64-%VERSION%.zip .\build\bin\*
-  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip -Algorithm SHA256
-  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip | Out-File open-etc-pool-friends-alltools-win64-$env:VERSION.zip.sha256
+  - ps: go build
 
 test_script:
   - ps: go build
