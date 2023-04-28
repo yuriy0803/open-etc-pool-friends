@@ -24,10 +24,10 @@ matrix:
       ARCH: arm64
 
 build_script:
-  - ps: go build
+  - ps: make
 
 test_script:
-  - ps: go build
+  - ps: make
 
 deploy_script:
-  - ps: go build
+  - ps: make
