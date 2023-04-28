@@ -4,6 +4,12 @@ image:
 
 environment:
   matrix:
+    - GETH_ARCH: amd64
+      GETH_CC: C:\msys64\mingw64\bin\gcc.exe
+      PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
+
+environment:
+  matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       MY_VAR: value1
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
