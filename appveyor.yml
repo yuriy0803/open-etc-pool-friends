@@ -1,6 +1,5 @@
 version: 1.0.{build}
 image:
-- Visual Studio 2017
 - Ubuntu
 
 environment:
@@ -11,9 +10,7 @@ environment:
 
 matrix:
   exclude:
-    - image: Visual Studio 2017
       ARCH: arm
-    - image: Visual Studio 2017
       ARCH: arm64
 
 build_script:
