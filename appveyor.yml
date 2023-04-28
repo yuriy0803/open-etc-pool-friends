@@ -1,5 +1,6 @@
 version: 1.0.{build}
 image:
+- Visual Studio 2019
 - Ubuntu
 
 environment:
@@ -8,11 +9,18 @@ environment:
     - ARCH: arm64
     - ARCH: amd64
 
+matrix:
+  exclude:
+    - image: Visual Studio 2019
+      ARCH: arm
+    - image: Visual Studio 2019
+      ARCH: arm64
+
 build_script:
-  - ps: go build
+  - ps: ./build.ps1
 
 test_script:
-  - ps: go build
+  - ps: ./test.ps1
 
 deploy_script:
-  - ps: go build
+  - ps: ./deploy.ps1
