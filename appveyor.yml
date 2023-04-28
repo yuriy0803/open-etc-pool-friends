@@ -1,11 +1,13 @@
-clone_depth: 5
-version: "{branch}.{build}"
-
+version: 1.0.{build}
 image:
-  - Visual Studio 2019
+- Visual Studio 2017
+- Ubuntu
 
 environment:
   matrix:
+    - ARCH: arm
+    - ARCH: arm64
+    - ARCH: amd64
     - GETH_ARCH: amd64
       GETH_CC: C:\msys64\mingw64\bin\gcc.exe
       PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
@@ -13,27 +15,19 @@ environment:
 install:
   - git submodule update --init --depth 1 --recursive
   - go version
-  
-  build_script:
-  - ps: $env:VERSION = "$(git describe --always)"
-  - go run build\ci.go install -dlgo -arch %GETH_ARCH% -cc %GETH_CC%
-  - 7z a open-etc-pool-friends-win64-%VERSION%.zip .\build\bin\geth.exe
-  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256
-  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File open-etc-pool-friends-win64-$env:VERSION.zip.sha256
-  - 7z a open-etc-pool-friends-alltools-win64-%VERSION%.zip .\build\bin\*
-  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip -Algorithm SHA256
-  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip | Out-File open-etc-pool-friends-alltools-win64-$env:VERSION.zip.sha256
 
-for:
-  - branches:
-      only:
-        - /v\d*\.\d*\.\d*.*/
-    artifacts:
-      - path: '*open-etc-pool-friends-win64*.zip'
-        name: open-etc-pool-friends
-      - path: '*open-etc-pool-friends*.zip.sha256'
-        name: open-etc-pool-friends-sha256
-      - path: '*open-etc-pool-friends*.zip'
-        name: alltools
-      - path: '*open-etc-pool-friends*.zip.sha256'
-        name: alltools-sha256
+matrix:
+  exclude:
+    - image: Visual Studio 2017
+      ARCH: arm
+    - image: Visual Studio 2017
+      ARCH: arm64
+
+build_script:
+  - ps: go build
+
+test_script:
+  - ps: go build
+
+deploy_script:
+  - ps: go build
