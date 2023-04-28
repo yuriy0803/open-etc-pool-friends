@@ -17,7 +17,14 @@ matrix:
       ARCH: arm64
 
 build_script:
-  - ps: go build
+  - ps: $env:VERSION = "$(git describe --always)"
+  - go run build\ci.go install -dlgo -arch %GETH_ARCH% -cc %GETH_CC%
+  - 7z a open-etc-pool-friends-win64-%VERSION%.zip .\build\bin\geth.exe
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File open-etc-pool-friends-win64-$env:VERSION.zip.sha256
+  - 7z a open-etc-pool-friends-alltools-win64-%VERSION%.zip .\build\bin\*
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip | Out-File open-etc-pool-friends-alltools-win64-$env:VERSION.zip.sha256
 
 test_script:
   - ps: go build
