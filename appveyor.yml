@@ -1,6 +1,8 @@
-version: 1.0.{build}
+clone_depth: 5
+version: "{branch}.{build}"
+
 image:
-- Ubuntu
+  - Visual Studio 2019
 
 environment:
   matrix:
@@ -13,10 +15,33 @@ install:
   - go version
 
 build_script:
-  - ps: go build
+  - ps: $env:VERSION = "$(git describe --always)"
+  - go run build\ci.go install -dlgo -arch %GETH_ARCH% -cc %GETH_CC%
+  - 7z a open-etc-pool-friends-win64-%VERSION%.zip .\build\bin\geth.exe
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File open-etc-pool-friends-win64-$env:VERSION.zip.sha256
+  - 7z a open-etc-pool-friends-alltools-win64-%VERSION%.zip .\build\bin\*
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash open-etc-pool-friends-alltools-win64-$env:VERSION.zip | Out-File open-etc-pool-friends-alltools-win64-$env:VERSION.zip.sha256
 
-test_script:
-  - ps: go build
+for:
+  - branches:
+      only:
+        - /v\d*\.\d*\.\d*.*/
+    artifacts:
+      - path: '*open-etc-pool-friends-win64*.zip'
+        name: geth
+      - path: '*open-etc-pool-friends-win64*.zip.sha256'
+        name: geth-sha256
+      - path: '*open-etc-pool-friends-alltools*.zip'
+        name: alltools
+      - path: '*open-etc-pool-friends-alltools*.zip.sha256'
+        name: alltools-sha256
 
-deploy_script:
-  - ps: go build
+deploy:
+  provider: GitHub
+  repository: yuriy0803/open-etc-pool-friends
+  artifact: /open-etc-pool-friends.*-win64-.*\.zip.*/
+  draft: true
+  on:
+    appveyor_repo_tag: true
