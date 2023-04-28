@@ -41,6 +41,7 @@ Dependencies:
     $ sudo apt-get update && apt-get upgrade
     $ sudo apt-get install golang
     $ sudo apt-get install rsync
+    $ sudo apt-get install git
     
 ### Install npm
     sudo apt-get install npm
