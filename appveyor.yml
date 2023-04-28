@@ -9,6 +9,7 @@ environment:
 
 matrix:
   exclude:
+    - image: Visual Studio 2017
       ARCH: arm64
 
 build_script:
