@@ -249,7 +249,9 @@ Modify based on configuration file.
 After setting nginx is completed, run the command below.
 
      sudo service nginx restart
+     
 Status all.
+
      sudo journalctl -f 
     
     
