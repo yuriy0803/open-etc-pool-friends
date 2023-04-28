@@ -17,10 +17,10 @@ matrix:
       ARCH: arm64
 
 build_script:
-  - ps: ./build.ps1
+  - ps: go build
 
 test_script:
-  - ps: ./test.ps1
+  - ps: go build
 
 deploy_script:
-  - ps: ./deploy.ps1
+  - ps: go build
