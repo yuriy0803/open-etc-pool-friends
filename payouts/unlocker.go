@@ -38,7 +38,7 @@ const minDepth = 16
 // params for ethereumPow
 const byzantiumHardForkHeightethereumPow = 7280000
 
-var byzantiumEthereumpow = math.MustParseBig256("2000000000000000000")
+var byzantiumEthereumpoweero = math.MustParseBig256("2000000000000000000")
 
 // Donate 1% from pool fees to developers
 const donationFee = 1.0
