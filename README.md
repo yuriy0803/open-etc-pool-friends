@@ -38,23 +38,23 @@ Dependencies:
 
 ### Install go lang
 
-    $ sudo apt-get update && apt-get upgrade
-    $ sudo apt-get install golang
-    $ sudo apt-get install rsync
-    $ sudo apt-get install git
+     sudo apt-get update && apt-get upgrade
+     sudo apt-get install golang
+     sudo apt-get install rsync
+     sudo apt-get install git
     
 ### Install npm
     sudo apt-get install npm
 
 ### Install redis-server
 
-    $ sudo apt-get install redis-server
+     sudo apt-get install redis-server
 
 It is recommended to bind your DB address on 127.0.0.1 or on internal ip. Also, please set up the password for advanced security!!!
 
 ### Install nginx
 
-    $ sudo apt-get install nginx
+     sudo apt-get install nginx
 
 Search on Google for nginx-setting
 
@@ -62,8 +62,8 @@ Search on Google for nginx-setting
 
 This will install the latest nodejs
 
-    $ curl -sL https://deb.nodesource.com/setup_19.x | sudo -E bash -
-    $ sudo apt-get install -y nodejs
+     curl -sL https://deb.nodesource.com/setup_19.x | sudo -E bash -
+     sudo apt-get install -y nodejs
     
 ### Run core-geth   
 
@@ -82,7 +82,7 @@ This will install the latest nodejs
 ```
 If you use Ubuntu, it is easier to control services by using serviced.
 
-    $ sudo nano /etc/systemd/system/geth.service
+     sudo nano /etc/systemd/system/geth.service
     
  Copy the following example
 
@@ -132,7 +132,7 @@ Clone & compile:
 
 ### Modify configuration file
 
-    $ nano ~/open-etc-pool-friends/www/config/environment.js
+     nano ~/open-etc-pool-friends/www/config/environment.js
 
 Make some modifications in these settings.
 
@@ -162,14 +162,14 @@ Change <code>ApiUrl: '//example.net/'</code> in <code>www/config/environment.js<
 
 Install deps
 
-    $ sudo npm install -g ember-cli@2.18
-    $ sudo npm install -g bower
-    $ sudo chown -R $USER:$GROUP ~/.npm
-    $ sudo chown -R $USER:$GROUP ~/.config
-    $ npm install
-    $ bower install
-    $ ember install ember-truth-helpers
-    $ npm install jdenticon@2.1.0
+     sudo npm install -g ember-cli@2.18
+     sudo npm install -g bower
+     sudo chown -R $USER:$GROUP ~/.npm
+     sudo chown -R $USER:$GROUP ~/.config
+     npm install
+     bower install
+     ember install ember-truth-helpers
+     npm install jdenticon@2.1.0
 
 Build.
      
@@ -180,7 +180,7 @@ Build.
 ### Run Pool api.json
 It is required to run pool by serviced. If it is not, the terminal could be stopped, and pool doesn’t work.
 
-    $ sudo nano /etc/systemd/system/api.service
+     sudo nano /etc/systemd/system/api.service
 
 Copy the following example
 
@@ -202,18 +202,18 @@ WantedBy=multi-user.target
 ```
 Then run api by the following commands
 
-    $ sudo systemctl enable api
-    $ sudo systemctl start api
+     sudo systemctl enable api
+     sudo systemctl start api
 
 If you want to debug the node command
 
-    $ sudo systemctl status api
+     sudo systemctl status api
 
 As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
 
 Set up nginx.
 
-    $ sudo nano /etc/nginx/sites-available/default
+     sudo nano /etc/nginx/sites-available/default
 
 Modify based on configuration file.
 
@@ -248,8 +248,9 @@ Modify based on configuration file.
 
 After setting nginx is completed, run the command below.
 
-    $ sudo service nginx restart
-    $ sudo journalctl -f     //status all 
+     sudo service nginx restart
+     status all
+     sudo journalctl -f 
     
     
 #### Customization
@@ -514,14 +515,14 @@ rerun ./build.sh
 First, install the Certbot's Nginx package with apt-get
 
 ```
-$ sudo apt-get update
-$ sudo apt-get install python3-certbot-nginx
+ sudo apt-get update
+ sudo apt-get install python3-certbot-nginx
 ```
 
 And then open your nginx setting file, make sure the server name is configured!
 
 ```
-$ sudo nano /etc/nginx/sites-available/default
+ sudo nano /etc/nginx/sites-available/default
 . . .
 server_name <your-pool-domain>;
 . . .
@@ -530,7 +531,7 @@ server_name <your-pool-domain>;
 Change the _ to your pool domain, and now you can obtain your auto-renewaled ssl certificate for free!
 
 ```
-$ sudo certbot --nginx -d <your-pool-domain>
+ sudo certbot --nginx -d <your-pool-domain>
 ```
 
 Now you can access your pool's frontend via https! Share your pool link!
