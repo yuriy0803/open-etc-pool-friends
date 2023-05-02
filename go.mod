@@ -6,7 +6,7 @@ require (
 	github.com/ethereum/go-ethereum v1.11.6
 	github.com/gorilla/mux v1.8.0
 	github.com/robfig/cron v1.2.0
-	github.com/yuriy0803/etchash v0.0.0-20230223191039-6ceba5f17b4d
+	github.com/yuriy0803/etchash v0.0.0-20230502193026-b69df1bc8d7b
 	github.com/yvasiyarov/gorelic v0.0.7
 	gopkg.in/redis.v3 v3.6.4
 )
