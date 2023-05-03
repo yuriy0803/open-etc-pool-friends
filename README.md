@@ -285,6 +285,8 @@ otherwise you will get errors on start because of JSON comments.**
   "pplns": 9000,
    // mordor, classic, ethereum, ropsten or ubiq, callisto, etica, ethereumPow, ethereumFair, expanse
   "network": "classic",
+  // etchash, ethash, ubqhash
+  "algo": "etchash",
   // exchange api coingecko
   "coin-name":"etc",
   
