@@ -90,7 +90,6 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
-		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
