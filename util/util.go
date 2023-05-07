@@ -36,7 +36,17 @@ func MakeTimestamp() int64 {
 func GetTargetHex(diff int64) string {
 	difficulty := big.NewInt(diff)
 	diff1 := new(big.Int).Div(pow256, difficulty)
-	return string(hexutil.Encode(diff1.Bytes()))
+	targetBytes := diff1.Bytes()
+
+	// The target bytes should be exactly 32 bytes long.
+	if len(targetBytes) < 32 {
+		padding := make([]byte, 32-len(targetBytes))
+		targetBytes = append(padding, targetBytes...)
+	}
+
+	targetStr := hexutil.Encode(targetBytes)
+
+	return targetStr
 }
 
 func TargetHexToDiff(targetHex string) *big.Int {
