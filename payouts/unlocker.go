@@ -35,11 +35,6 @@ type UnlockerConfig struct {
 
 const minDepth = 16
 
-// params for ethereumPow
-const byzantiumHardForkHeightethereumPow = 7280000
-
-var byzantiumEthereumpow = math.MustParseBig256("2000000000000000000")
-
 // Donate 1% from pool fees to developers
 const donationFee = 1.0
 const donationAccount = "0xd97e0075Abe7dC9e12805345336340649b8658Df"
@@ -722,10 +717,9 @@ func getConstRewardExpanse(height int64) *big.Int {
 }
 
 func getConstRewardEthereumpow(height int64) *big.Int {
-	if height >= byzantiumHardForkHeight {
-		return new(big.Int).Set(byzantiumEthereumpow)
-	}
-	return new(big.Int).Set(byzantiumEthereumpow)
+	// Rewards)
+	// EthereumPow
+	return calcBigNumber(2.0)
 }
 
 // ubqhash
