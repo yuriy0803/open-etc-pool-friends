@@ -12,7 +12,7 @@ import (
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
-const maxBacklog = 3
+const maxBacklog = 10
 
 type heightDiffPair struct {
 	diff   *big.Int
@@ -59,9 +59,13 @@ func (s *ProxyServer) fetchBlockTemplate() {
 		return
 	}
 	// No need to update, we have fresh job
-	if t != nil && t.Header == reply[0] {
-		return
-	}
+	if t != nil {
+		if t.Header == reply[0] {
+			return
+		}
+		if _, ok := t.headers[reply[0]]; ok {
+			return
+		}
 
 	pendingReply.Difficulty = util.ToHex(s.config.Proxy.Difficulty)
 
