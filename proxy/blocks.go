@@ -66,6 +66,7 @@ func (s *ProxyServer) fetchBlockTemplate() {
 		if _, ok := t.headers[reply[0]]; ok {
 			return
 		}
+	}
 
 	pendingReply.Difficulty = util.ToHex(s.config.Proxy.Difficulty)
 
