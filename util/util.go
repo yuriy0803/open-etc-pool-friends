@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/hex"
 	"math/big"
 	"regexp"
 	"strconv"
@@ -17,6 +18,14 @@ var Shannon = math.BigPow(10, 9)
 var pow256 = math.BigPow(2, 256)
 var addressPattern = regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
 var zeroHash = regexp.MustCompile("^0?x?0+$")
+
+var Diff1 = StringToBig("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+
+func StringToBig(h string) *big.Int {
+	n := new(big.Int)
+	n.SetString(h, 0)
+	return n
+}
 
 func IsValidHexAddress(s string) bool {
 	if IsZeroHash(s) || !addressPattern.MatchString(s) {
@@ -35,8 +44,13 @@ func MakeTimestamp() int64 {
 
 func GetTargetHex(diff int64) string {
 	difficulty := big.NewInt(diff)
-	diff1 := new(big.Int).Div(pow256, difficulty)
-	return string(hexutil.Encode(diff1.Bytes()))
+	diff1 := new(big.Int).Div(Diff1, difficulty)
+	targetBytes := diff1.Bytes()
+	if len(targetBytes) < 32 {
+		padding := make([]byte, 32-len(targetBytes))
+		targetBytes = append(padding, targetBytes...)
+	}
+	return "0x" + hex.EncodeToString(targetBytes)
 }
 
 func TargetHexToDiff(targetHex string) *big.Int {
