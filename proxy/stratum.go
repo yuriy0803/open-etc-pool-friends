@@ -198,6 +198,11 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 			return err
 		}
 
+		if params[1] != "EthereumStratum/1.0.0" && params[0] != "GodMiner/2.0.0" {
+			log.Println("Unsupported stratum version from", cs.ip)
+			return cs.sendStratumError(req.Id, "unsupported stratum version")
+		}
+
 		cs.ExtranonceSub = true
 		cs.setStratumMode("EthereumStratum/1.0.0")
 		log.Println("Nicehash subscribe", cs.ip)
