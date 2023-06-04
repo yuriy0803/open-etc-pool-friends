@@ -32,6 +32,7 @@ export const state = () => ({
   roundShares: 0,
   height: 0,
   difficulty: 0,
+  blocktime: 0,
   networkHashrate: 0,
   miners: {},
   blocks: {},
@@ -43,16 +44,16 @@ export const state = () => ({
 
 export const mutations = {
   SET_STATS(state, info) {
-    state.minersOnline = info.minersOnline | state.minersOnline
-    state.poolHashRate = info.poolHashRate | state.poolHashRate
-    state.lastBlockFound = info.lastBlockFound | state.lastBlockFound
-    state.roundShares = info.roundShares | state.roundShares
-    state.poolFee = info.poolFee | state.poolFee
-    state.height = info.height | state.height
-    state.difficulty = info.difficulty | state.difficulty
-    state.networkHashrate = state.difficulty / TARGET_TIME
+    state.minersOnline = info.minersOnline || state.minersOnline
+    state.poolHashRate = info.poolHashRate || state.poolHashRate
+    state.lastBlockFound = info.lastBlockFound || state.lastBlockFound
+    state.roundShares = info.roundShares || state.roundShares
+    state.poolFee = info.poolFee || state.poolFee
+    state.height = info.height || state.height
+    state.difficulty = info.difficulty || state.difficulty
+    state.networkHashrate = state.difficulty / info.blocktime // Verwenden Sie die blocktime von der API
     state.epoch = Math.trunc(info.height / EPOCH_LENGTH)
-    state.dagSize = 1024 + 8 * state.epoch
+    state.dagSize = state.epoch * 8192 / 1024 / 1024 + 1
   },
   SET_MINERS(state, miners) {
     state.miners = miners
@@ -79,6 +80,7 @@ export const actions = {
           height: data.nodes[0].height,
           difficulty: data.nodes[0].difficulty,
           lastBlockFound: data.stats.lastBlockFound,
+          blocktime: data.nodes[0].blocktime, // Hinzufügen der blocktime von der API
         }
         commit('SET_STATS', info)
       }
