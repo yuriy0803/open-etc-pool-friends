@@ -38,6 +38,10 @@ body > .container {
   margin: 20px 0;
 }
 
+.navbar {
+  display: flex;
+}
+
 .footer > .container {
   padding-right: 15px;
   padding-left: 15px;
