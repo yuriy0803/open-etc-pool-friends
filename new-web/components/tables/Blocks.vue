@@ -34,7 +34,7 @@
         }}</v-chip>
       </template>
       <template #[`item.timestamp`]="{ item }">
-        {{ dtf.format(item.timestamp * 1000) }}
+        {{ new Date(item.timestamp * 1000).toLocaleString() }}
       </template>
       <template #[`item.hash`]="{ item }">
         <explorer-link
@@ -81,14 +81,6 @@ export default {
   data() {
     return {
       search: null,
-      dtf: new Intl.DateTimeFormat('en', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-      }),
       nf: new Intl.NumberFormat(this.locale, {}),
     }
   },
