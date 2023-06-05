@@ -8,9 +8,7 @@
               <v-icon>mdi-cloud-outline</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.immatureBal')
-              }}</v-list-item-title>
+              <v-list-item-title>{{ $t('pages.account.immatureBal') }}</v-list-item-title>
               <v-list-item-subtitle>
                 {{ formatEther(data.stats.immature) }} {{ config.symbol }}
               </v-list-item-subtitle>
@@ -21,9 +19,7 @@
               <v-icon>mdi-bank</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.pendingBal')
-              }}</v-list-item-title>
+              <v-list-item-title>{{ $t('pages.account.pendingBal') }}</v-list-item-title>
               <v-list-item-subtitle>
                 {{ formatEther(data.stats.balance) }} {{ config.symbol }}
               </v-list-item-subtitle>
@@ -34,13 +30,10 @@
               <v-icon>mdi-cash</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.totalPaid')
-              }}</v-list-item-title>
-              <v-list-item-subtitle
-                >{{ formatEther(data.stats.paid) }}
-                {{ config.symbol }}</v-list-item-subtitle
-              >
+              <v-list-item-title>{{ $t('pages.account.totalPaid') }}</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ formatEther(data.stats.paid) }} {{ config.symbol }}
+              </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -52,12 +45,8 @@
               <v-icon>mdi-cube-send</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.lastShare')
-              }}</v-list-item-title>
-              <v-list-item-subtitle>{{
-                formatTimeSince(data.stats.lastShare)
-              }}</v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.lastShare') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ formatTimeSince(data.stats.lastShare) }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item class="border-right">
@@ -65,12 +54,8 @@
               <v-icon>mdi-gauge-full</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.hashrate30min')
-              }}</v-list-item-title>
-              <v-list-item-subtitle
-                >{{ formatHashrate(data.currentHashrate, true) }}
-              </v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.hashrate30min') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ formatHashrate(data.currentHashrate, true) }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item class="border-right">
@@ -78,12 +63,8 @@
               <v-icon>mdi-gauge-full</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.hashrate3hour')
-              }}</v-list-item-title>
-              <v-list-item-subtitle
-                >{{ formatHashrate(data.hashrate, true) }}
-              </v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.hashrate3hour') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ formatHashrate(data.hashrate, true) }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -95,12 +76,8 @@
               <v-icon>mdi-cube-scan</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.blocksFound')
-              }}</v-list-item-title>
-              <v-list-item-subtitle>{{
-                nf.format(data.stats.blocksFound)
-              }}</v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.blocksFound') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ nf.format(data.stats.blocksFound) }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item class="border-right">
@@ -108,12 +85,8 @@
               <v-icon>mdi-pickaxe</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.workersOnline')
-              }}</v-list-item-title>
-              <v-list-item-subtitle>{{
-                data.workersOnline
-              }}</v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.workersOnline') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ data.workersOnline }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item class="border-right">
@@ -121,12 +94,8 @@
               <v-icon>mdi-clock-outline</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{
-                $t('pages.account.roundShare')
-              }}</v-list-item-title>
-              <v-list-item-subtitle
-                >{{ data.roundShares }}%
-              </v-list-item-subtitle>
+              <v-list-item-title>{{ $t('pages.account.roundShare') }}</v-list-item-title>
+              <v-list-item-subtitle>{{ data.roundShares }}%</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -137,26 +106,16 @@
     </v-alert>
     <v-alert tile dismissible type="info">
       {{ $t('pages.account.jsonApi') }}
-      <a
-        :href="
-          config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71'
-        "
-        target="_blank"
-        style="color: #fff"
-      >
-        {{
-          config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71'
-        }}
+      <a :href="config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71'" target="_blank" style="color: #fff">
+        {{ config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71' }}
       </a>
     </v-alert>
     <v-tabs v-model="tab" grow>
       <v-tab>
-        {{ $t('pages.account.workers')
-        }}<v-chip label x-small class="ml-2">{{ data.workersTotal }}</v-chip>
+        {{ $t('pages.account.workers') }}<v-chip label x-small class="ml-2">{{ data.workersTotal }}</v-chip>
       </v-tab>
       <v-tab>
-        {{ $t('pages.account.payments')
-        }}<v-chip label x-small class="ml-2">{{ data.paymentsTotal }}</v-chip>
+        {{ $t('pages.account.payments') }}<v-chip label x-small class="ml-2">{{ data.paymentsTotal }}</v-chip>
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
@@ -166,15 +125,9 @@
             <thead>
               <tr>
                 <th class="text-left">{{ $t('pages.account.worker.id') }}</th>
-                <th class="text-left">
-                  {{ $t('pages.account.worker.hashrateShort') }}
-                </th>
-                <th class="text-left">
-                  {{ $t('pages.account.worker.hashrateLong') }}
-                </th>
-                <th class="text-left">
-                  {{ $t('pages.account.worker.lastShare') }}
-                </th>
+                <th class="text-left">{{ $t('pages.account.worker.hashrateShort') }}</th>
+                <th class="text-left">{{ $t('pages.account.worker.hashrateLong') }}</th>
+                <th class="text-left">{{ $t('pages.account.worker.lastShare') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -261,14 +214,15 @@ export default {
     },
   },
   created() {
-    this.fetchData(this.id)
+    this.fetchData(this.id);
+    setInterval(() => {
+      this.fetchData(this.id);
+    }, 1000);
   },
   methods: {
     async fetchData(address) {
       try {
-        const { data } = await axios.get(
-          this.config.api + '/accounts/' + address
-        )
+        const { data } = await axios.get(this.config.api + '/accounts/' + address)
         if (data) {
           this.data = data
         }
