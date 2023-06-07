@@ -283,7 +283,7 @@ otherwise you will get errors on start because of JSON comments.**
   "name": "main",
   // shares or (solo "pplns": 0,)
   "pplns": 9000,
-   // mordor, classic, ethereum, ropsten or ubiq, callisto, etica, ethereumPow, ethereumFair, expanse
+   // mordor, classic, ethereum, ropsten or ubiq, callisto, etica, ethereumPow, ethereumFair, expanse, octaspace
   "network": "classic",
   // etchash, ethash, ubqhash
   "algo": "etchash",

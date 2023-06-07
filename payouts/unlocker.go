@@ -51,6 +51,9 @@ var constantinopleBlockReward = big.NewInt(2e+18)
 // params for ubqhash
 var ubiqStartReward = big.NewInt(8e+18)
 
+// params for Octaspace
+var octaspaceStartReward = big.NewInt(650e+16)
+
 // params for expanse
 const byzantiumHardForkHeight = 800000
 
@@ -97,6 +100,8 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	} else if network == "callisto" {
 		// nothing needs configuring here, simply proceed.
 	} else if network == "ubiq" {
+		// nothing needs configuring here, simply proceed.
+	} else if network == "octaspace" {
 		// nothing needs configuring here, simply proceed.
 	} else {
 		log.Fatalln("Invalid network set", network)
@@ -322,6 +327,12 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		uncleReward := new(big.Int).Div(reward, big32)
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
+	} else if u.config.Network == "octaspace" {
+		reward = getConstRewardOctaspace(candidate.Height)
+		// Add reward for including uncles
+		uncleReward := new(big.Int).Div(reward, big32)
+		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+		reward.Add(reward, rewardForUncles)
 	} else {
 		log.Fatalln("Invalid network set", u.config.Network)
 	}
@@ -381,6 +392,8 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleRewardEthereumpow(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardEthereumpow(height))
 	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" || cfg.Network == "ethereumFair" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
+	} else if cfg.Network == "octaspace" {
+		reward = getUncleRewardOctaspace(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardOctaspace(height))
 	}
 	candidate.Height = height
 	candidate.UncleHeight = uncleHeight
@@ -767,6 +780,52 @@ func getConstRewardUbiq(height int64) *big.Int {
 	}
 
 	return reward
+}
+
+// Octaspace
+func getConstRewardOctaspace(height int64) *big.Int {
+	// Rewards
+	reward := new(big.Int).Set(octaspaceStartReward)
+	headerNumber := big.NewInt(height)
+
+	if headerNumber.Cmp(big.NewInt(400_000)) > 0 {
+		reward = big.NewInt(500e+16)
+		// ArcturusBlock
+	}
+	if headerNumber.Cmp(big.NewInt(1_000_000)) > 0 {
+		reward = big.NewInt(400e+16)
+		// OldenburgBlock
+	}
+	if headerNumber.Cmp(big.NewInt(1_500_000)) > 0 {
+		reward = big.NewInt(350e+16)
+		// ZagamiBlock
+	}
+	if headerNumber.Cmp(big.NewInt(2_000_000)) > 0 {
+		reward = big.NewInt(300e+16)
+		// SpringwaterBlock
+	}
+	// PolarisBlock
+	if headerNumber.Cmp(big.NewInt(2_500_000)) >= 0 {
+		reward = big.NewInt(280e+16)
+	}
+
+	// MahasimBlock
+	if headerNumber.Cmp(big.NewInt(3_000_000)) >= 0 {
+		reward = big.NewInt(230e+16)
+	}
+
+	return reward
+}
+
+// Octaspace Uncle rw
+func getUncleRewardOctaspace(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
+	r := new(big.Int)
+	r.Add(uHeight, big8)
+	r.Sub(r, height)
+	r.Mul(r, reward)
+	r.Div(r, big8)
+
+	return r
 }
 
 func calcBigNumber(reward float64) *big.Int {
