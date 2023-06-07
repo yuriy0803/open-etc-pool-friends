@@ -1,7 +1,7 @@
 ## Open Source Ethereum Mining Pool PPLNS / SOLO
 
 ### Donations
-
+1
 * Donate 1% from pool fees to developers (Attention becomes automatic)
 
 ### My [Pool](https://etc.yu-tam.contact).
