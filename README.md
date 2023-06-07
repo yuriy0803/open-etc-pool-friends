@@ -1,5 +1,5 @@
 ## Open Source Ethereum Mining Pool PPLNS / SOLO
-
+d
 ### Donations
 
 * Donate 1% from pool fees to developers (Attention becomes automatic)
