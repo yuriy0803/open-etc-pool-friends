@@ -790,28 +790,29 @@ func getConstRewardOctaspace(height int64) *big.Int {
 
 	if headerNumber.Cmp(big.NewInt(400_000)) > 0 {
 		reward = big.NewInt(500e+16)
-		// ArcturusBlock
+		// ArcturusBlock 5.00
 	}
 	if headerNumber.Cmp(big.NewInt(1_000_000)) > 0 {
 		reward = big.NewInt(400e+16)
-		// OldenburgBlock
+		// OldenburgBlock 4.00
 	}
 	if headerNumber.Cmp(big.NewInt(1_500_000)) > 0 {
 		reward = big.NewInt(350e+16)
-		// ZagamiBlock
+		// ZagamiBlock 3.50
 	}
 	if headerNumber.Cmp(big.NewInt(2_000_000)) > 0 {
 		reward = big.NewInt(300e+16)
-		// SpringwaterBlock
+		// SpringwaterBlock 3.00
 	}
 	// PolarisBlock
 	if headerNumber.Cmp(big.NewInt(2_500_000)) >= 0 {
 		reward = big.NewInt(280e+16)
+		// PolarisBlock 2.80
 	}
 
-	// MahasimBlock
 	if headerNumber.Cmp(big.NewInt(3_000_000)) >= 0 {
 		reward = big.NewInt(230e+16)
+		// MahasimBlock 2.30
 	}
 
 	return reward
