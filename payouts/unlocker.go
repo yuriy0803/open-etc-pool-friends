@@ -741,9 +741,9 @@ func getUncleReward(uHeight *big.Int, height *big.Int, era *big.Int, reward *big
 // expanse
 func getConstRewardExpanse(height int64) *big.Int {
 	if height >= byzantiumHardForkHeight {
-		return new(big.Int).Set(homesteadExpanseReward)
+		return new(big.Int).Set(byzantiumExpanseReward)
 	}
-	return new(big.Int).Set(byzantiumExpanseReward)
+	return new(big.Int).Set(homesteadExpanseReward)
 }
 
 func getConstRewardEthereumpow(height int64) *big.Int {
