@@ -213,6 +213,17 @@
         </v-list-item>
         <v-list-item class="stats-item ma-1">
           <v-list-item-avatar>
+            <v-icon>mdi-lock</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title>{{
+             $t('pages.blocks.variance')
+            }}</v-list-item-title>
+            <v-list-item-subtitle>{{ stats.percent }}%</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="stats-item ma-1">
+          <v-list-item-avatar>
             <v-icon>mdi-timer-sand</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
