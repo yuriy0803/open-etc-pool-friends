@@ -9,11 +9,8 @@ sleep 2
 
 echo "Update... Please wait!"
 
-
-
-
+git stash
 git pull
-
 
 echo ""
 echo "Update complete!"
