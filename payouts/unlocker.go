@@ -36,6 +36,8 @@ type UnlockerConfig struct {
 const minDepth = 16
 
 // Universal block reward ethash
+const UniversalHardForkHeight = 0
+
 var UniversalBlockReward = math.MustParseBig256("2000000000000000000") // 2.00
 var UniversalUncleReward = math.MustParseBig256("1750000000000000000") // 1.75
 
@@ -407,7 +409,7 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 	} else if cfg.Network == "octaspace" {
 		reward = getUncleRewardOctaspace(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardOctaspace(height))
 	} else if cfg.Network == "universal" {
-		reward = getUncleRewardUniversal(uncleHeight, candidate.Height)
+		reward = getUncleRewardUniversal(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUniversal(height))
 	}
 
 	candidate.Height = height
@@ -942,15 +944,19 @@ func getUncleRewardEthereumpow(uHeight *big.Int, height *big.Int, reward *big.In
 	return r
 }
 
-// expanse Universal
+//  Universal
+
 func getConstRewardUniversal(height int64) *big.Int {
-	if big.NewInt(height).Cmp(UniversalBlockReward) >= 0 {
+	if height >= UniversalHardForkHeight {
 		return new(big.Int).Set(UniversalBlockReward)
 	}
 	return new(big.Int).Set(UniversalBlockReward)
 }
-func getUncleRewardUniversal(uHeight, height int64) *big.Int {
+
+func getUncleRewardUniversal(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
+
 	return new(big.Int).Set(UniversalUncleReward)
+
 }
 
 // expanse Uncle rw
