@@ -436,20 +436,26 @@ func (r *RedisClient) GetAllMinerAccount() (account []string, err error) {
 	return account, nil
 }
 
-func (r *RedisClient) GetMinerCharts(hashNum int64, login string) (stats []*MinerCharts, err error) {
-
+func (r *RedisClient) GetMinerCharts(hashNum int64, login string, args ...int64) (stats []*MinerCharts, err error) {
 	tx := r.client.Multi()
 	defer tx.Close()
 	now := util.MakeTimestamp() / 1000
 	cmds, err := tx.Exec(func() error {
-		tx.ZRemRangeByScore(r.formatKey("charts", "miner", login), "-inf", fmt.Sprint("(", now-172800))
-		tx.ZRevRangeWithScores(r.formatKey("charts", "miner", login), 0, hashNum)
+		if len(args) > 0 && args[0] >= 0 {
+			deleteCount := args[0]
+			if deleteCount == 0 {
+				tx.ZRemRangeByScore(r.formatKey("charts", "miner", login), "-inf", fmt.Sprint("(", now-86400))
+			} else {
+				tx.ZRemRangeByRank(r.formatKey("charts", "miner", login), 0, deleteCount-1)
+			}
+		}
+		tx.ZRevRangeWithScores(r.formatKey("charts", "miner", login), 0, hashNum-1)
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	stats = convertMinerChartsResults(cmds[1].(*redis.ZSliceCmd))
+	stats = convertMinerChartsResults(cmds[len(cmds)-1].(*redis.ZSliceCmd))
 	return stats, nil
 }
 

@@ -441,6 +441,10 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 		stats["pageSize"] = s.config.Payments
 		stats["exchangedata"] = generalstats["exchangedata"]
 		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
+
+		// Aufruf mit Löschoperation (alle Einträge, die älter als 24 Stunden sind, werden gelöscht)
+		deleteCount := int64(0)
+		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login, deleteCount)
 		stats["shareCharts"], err = s.backend.GetShareCharts(s.config.ShareChartsNum, login)
 		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
 		reply = &Entry{stats: stats, updatedAt: now}
