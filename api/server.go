@@ -134,6 +134,23 @@ func (s *ApiServer) Start() {
 				s.collectMinerCharts(login, miner["currentHashrate"].(int64), miner["hashrate"].(int64), miner["workersOnline"].(int64))
 			}
 		})
+
+		c.AddFunc("0 0 */1 * *", func() {
+			// Delete old miner data
+			err := s.backend.DeleteOldMinerData()
+			if err != nil {
+				log.Println("Error deleting old miner data:", err)
+			}
+		})
+
+		c.AddFunc("0 0 */1 * *", func() {
+			// Delete old share data
+			err := s.backend.DeleteOldShareData()
+			if err != nil {
+				log.Println("Error deleting old share data:", err)
+			}
+		})
+
 		///test share chart
 		shareCharts := s.config.ShareCharts
 		log.Printf("Share charts config is :%v", shareCharts)
@@ -441,10 +458,6 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 		stats["pageSize"] = s.config.Payments
 		stats["exchangedata"] = generalstats["exchangedata"]
 		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
-
-		// Aufruf mit Löschoperation (alle Einträge, die älter als 24 Stunden sind, werden gelöscht)
-		deleteCount := int64(0)
-		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login, deleteCount)
 		stats["shareCharts"], err = s.backend.GetShareCharts(s.config.ShareChartsNum, login)
 		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
 		reply = &Entry{stats: stats, updatedAt: now}

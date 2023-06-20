@@ -436,27 +436,67 @@ func (r *RedisClient) GetAllMinerAccount() (account []string, err error) {
 	return account, nil
 }
 
-func (r *RedisClient) GetMinerCharts(hashNum int64, login string, args ...int64) (stats []*MinerCharts, err error) {
+func (r *RedisClient) GetMinerCharts(hashNum int64, login string) (stats []*MinerCharts, err error) {
+
 	tx := r.client.Multi()
 	defer tx.Close()
 	now := util.MakeTimestamp() / 1000
 	cmds, err := tx.Exec(func() error {
-		if len(args) > 0 && args[0] >= 0 {
-			deleteCount := args[0]
-			if deleteCount == 0 {
-				tx.ZRemRangeByScore(r.formatKey("charts", "miner", login), "-inf", fmt.Sprint("(", now-86400))
-			} else {
-				tx.ZRemRangeByRank(r.formatKey("charts", "miner", login), 0, deleteCount-1)
-			}
-		}
-		tx.ZRevRangeWithScores(r.formatKey("charts", "miner", login), 0, hashNum-1)
+		tx.ZRemRangeByScore(r.formatKey("charts", "miner", login), "-inf", fmt.Sprint("(", now-172800))
+		tx.ZRevRangeWithScores(r.formatKey("charts", "miner", login), 0, hashNum)
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	stats = convertMinerChartsResults(cmds[len(cmds)-1].(*redis.ZSliceCmd))
+	stats = convertMinerChartsResults(cmds[1].(*redis.ZSliceCmd))
 	return stats, nil
+}
+
+// DeleteOldMinerData deletes old miner data from the "miner" ZSets.
+// All entries that are older than 24 hours are removed.
+func (r *RedisClient) DeleteOldMinerData() error {
+	now := time.Now()
+	pastTime := now.Add(-24 * time.Hour)
+
+	// Retrieve all keys matching the pattern "charts:miner:*"
+	loginKeys, err := r.client.Keys(r.formatKey("charts", "miner", "*")).Result()
+	if err != nil {
+		return err
+	}
+
+	// Iterate through all found keys and remove the old entries
+	for _, loginKey := range loginKeys {
+		_, err := r.client.ZRemRangeByScore(loginKey, "-inf", fmt.Sprintf("(%d", pastTime.Unix())).Result()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// DeleteOldShareData deletes old share data from the "share" ZSets.
+// All entries that are older than 24 hours are removed.
+func (r *RedisClient) DeleteOldShareData() error {
+	now := time.Now()
+	pastTime := now.Add(-24 * time.Hour)
+
+	// Retrieve all keys matching the pattern "charts:share:*"
+	shareKeys, err := r.client.Keys(r.formatKey("charts", "share", "*")).Result()
+	if err != nil {
+		return err
+	}
+
+	// Iterate through all found keys and remove the old entries
+	for _, shareKey := range shareKeys {
+		_, err := r.client.ZRemRangeByScore(shareKey, "-inf", fmt.Sprintf("(%d", pastTime.Unix())).Result()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *RedisClient) GetShareCharts(shareNum int64, login string) (stats []*ShareCharts, err error) {
