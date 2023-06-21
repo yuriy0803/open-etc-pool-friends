@@ -106,8 +106,8 @@
     </v-alert>
     <v-alert tile dismissible type="info">
       {{ $t('pages.account.jsonApi') }}
-      <a :href="config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71'" target="_blank" style="color: #fff">
-        {{ config.api + '/accounts/0xda904bc07fd95e39661941b3f6daded1b8a38c71' }}
+      <a :href="`${config.api}/accounts/${id}`" target="_blank" style="color: #fff">
+        {{ `${config.api}/accounts/${id}` }}
       </a>
     </v-alert>
     <v-tabs v-model="tab" grow>
