@@ -60,10 +60,27 @@ Search on Google for nginx-setting
 
 ### Install NODE
 
-This will install the latest nodejs
+**See source**: [https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 
-     curl -sL https://deb.nodesource.com/setup_19.x | sudo -E bash -
-     sudo apt-get install -y nodejs
+**curl to setup the node.js repository in your sources.**
+
+`curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -`
+
+**Now install node.js.** *Note the command name changes in ubuntu, `nodejs` instead of `node`. This is to avoid a name conflict with a package called `node` in ubuntu.
+`sudo apt-get install -y nodejs`
+
+## Optional (
+**Install bower**. __*NOTE:*__ Used by https://github.com/adiwg/mdEditor
+
+### Warning
+```
+npm WARN deprecated bower@1.8.2: ...psst! Your project can stop working at any moment because its dependencies can change. Prevent this by migrating to Yarn: https://bower.io/blog/2017/how-to-migrate-away-from-bower/
+/usr/bin/bower -> /usr/lib/node_modules/bower/bin/bower
+```
+
+*YOU HAVE BEEN WARNED*
+
+`sudo npm install -g bower`
     
 ### Run core-geth   
 
