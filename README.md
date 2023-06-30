@@ -64,7 +64,7 @@ Search on Google for nginx-setting
 
 **curl to setup the node.js repository in your sources.**
 
-`curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -`
+`curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -`
 
 **Now install node.js.** *Note the command name changes in ubuntu, `nodejs` instead of `node`. This is to avoid a name conflict with a package called `node` in ubuntu.
 `sudo apt-get install -y nodejs`
