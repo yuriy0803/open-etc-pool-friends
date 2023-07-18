@@ -18,6 +18,9 @@ import (
 
 const (
 	MaxReqSize = 1024
+)
+
+const (
 	EthProxy int = iota
 	NiceHash
 )
