@@ -640,5 +640,26 @@ func (cs *Session) getNotificationResponse(s *ProxyServer) interface{} {
 	result[0] = []string{"mining.notify", randomHex(16), "EthereumStratum/1.0.0"}
 	result[1] = cs.Extranonce
 
+	// Additional response data for NiceHash stratum mode
+	if cs.stratumMode() == NiceHash {
+		t := s.currentBlockTemplate()
+		if t != nil {
+			// Construct the response for NiceHash "mining.notify"
+			jobID := randomHex(8)
+			seedHash := t.Seed
+			headerHash := t.Header
+			height := util.ToHex1(int64(t.Height))
+			// TO DO: Clean up the response structure based on actual data in "t"
+
+			result = []interface{}{
+				"mining.notify",
+				jobID,
+				seedHash,
+				headerHash,
+				height,
+			}
+		}
+	}
+
 	return result
 }
