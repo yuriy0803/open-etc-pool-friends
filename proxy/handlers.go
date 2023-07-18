@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -173,10 +174,10 @@ func (s *ProxyServer) handleGetBlockByNumberRPC() *rpc.GetBlockReplyPart {
 	return reply
 }
 
-// handleUnknownRPC handles an unknown RPC request method.
-// It logs an error and returns an error reply.
-func (s *ProxyServer) handleUnknownRPC(cs *Session, m string) *ErrorReply {
-	log.Printf("Unknown request method %s from %s", m, cs.ip)
-	s.policy.ApplyMalformedPolicy(cs.ip)
-	return &ErrorReply{Code: -3, Message: "Method not found"}
+// handleUnknownRPC handles incoming requests with unknown methods
+func (s *ProxyServer) handleUnknownRPC(cs *Session, method string) *ErrorReply {
+	// Implement your logic for handling unknown methods here
+	// For example, you can return a custom error indicating that the method is not supported
+	errMsg := fmt.Sprintf("Method %s not supported", method)
+	return &ErrorReply{Code: -32601, Message: errMsg}
 }
