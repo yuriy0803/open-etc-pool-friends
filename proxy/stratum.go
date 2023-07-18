@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"math/rand"
@@ -393,12 +392,8 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 		return cs.sendTCPResult(req.Id, &reply)
 
 	case "eth_submitHashrate":
-		// Return an error indicating that the method is not supported
-		errMsg := fmt.Sprintf("Method %s not supported", req.Method)
-		errReply := &ErrorReply{Code: -32601, Message: errMsg}
-		return cs.sendTCPError(req.Id, errReply)
+		return cs.sendTCPResult(req.Id, true)
 	default:
-		// Handle unknown methods
 		errReply := s.handleUnknownRPC(cs, req.Method)
 		return cs.sendTCPError(req.Id, errReply)
 	}
