@@ -31,6 +31,10 @@ var Block = Ember.Object.extend({
 		return this.get('variance') <= 1.0;
 	}),
 
+	isHard: Ember.computed('variance', function() {
+		return this.get('variance') >= 1.2;
+	}),
+
 	isOk: Ember.computed('orphan', 'uncle', function() {
 		return !this.get('orphan');
 	}),

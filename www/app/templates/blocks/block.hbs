@@ -20,7 +20,11 @@
     {{#if block.isLucky}}
       <span class="label label-success">{{format-number block.variance style='percent'}}</span>
     {{else}}
-      <span class="label label-info">{{format-number block.variance style='percent'}}</span>
+        {{#if block.isHard}}
+          <span class="label label-danger">{{format-number block.variance style='percent'}}</span>
+        {{else}}
+          <span class="label label-info">{{format-number block.variance style='percent'}}</span>
+        {{/if}}
     {{/if}}
   </td>
   <td>
