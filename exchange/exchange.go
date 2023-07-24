@@ -37,6 +37,8 @@ type RestClient struct {
 	client      *http.Client
 }
 
+type ExchangeReply1 map[string]interface{}
+
 type ExchangeReply []map[string]interface{}
 
 func NewRestClient(name, url, timeout string) *RestClient {
@@ -54,9 +56,23 @@ func (r *RestClient) GetData() (ExchangeReply, error) {
 		return nil, err
 	}
 
+	// Attempt to interpret the response as a slice of maps
 	var data ExchangeReply
 	err = json.Unmarshal(resp, &data)
-	return data, err
+	if err == nil {
+		return data, nil
+	}
+
+	// If interpreting as a slice of maps fails, try to interpret it as a single map
+	var dataSingle ExchangeReply1
+	err = json.Unmarshal(resp, &dataSingle)
+	if err == nil {
+		// Convert the single map into a slice of maps with only one entry
+		data = ExchangeReply{dataSingle}
+		return data, nil
+	}
+
+	return nil, err
 }
 
 func StartExchangeProcessor(cfg *ExchangeConfig, backend *storage.RedisClient) *ExchangeProcessor {
