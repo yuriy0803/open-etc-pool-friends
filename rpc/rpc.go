@@ -13,8 +13,25 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-
 	"github.com/yuriy0803/open-etc-pool-friends/util"
+)
+
+const (
+	// RPC method "eth_getWork"
+	RPCEthGetWork = "eth_getWork"
+
+	// RPC method "eth_getBlockByNumber"
+	RPCEthGetBlockByNumber = "eth_getBlockByNumber"
+
+	// RPC method "eth_getBlockByHash"
+	RPCEthGetBlockByHash = "eth_getBlockByHash"
+
+	// Additional RPC method constants can be added here
+	RPCMethodFoo = "foo"
+	RPCMethodBar = "bar"
+
+	RPCMethodBaz = "baz"
+	RPCMethodQux = "qux"
 )
 
 type RPCClient struct {
@@ -34,8 +51,8 @@ type GetBlockReply struct {
 	Miner         string   `json:"miner"`
 	Difficulty    string   `json:"difficulty"`
 	GasLimit      string   `json:"gasLimit"`
-	BaseFeePerGas string   `json:"baseFeePerGas"`
 	GasUsed       string   `json:"gasUsed"`
+	BaseFeePerGas string   `json:"baseFeePerGas"`
 	Timestamp     string   `json:"timestamp"`
 	Transactions  []Tx     `json:"transactions"`
 	Uncles        []string `json:"uncles"`
@@ -207,6 +224,19 @@ func (r *RPCClient) GetPeerCount() (int64, error) {
 	return strconv.ParseInt(strings.Replace(reply, "0x", "", -1), 16, 64)
 }
 
+func (r *RPCClient) GetGasPrice() (int64, error) {
+	rpcResp, err := r.doPost(r.Url, "eth_gasPrice", nil)
+	if err != nil {
+		return 0, err
+	}
+	var reply string
+	err = json.Unmarshal(*rpcResp.Result, &reply)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseInt(strings.Replace(reply, "0x", "", -1), 16, 64)
+}
+
 func (r *RPCClient) SendTransaction(from, to, gas, gasPrice, value string, autoGas bool) (string, error) {
 	params := map[string]string{
 		"from":  from,
@@ -214,7 +244,6 @@ func (r *RPCClient) SendTransaction(from, to, gas, gasPrice, value string, autoG
 		"value": value,
 	}
 	if !autoGas {
-		// Sends as Legacy TX
 		params["gas"] = gas
 		params["gasPrice"] = gasPrice
 	}
