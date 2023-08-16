@@ -7,7 +7,7 @@
 	"coin-name": "etc",
 	"payouts": {
 		"enabled": true,
-		"requirePeers": 1,
+		"requirePeers": 2,
 		"interval": "20m",
 		"daemon": "http://127.0.0.1:8545",
 		"timeout": "10s",
