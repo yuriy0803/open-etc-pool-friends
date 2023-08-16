@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ETC Mining Pool</title>
+    <title>PoolBE | Multicoin Mining Pool</title>
     <meta name="description" content="High profitability ETC mining pool"/>
-    <meta name="keywords" content="Ethereum, ethereum, Classic, classic, ETC, etc, pool, mining, cryptocurrency"/>
+    <meta name="keywords" content="ethereumclassic, etc, ETC, etchash, poolbe, classic, pool, mining, cryptocurrency"/>
     <script src="https://cdn.polyfill.io/v3/polyfill.min.js?features=Intl.~locale.en"></script>
     {{content-for "head"}}
     <link rel="stylesheet" href="{{rootURL}}assets/vendor.css">
@@ -19,17 +19,55 @@
 
     <script src="{{rootURL}}assets/vendor.js"></script>
     <script src="{{rootURL}}assets/open-etc-pool.js"></script>
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  </head>
+  <body>
+    <script>
+      var lastBlockHeight = 0;
+      function fetchBlocks() {
+        fetch('https://solo-etc.poolbe.eu/api/blocks')
+          .then(response => response.json())
+          .then(data => {
+            var blocks = data.candidates;
+            var latestBlock = blocks[0];
 
-    {{content-for "body-footer"}}
-
+            if (latestBlock.height > lastBlockHeight) {
+              showNotification(latestBlock.height, latestBlock.worker); // przekazanie wartosci worker do funkcji showNotification()
+              lastBlockHeight = latestBlock.height;
+            }
+          })
+          .catch(error => {
+          });
+      }
+      setInterval(fetchBlocks, 5000);
+      function showNotification(blockHeight, worker) {
+        Toastify({
+          text: "New Block Found!\nBlock Height: " + blockHeight + " Worker: " + worker,
+          duration: 5000,
+          gravity: "top",
+          position: "right",
+          stopOnFocus: true,
+          className: "info",
+        style: {
+        background: "linear-gradient(to right, #33ccff, #33ccff)",
+        },
+        }).showToast();
+      }
+</script>
+    
+    
     <footer class="footer">
+    <script type="text/javascript" src="https://unpkg.com/@coinpaprika/widget-currency/dist/widget.min.js"></script><div class="coinpaprika-currency-widget cp-widget__night-mode" data-primary-currency="usd" data-currency="etc-ethereum-classic" data-modules='["market_details"]' data-update-active="false"></div>
       <div class="container">
         <div class="text-center">
           <div class="row">
             <div class="col-md-12" style="text-align: center;">
-              <p class="text-muted" style="margin:20px 0">&copy;  |
-                Powered by <a href="https://github.com/yuriy0803/open-etc-pool-friends" target="_blank">open-etc-pool-friends</a>
+              <p class="text-muted" style="margin:20px 0">&copy;
+                2023 Brought to you by <a href="" target="_blank"><i class="fa fa-discord" style="color:#0088cc"></i>poolbe.eu</a> and <a href="https://github.com/yuriy0803/open-etc-pool-friends" target="_blank">open-etc-pool-friends</a>. This pool is fully compatible with <a href="https://www.miningrigrentals.com/"><img src="https://www.miningrigrentals.com/images/mrr-logo1.png" alt="" height="50"></a>
               </p>
+            </div>
             </div>
           </div>
         </div>
@@ -37,4 +75,3 @@
     </footer>
   </body>
 </html>
-
