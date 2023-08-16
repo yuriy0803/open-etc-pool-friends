@@ -1,13 +1,13 @@
 {
 	"threads": 4,
-	"coin": "etc",
+	"coin": "ETC",
 	"name": "main",
-	"pplns": 9000,
+	"pplns": 0,
 	"network": "classic",
-	"coin-name": "etc",
+	"coin-name": "ETC",
 	"payouts": {
 		"enabled": true,
-		"requirePeers": 1,
+		"requirePeers": 2,
 		"interval": "20m",
 		"daemon": "http://127.0.0.1:8545",
 		"timeout": "10s",
