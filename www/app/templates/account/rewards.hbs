@@ -7,6 +7,7 @@
         <th>Time</th>
         <th>Blocks</th>
         <th>Amount</th>
+        <th>Luck</th>
         <th>USD</th>
       </tr>
     </thead>
@@ -17,10 +18,11 @@
         <td>{{sumreward.name}}</td>
         <td>{{sumreward.blocks}}</td>
         <td>{{format-balance sumreward.reward}}</td>
+        <td>{{format-number sumreward.personalLuck style='percent'}}</td>
         <td><em>
 
             {{#if (eq config.Currency 'USD') }}
-            {{format-ethusd sumreward.reward model.exchangedata.current_price}}
+            {{format-ethusd sumreward.reward model.exchangedata.price_usd}}
             {{else}}
             {{format-ethinr sumreward.reward model.exchangedata.price_inr}}
             {{/if}}
@@ -37,7 +39,7 @@
         <th>Block Height</th>
         <th>Time Found</th>
         <th>Reward</th>
-        <th>Round Share</th>
+        <th>Personal Luck</th>
 
       </tr>
     </thead>
@@ -53,7 +55,7 @@
           <span class="label label-success">{{format-balance tx.reward}}</span>
           {{/if}}
         </td>
-        <td>{{format-number tx.percent style='percent' maximumFractionDigits='2'}}</td>
+          <td>{{format-number tx.personalLuck style='percent' maximumFractionDigits='2'}}</td>
       </tr>
       {{/each}}
     </tbody>
