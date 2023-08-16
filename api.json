@@ -1,11 +1,11 @@
 {
 	"threads": 4,
-	"coin": "etc",
+	"coin": "ETC",
 	"name": "main",
-	"pplns": 9000,
+	"pplns": 0,
 	"network": "classic",
 	"algo": "etchash",
-	"coin-name": "etc",
+	"coin-name": "ETC",
 	"proxy": {
 		"enabled": true,
 		"listen": "0.0.0.0:8888",
@@ -101,7 +101,7 @@
 	},
 	"exchange": {
 		"enabled": true,
-		"url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
+		"url": "https://api.coinpaprika.com/v1/ticker/etc-ethereum-classic",
 		"timeout": "50s",
 		"refreshInterval": "900s"
 	},
