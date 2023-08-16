@@ -67,6 +67,9 @@ type SumRewardData struct {
 	Name     string `json:"name"`
 	Offset   int64  `json:"offset"`
 	Blocks   int64  `json:"blocks"`
+	Effort   float64 `json:"personalLuck"`
+	Count    float64 `json:"_"`
+	ESum     float64 `json:"_"`
 }
 
 type RewardData struct {
@@ -76,6 +79,9 @@ type RewardData struct {
 	Reward    int64   `json:"reward"`
 	Percent   float64 `json:"percent"`
 	Immature  bool    `json:"immature"`
+	Difficulty int64  `json:"-"`
+	PersonalShares int64 `json:"-"`
+	PersonalEffort float64 `json:"personalLuck"`
 }
 
 type BlockData struct {
@@ -86,6 +92,7 @@ type BlockData struct {
 	Timestamp      int64    `json:"timestamp"`
 	Difficulty     int64    `json:"difficulty"`
 	TotalShares    int64    `json:"shares"`
+	PersonalShares int64    `json:"PersonalShares"`
 	Uncle          bool     `json:"uncle"`
 	UncleHeight    int64    `json:"uncleHeight"`
 	Orphan         bool     `json:"orphan"`
@@ -134,7 +141,7 @@ func (b *BlockData) RoundKey() string {
 }
 
 func (b *BlockData) key() string {
-	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward, b.Login, b.ShareDiffCalc, b.Worker)
+	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward, b.Login, b.ShareDiffCalc, b.Worker, b.PersonalShares)
 }
 
 type Miner struct {
@@ -682,8 +689,12 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, shareD
 			n, _ := strconv.ParseInt(v, 10, 64)
 			totalShares += n
 		}
+
+		personalShares := int64(0)
+		personalShares = cmds[len(cmds)-14].(*redis.IntCmd).Val()
+
 		hashHex := strings.Join(params, ":")
-		s := join(hashHex, ts, roundDiff, totalShares, login, shareDiffCalc, id)
+		s := join(hashHex, ts, roundDiff, totalShares, login, shareDiffCalc, id, personalShares)
 		cmd := r.client.ZAdd(r.formatKey("blocks", "candidates"), redis.Z{Score: float64(height), Member: s})
 		return false, cmd.Err()
 	}
@@ -963,8 +974,8 @@ func (r *RedisClient) WriteReward(login string, amount int64, percent *big.Rat, 
 	tx := r.client.Multi()
 	defer tx.Close()
 
-	addStr := join(amount, percent, immature, block.Hash, block.Height, block.Timestamp)
-	remStr := join(amount, percent, !immature, block.Hash, block.Height, block.Timestamp)
+	addStr := join(amount, percent, immature, block.Hash, block.Height, block.Timestamp, block.Difficulty, block.PersonalShares)
+	remStr := join(amount, percent, !immature, block.Hash, block.Height, block.Timestamp, block.Difficulty, block.PersonalShares)
 	remscore := block.Timestamp - 3600*24*40 // Store the last 40 Days
 
 	_, err := tx.Exec(func() error {
@@ -1415,11 +1426,17 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	for _, reward := range rewards {
 
 		for _, dore := range dorew {
+			dore.Count += 0
+			dore.ESum += 0
 			dore.Reward += 0
 			dore.Blocks += 0
+			dore.Effort += 0
 			if reward.Timestamp > now-dore.Interval {
 				dore.Reward += reward.Reward
 				dore.Blocks++
+				dore.ESum += reward.PersonalEffort
+				dore.Count++
+				dore.Effort = dore.ESum / dore.Count
 			}
 		}
 	}
@@ -1545,6 +1562,7 @@ func convertCandidateResults(raw *redis.ZSliceCmd) []*BlockData {
 		block.TotalShares, _ = strconv.ParseInt(fields[5], 10, 64)
 		block.Login = fields[6]
 		block.ShareDiffCalc, _ = strconv.ParseInt(fields[7], 10, 64)
+		block.PersonalShares, _ = strconv.ParseInt(fields[9], 10, 64)
 		block.Worker = fields[8]
 		block.candidateKey = v.Member.(string)
 		result = append(result, &block)
@@ -1566,6 +1584,11 @@ func convertRewardResults(rows ...*redis.ZSliceCmd) []*RewardData {
 			reward.Percent, _ = strconv.ParseFloat(fields[1], 64)
 			reward.Immature, _ = strconv.ParseBool(fields[2])
 			reward.Height, _ = strconv.ParseInt(fields[4], 10, 64)
+			reward.Difficulty, _ = strconv.ParseInt(fields[5], 10, 64)
+			reward.PersonalShares, _ = strconv.ParseInt(fields[7], 10, 64)
+			Difficulty, _ := strconv.ParseFloat(fields[6], 64)
+			PersonalShares, _ := strconv.ParseFloat(fields[7], 64)
+			reward.PersonalEffort = float64(PersonalShares / Difficulty)
 			result = append(result, &reward)
 		}
 	}
@@ -1593,6 +1616,7 @@ func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 			block.ImmatureReward = fields[7]
 			block.Login = fields[8]
 			block.ShareDiffCalc, _ = strconv.ParseInt(fields[9], 10, 64)
+			block.PersonalShares, _ = strconv.ParseInt(fields[11], 10, 64)
 			block.Worker = fields[10]
 			block.immatureKey = v.Member.(string)
 			result = append(result, &block)
