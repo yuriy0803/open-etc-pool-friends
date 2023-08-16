@@ -11,19 +11,13 @@
           <i class="fa fa-bank"></i> Pending Balance: <span>{{format-balance model.stats.balance}}</span><br>
           <small>Credited coins awaiting payout.</small>
         </div>
-        {{#if model.stats.payouttreshold}}
-	      <div style="display: block;">
-          <i class="fa fa-bank"></i> Payout Treshold: <span>{{format-balance model.stats.payouttreshold}}</span><br>
-        </div>
-	     {{/if}}
         {{#if model.stats.pending}}
         <div style="display: block;">
           <i class="fa fa-clock-o"></i> Current Payment: <span>{{format-balance model.stats.pending}}</span><br>
         </div>
         {{/if}}
-        <div style="display: block;"><i class="fa fa-money"></i> Total Paid: <span>{{format-balance model.stats.paid}}</span></div>
+        <div style="display: block;"><i class="fa fa-money"></i> Total Paid: <span>{{format-balance model.stats.paid}}</span> / <span>{{format-balance earnTotalPaid}} $</span></div>
         <div style="display: block;"><i class="fa fa-money"></i> Last 24h Reward: <span>{{format-balance model.24hreward}}</span></div>
-        <div style="display: block;"><i class="fa fa-calculator"></i>Earnings per day (3h avg):<span>{{format-number earnPerDay}}</span></div>
       </div>
       <div class="col-md-4 stats">
         {{#if model.stats.lastShare}}
@@ -34,17 +28,16 @@
         <div style="display: block;"><i class="fa fa-gears"></i> Workers Online: <span>{{format-number model.workersOnline}}</span></div>
         <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (30m): <span>{{format-hashrate model.currentHashrate}}</span></div>
         <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (3h): <span>{{format-hashrate model.hashrate}}</span></div>
-        <div style="display: block;"><i class="fa fa-gears"></i> Personal Luck: <span>{{format-number PersonalLuck style='percent'}}</span></div>
-        <div style="display: block;"><i class="fa fa-gears"></i> Shares found: <span>{{format-hashrate model.stats.lastShareDiff}}</span></div>
+        <div style="display: block;"><i class="fa fa-gears"></i> Last Share Diff: <span>{{format-hashrate model.stats.lastShareDiff}}</span></div>
         
       </div>
       <div class="col-md-4 stats">
         <div style="display: block;"><i class="fa fa-tachometer"></i> Blocks Found: <span>{{format-number model.stats.blocksFound fallback='0'}}</span></div>
         <div style="display: block;"><i class="fa fa-paper-plane-o"></i> Total Payments: <span>{{format-number model.paymentsTotal}}</span></div>
         <div style="display: block;">
-          <i class="fa fa-gears"></i> Your Round Share: <span>{{format-number roundPercent style='percent' maximumFractionDigits='2'}}</span><br/>
-          <small>Percent of your contribution to current round.</small>
         </div>
+        <div style="display: block;"><i class="fa fa-gears"></i> Personal Luck: <span>{{format-number PersonalLuck style='percent'}}</span></div>
+        <div style="display: block;"><i class="fa fa-calculator"></i> Est. Earnings /day (3h avg): <span>{{format-number earnPerDayToken maximumFractionDigits='1'}}</span> / <span>{{format-number earnPerDayUsd maximumFractionDigits='1'}} $</span></div>
         <div style="display: block;">
           <i class="fa fa-clock-o"></i>
           Epoch Switch: <span>{{format-relative applicationController.nextEpoch units="hour"}}</span>
