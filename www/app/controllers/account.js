@@ -30,11 +30,25 @@ export default Ember.Controller.extend({
     }
   }),
   
-    earnPerDay: Ember.computed('model', {
+    earnPerDayToken: Ember.computed('model', {
         get() {
             return 24 * 60 * 60 / this.get('applicationController.blockTime') * this.get('config').BlockReward *
                 this.getWithDefault('model.hashrate') / this.get('hashrate');
         }
+    }),
+
+    earnPerDayUsd: Ember.computed('model', {
+        get() {
+            return 24 * 60 * 60 / this.get('applicationController.blockTime') * this.get('config').BlockReward *
+                this.getWithDefault('model.hashrate') / this.get('hashrate') * this.get ('model.exchangedata.price_usd');
+        }
+    }),
+
+    earnTotalPaid: Ember.computed('model', {
+        get() {
+            return 1 * this.get ('model.exchangedata.price_usd') * this.get ('model.stats.paid');
+        }
     })
+
   
 });
