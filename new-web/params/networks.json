@@ -28,7 +28,7 @@
         "title": "Ubiq Mainnet",
         "symbol": "UBQ",
         "icon": "ubq.svg",
-        "blockTime": 88,
+        "blockTime": 15,
         "epochLength": 30000,
         "algo": "ubqhash"
     }

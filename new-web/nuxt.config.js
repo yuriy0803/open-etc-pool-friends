@@ -2,9 +2,6 @@
 import config from './params/config.json'
 
 export default {
-  server: {
-    host: '192.168.8.169' // default: localhost  sudo npm run dev
-  },
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
 
@@ -25,7 +22,7 @@ export default {
   
   //The dist folder is named dist by default but can be configured in your nuxt.config file.
   generate: {
-    dir: '/var/www/etc3pool'
+    dir: '/var/www/testpool'
  },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)

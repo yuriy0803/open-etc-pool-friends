@@ -92,7 +92,7 @@ export default {
           align: 'start',
           value: 'height',
         },
-        { text: this.$t('pages.blocks.blockHash'), value: 'hash' },
+        { text: this.$t('pages.blocks.blockHash'), value: 'finder' },
         { text: this.$t('pages.blocks.timeFound'), value: 'timestamp' },
         { text: this.$t('pages.blocks.variance'), value: 'shares' },
         {

@@ -52,7 +52,7 @@
             "blocksPerPage": "Blocks per page",
             "search": "Search by number or hash",
             "blockNumber": "Block Number",
-            "blockHash": "Block Hash",
+            "blockHash": "finder",
             "timeFound": "Time Found",
             "variance": "Variance",
             "reward": "Reward",
