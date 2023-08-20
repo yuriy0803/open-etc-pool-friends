@@ -46,4 +46,10 @@ EOF'
 # Reload Nginx configuration
 sudo systemctl reload nginx
 
+# Change into the open-etc-pool-friends directory
+cd open-etc-pool-friends
+
+# Build the Go application
+go build
+
 echo "Installation completed!"
