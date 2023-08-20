@@ -16,7 +16,6 @@ sudo apt-get install -y nodejs
 wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
 
 # Create a symbolic link for the Go binary
 sudo ln -s /usr/local/go/bin/go /usr/local/bin/go
