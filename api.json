@@ -12,7 +12,7 @@
 		"limitHeadersSize": 1024,
 		"limitBodySize": 256,
 		"behindReverseProxy": false,
-		"blockRefreshInterval": "120ms",
+		"blockRefreshInterval": "50ms",
 		"stateUpdateInterval": "3s",
 		"difficulty": 8589934592,
 		"hashrateExpiration": "3h",
