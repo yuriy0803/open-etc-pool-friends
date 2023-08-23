@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x  # Enable displaying all commands
+
 echo "Welcome to the installation!"
 
 # Update and upgrade the package list
