@@ -27,32 +27,38 @@ ip_address=$(hostname -I | cut -d' ' -f1)
 
 # Configure Nginx
 sudo sh -c 'cat > /etc/nginx/sites-available/default <<EOF
+# Default server configuration
+# nginx example
+
 upstream api {
-	server 127.0.0.1:8080;
+    server 127.0.0.1:8080;
 }
 
 server {
-	listen 0.0.0.0:80;
-	root /var/www/etc2pool;
-	index index.html index.htm;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/etc2pool;
 
-	server_name localhost;
+    # Add index.php to the list if you are using PHP
+    index index.html index.htm index.nginx-debian.html;
 
-	location /api {
-		proxy_pass http://127.0.0.1:8080;
-	}
+    server_name _;
 
-	location / {
-		try_files $uri $uri/ /index.html;
-	}
+    location / {
+            # First attempt to serve request as file, then
+            # as directory, then fall back to displaying a 404.
+            try_files $uri $uri/ =404;
+    }
+
+    location /api {
+            proxy_pass http://127.0.0.1:8080;
+    }
+
 }
 EOF'
 
 # Reload Nginx configuration
 sudo systemctl reload nginx
-
-# Change into the open-etc-pool-friends directory
-cd open-etc-pool-friends
 
 # Build the Go application
 go build
@@ -132,4 +138,32 @@ module.exports = function (environment) {
 # Write modified content to environment.js
 echo "$modified_content" > www/config/environment.js
 
+# Change into the www directory
+cd www
+
+# Install ember-cli and bower globally
+sudo npm install -g ember-cli@2.18.2
+sudo npm install -g bower
+
+# Change ownership of npm and config directories
+sudo chown -R $USER:$GROUP ~/.npm
+sudo chown -R $USER:$GROUP ~/.config
+
+# Install npm and bower dependencies
+npm install
+bower install
+
+# Install ember-truth-helpers
+ember install ember-truth-helpers
+
+# Install jdenticon
+npm install jdenticon@2.1.0
+
+# Run the build.sh script within the www directory
+bash build.sh
+
+# Change back to the main directory
+cd ..
+
+set +x  # Disable displaying commands
 echo "Installation completed!"
