@@ -15,6 +15,7 @@ sudo systemctl start nginx
 
 sudo rm -f /etc/nginx/sites-available/default
 sudo rm -f /etc/nginx/sites-enabled/default
+sudo apt-get install python3-certbot-nginx
 
 # Install Node.js Version 14.x
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
