@@ -16,6 +16,7 @@
 		"stateUpdateInterval": "3s",
 		"difficulty": 8589934592,
 		"hashrateExpiration": "3h",
+		"stratumHostname": "example.org",
 		"healthCheck": true,
 		"debug": true,
 		"maxFails": 100,
