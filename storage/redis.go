@@ -1646,7 +1646,7 @@ func convertWorkersStats(window int64, raw *redis.ZSliceCmd, blocks *redis.ZSlic
 		share, _ := strconv.ParseInt(parts[0], 10, 64)
 		var hostname string
 		if len(parts) > 3 {
-			hostname = parts[4]
+			hostname = parts[3]
 		} else {
 			hostname = "unknown"
 		}
