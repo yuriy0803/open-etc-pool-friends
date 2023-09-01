@@ -85,7 +85,6 @@ type RewardData struct {
 }
 
 type BlockData struct {
-	Login          string   `json:"login"`
 	Worker         string   `json:"worker"`
 	ShareDiffCalc  int64    `json:"shareDiff"`
 	Height         int64    `json:"height"`
@@ -97,6 +96,7 @@ type BlockData struct {
 	UncleHeight    int64    `json:"uncleHeight"`
 	Orphan         bool     `json:"orphan"`
 	Hash           string   `json:"hash"`
+	Finder         string   `json:"finder"`
 	Nonce          string   `json:"-"`
 	PowHash        string   `json:"-"`
 	MixDigest      string   `json:"-"`
@@ -141,7 +141,7 @@ func (b *BlockData) RoundKey() string {
 }
 
 func (b *BlockData) key() string {
-	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward, b.Login, b.ShareDiffCalc, b.Worker, b.PersonalShares)
+	return join(b.UncleHeight, b.Orphan, b.Nonce, b.serializeHash(), b.Timestamp, b.Difficulty, b.TotalShares, b.Reward, b.Finder, b.ShareDiffCalc, b.Worker, b.PersonalShares)
 }
 
 type Miner struct {
@@ -1562,7 +1562,7 @@ func convertCandidateResults(raw *redis.ZSliceCmd) []*BlockData {
 		block.Timestamp, _ = strconv.ParseInt(fields[3], 10, 64)
 		block.Difficulty, _ = strconv.ParseInt(fields[4], 10, 64)
 		block.TotalShares, _ = strconv.ParseInt(fields[5], 10, 64)
-		block.Login = fields[6]
+		block.Finder = fields[6]
 		block.ShareDiffCalc, _ = strconv.ParseInt(fields[7], 10, 64)
 		block.PersonalShares, _ = strconv.ParseInt(fields[9], 10, 64)
 		block.Worker = fields[8]
@@ -1616,7 +1616,7 @@ func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 			block.TotalShares, _ = strconv.ParseInt(fields[6], 10, 64)
 			block.RewardString = fields[7]
 			block.ImmatureReward = fields[7]
-			block.Login = fields[8]
+			block.Finder = fields[8]
 			block.ShareDiffCalc, _ = strconv.ParseInt(fields[9], 10, 64)
 			block.PersonalShares, _ = strconv.ParseInt(fields[11], 10, 64)
 			block.Worker = fields[10]

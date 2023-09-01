@@ -2,7 +2,7 @@
 	"threads": 4,
 	"coin": "ETC",
 	"name": "main",
-	"pplns": 0,
+	"pplns": 9000,
 	"network": "classic",
 	"algo": "etchash",
 	"coin-name": "ETC",
@@ -108,6 +108,7 @@
 	},
 	"unlocker": {
 		"enabled": true,
+		"miningtype": "pplns",
 		"poolFee": 1.0,
 		"poolFeeAddress": "",
 		"depth": 120,
