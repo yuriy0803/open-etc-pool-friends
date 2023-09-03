@@ -52,7 +52,7 @@ module.exports = function (environment) {
       ApiUrl: '//$ip_address/',
       HttpHost: 'http://$ip_address',
       HttpPort: 8888,
-      StratumHost: 'example.net',
+      StratumHost: '$ip_address',
       StratumPort: 8008,
       Unit: 'ETC',
       Currency: 'USD',
