@@ -206,7 +206,7 @@ Description=api
 After=network-online.target
 
 [Service]
-ExecStart=/home/pool/open-etc-pool-friends /home/pool/api.json
+ExecStart=/home/pool/open-etc-pool-friends/open-etc-pool-friends /home/pool/open-etc-pool-friends/api.json
 
 User=pool
 
