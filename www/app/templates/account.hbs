@@ -16,8 +16,10 @@
           <i class="fa fa-clock-o"></i> Current Payment: <span>{{format-balance model.stats.pending}}</span><br>
         </div>
         {{/if}}
-        <div style="display: block;"><i class="fa fa-money"></i> Total Paid: <span>{{format-balance model.stats.paid}}</span> / <span>{{format-balance earnTotalPaid}} $</span></div>
-        <div style="display: block;"><i class="fa fa-money"></i> Last 24h Reward: <span>{{format-balance model.24hreward}}</span></div>
+        <div style="display: block;"><i class="fa fa-money"></i> Total Paid: <span>{{format-balance
+            model.stats.paid}}</span> / <span>{{format-balance earnTotalPaid}} $</span></div>
+        <div style="display: block;"><i class="fa fa-money"></i> Last 24h Reward: <span>{{format-balance
+            model.24hreward}}</span></div>
       </div>
       <div class="col-md-4 stats">
         {{#if model.stats.lastShare}}
@@ -25,19 +27,30 @@
           Last Share Submitted: <span>{{format-relative (seconds-to-ms (string-to-int model.stats.lastShare))}}</span>
         </div>
         {{/if}}
-        <div style="display: block;"><i class="fa fa-gears"></i> Workers Online: <span>{{format-number model.workersOnline}}</span></div>
-        <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (30m): <span>{{format-hashrate model.currentHashrate}}</span></div>
-        <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (3h): <span>{{format-hashrate model.hashrate}}</span></div>
-        <div style="display: block;"><i class="fa fa-gears"></i> Last Share Diff: <span>{{format-hashrate model.stats.lastShareDiff}}</span></div>
-        
+        <div style="display: block;"><i class="fa fa-gears"></i> Workers Online: <span>{{format-number
+            model.workersOnline}}</span></div>
+        <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (30m): <span>{{format-hashrate
+            model.currentHashrate}}</span></div>
+        <div style="display: block;"><i class="fa fa-tachometer"></i> Hashrate (3h): <span>{{format-hashrate
+            model.hashrate}}</span></div>
+        <div style="display: block;"><i class="fa fa-gears"></i> Last Share Diff: <span>{{format-hashrate
+            model.stats.lastShareDiff}}</span></div>
+        <div style="display: block;">
+          <i class="fa fa-gears"></i> Your Round Share: <span>{{format-number roundPercent style='percent'
+            maximumFractionDigits='2'}}</span><br />
+        </div>
+
       </div>
       <div class="col-md-4 stats">
-        <div style="display: block;"><i class="fa fa-tachometer"></i> Blocks Found: <span>{{format-number model.stats.blocksFound fallback='0'}}</span></div>
-        <div style="display: block;"><i class="fa fa-paper-plane-o"></i> Total Payments: <span>{{format-number model.paymentsTotal}}</span></div>
-        <div style="display: block;">
-        </div>
-        <div style="display: block;"><i class="fa fa-gears"></i> Personal Luck: <span>{{format-number PersonalLuck style='percent'}}</span></div>
-        <div style="display: block;"><i class="fa fa-calculator"></i> Est. Earnings /day (3h avg): <span>{{format-number earnPerDayToken maximumFractionDigits='1'}}</span> / <span>{{format-number earnPerDayUsd maximumFractionDigits='1'}} $</span></div>
+        <div style="display: block;"><i class="fa fa-tachometer"></i> Blocks Found: <span>{{format-number
+            model.stats.blocksFound fallback='0'}}</span></div>
+        <div style="display: block;"><i class="fa fa-paper-plane-o"></i> Total Payments: <span>{{format-number
+            model.paymentsTotal}}</span></div>
+        <div style="display: block;"><i class="fa fa-gears"></i> Personal Luck: <span>{{format-number PersonalLuck
+            style='percent'}}</span></div>
+        <div style="display: block;"><i class="fa fa-calculator"></i> Est. Earnings /day (3h avg): <span>{{format-number
+            earnPerDayToken maximumFractionDigits='1'}}</span> / <span>{{format-number earnPerDayUsd
+            maximumFractionDigits='1'}} $</span></div>
         <div style="display: block;">
           <i class="fa fa-clock-o"></i>
           Epoch Switch: <span>{{format-relative applicationController.nextEpoch units="hour"}}</span>
@@ -50,13 +63,14 @@
 <div class="container">
   <ul class="nav nav-tabs">
     {{#active-li currentWhen='account.index' role='presentation'}}
-      {{#link-to 'account.index'}}Workers <span class="label label-success">{{model.workersOnline}}</span> / <span class="label label-danger">{{model.workersOffline}}</span>{{/link-to}}
+    {{#link-to 'account.index'}}Workers <span class="label label-success">{{model.workersOnline}}</span> / <span
+      class="label label-danger">{{model.workersOffline}}</span>{{/link-to}}
     {{/active-li}}
     {{#active-li currentWhen='account.rewards' role='presentation'}}
-      {{#link-to 'account.rewards'}}Rewards{{/link-to}}
+    {{#link-to 'account.rewards'}}Rewards{{/link-to}}
     {{/active-li}}
     {{#active-li currentWhen='account.payouts' role='presentation'}}
-      {{#link-to 'account.payouts'}}Payouts{{/link-to}}
+    {{#link-to 'account.payouts'}}Payouts{{/link-to}}
     {{/active-li}}
   </ul>
 </div>
