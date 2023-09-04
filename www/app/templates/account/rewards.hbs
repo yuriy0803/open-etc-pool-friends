@@ -39,6 +39,7 @@
         <th>Block Height</th>
         <th>Time Found</th>
         <th>Reward</th>
+        <th>Your Round Share</th>
         <th>Personal Luck</th>
 
       </tr>
@@ -55,7 +56,8 @@
           <span class="label label-success">{{format-balance tx.reward}}</span>
           {{/if}}
         </td>
-          <td>{{format-number tx.personalLuck style='percent' maximumFractionDigits='2'}}</td>
+        <td>{{format-number tx.percent style='percent' maximumFractionDigits='2'}}</td>
+        <td>{{format-number tx.personalLuck style='percent' maximumFractionDigits='2'}}</td>
       </tr>
       {{/each}}
     </tbody>
