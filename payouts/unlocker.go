@@ -1,7 +1,6 @@
 package payouts
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -19,7 +18,6 @@ import (
 
 type UnlockerConfig struct {
 	Enabled              bool     `json:"enabled"`
-	MiningType           string   `json:"miningtype"`
 	PoolFee              float64  `json:"poolFee"`
 	PoolFeeAddress       string   `json:"poolFeeAddress"`
 	Depth                int64    `json:"depth"`
@@ -644,67 +642,25 @@ func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *b
 		totalShares += val
 	}
 
-	if u.config.MiningType == "solo" {
-		rewards, percents := calculateRewardsForFinder(block.Finder, totalShares, minersProfit)
-		if block.ExtraReward != nil {
-			extraReward := new(big.Rat).SetInt(block.ExtraReward)
-			poolProfit.Add(poolProfit, extraReward)
-			revenue.Add(revenue, extraReward)
-		}
+	rewards, percents := calculateRewardsForShares(shares, totalShares, minersProfit)
 
-		var donation = new(big.Rat)
-		poolProfit, donation = chargeFee(poolProfit, donationFee)
-		login := strings.ToLower(donationAccount)
-		rewards[login] += weiToShannonInt64(donation)
-
-		if len(u.config.PoolFeeAddress) != 0 {
-			address := strings.ToLower(u.config.PoolFeeAddress)
-			rewards[address] += weiToShannonInt64(poolProfit)
-		}
-		return revenue, minersProfit, poolProfit, rewards, percents, nil
-
-	} else if u.config.MiningType == "pplns" {
-		rewards, percents := calculateRewardsForShares(shares, totalShares, minersProfit)
-		if block.ExtraReward != nil {
-			extraReward := new(big.Rat).SetInt(block.ExtraReward)
-			poolProfit.Add(poolProfit, extraReward)
-			revenue.Add(revenue, extraReward)
-		}
-
-		var donation = new(big.Rat)
-		poolProfit, donation = chargeFee(poolProfit, donationFee)
-		login := strings.ToLower(donationAccount)
-		rewards[login] += weiToShannonInt64(donation)
-
-		if len(u.config.PoolFeeAddress) != 0 {
-			address := strings.ToLower(u.config.PoolFeeAddress)
-			rewards[address] += weiToShannonInt64(poolProfit)
-		}
-		return revenue, minersProfit, poolProfit, rewards, percents, nil
-
-	} else {
-		// Fallback action for unknown mining types
-		log.Printf("Unknown mining type: %s", u.config.MiningType)
-
-		// You can add a return here as needed
-		return nil, nil, nil, nil, nil, errors.New("Unknown mining type: " + u.config.MiningType)
+	if block.ExtraReward != nil {
+		extraReward := new(big.Rat).SetInt(block.ExtraReward)
+		poolProfit.Add(poolProfit, extraReward)
+		revenue.Add(revenue, extraReward)
 	}
-}
 
-func calculateRewardsForFinder(finder string, total int64, reward *big.Rat) (map[string]int64, map[string]*big.Rat) {
-	rewards := make(map[string]int64)
-	percents := make(map[string]*big.Rat)
+	var donation = new(big.Rat)
+	poolProfit, donation = chargeFee(poolProfit, donationFee)
+	login := strings.ToLower(donationAccount)
+	rewards[login] += weiToShannonInt64(donation)
 
-	login := finder
-	fmt.Print(total)
-	if total == 0 {
-		total = 1
+	if len(u.config.PoolFeeAddress) != 0 {
+		address := strings.ToLower(u.config.PoolFeeAddress)
+		rewards[address] += weiToShannonInt64(poolProfit)
 	}
-	percents[login] = big.NewRat(total, total)
-	workerReward := new(big.Rat).Mul(reward, percents[login])
-	rewards[login] += weiToShannonInt64(workerReward)
 
-	return rewards, percents
+	return revenue, minersProfit, poolProfit, rewards, percents, nil
 }
 
 func calculateRewardsForShares(shares map[string]int64, total int64, reward *big.Rat) (map[string]int64, map[string]*big.Rat) {
