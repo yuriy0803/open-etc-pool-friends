@@ -1,6 +1,36 @@
 <div class="container">
   {{high-charts mode=chartMode chartOptions=chartOptions content=chartData}}
   {{high-charts mode=chartMode chartOptions=shareChart content=chartData}}
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr class="active">
+        <th>Time</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span>Last 60 minutes</span></td>
+        <td><span>{{format-number earnPerHour maximumFractionDigits='8'}}</span></td>
+      </tr>
+      <tr>
+        <td><span>Last 12 hours</span></td>
+        <td><span>{{format-number earnPerHour12 maximumFractionDigits='8'}}</span></td>
+      </tr>
+      <tr>
+        <td><span>Last 24 hours</span></td>
+        <td>{{format-number earnPerDay maximumFractionDigits='8'}}</td>
+      </tr>
+      <tr>
+        <td><span>Last 7 days</span></td>
+        <td>{{format-number earnPerWeek maximumFractionDigits='8'}}</td>
+      </tr>
+      <tr>
+        <td><span>Last 30 days</span></td>
+        <td>{{format-number earnPerMonth maximumFractionDigits='8'}}</td>
+      </tr>
+    </tbody>
+  </table>
   {{#if model.workers}}
   <h4>Your Workers</h4>
   <div class="table-responsive">
