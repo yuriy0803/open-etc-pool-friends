@@ -49,6 +49,10 @@ home:
   blockchain_height: Blockchain Height
   current_round_variance: Current Round Variance
   query_history: Your Stats and Payment History
+  block_time: Block Time
+  epoch: Epoch
+  dag_Size: DAG Size
+  current_price: Current price
   input:
     enter_your_wallet_address: Enter Your Wallet Address
   button:
