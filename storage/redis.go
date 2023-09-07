@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/redis.v3"
+	redis "gopkg.in/redis.v3"
 
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
@@ -1408,6 +1408,8 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 		workers[id] = worker
 	}
 
+	var personalEffort float64
+
 	stats["workers"] = workers
 	stats["workersTotal"] = len(workers)
 	stats["workersOnline"] = online
@@ -1426,7 +1428,7 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	dorew = append(dorew, &SumRewardData{Name: "Last 30 days", Interval: 3600 * 24 * 30, Offset: 0})
 
 	for _, reward := range rewards {
-
+		personalEffort = reward.PersonalEffort
 		for _, dore := range dorew {
 			dore.Count += 0
 			dore.ESum += 0
@@ -1436,12 +1438,13 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 			if reward.Timestamp > now-dore.Interval {
 				dore.Reward += reward.Reward
 				dore.Blocks++
-				dore.ESum += reward.PersonalEffort
+				dore.ESum += personalEffort // Hier wird personalEffort verwendet
 				dore.Count++
 				dore.Effort = dore.ESum / dore.Count
 			}
 		}
 	}
+
 	stats["sumrewards"] = dorew
 	stats["24hreward"] = dorew[2].Reward
 	return stats, nil
