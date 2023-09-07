@@ -112,8 +112,8 @@
                 <div id="win_collapseOne" class="panel-collapse collapse in" role="tabpanel"
                   aria-labelledby="headingOne">
                   <div class="panel-body">
-                    <input type="text" class="form-control"
-                      value="EthDcrMiner64.exe -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -esm 0 -ewal &lt;address&gt; -eworker &lt;worker&gt; -allcoins 1 -allpools 1">
+                    <code>
+                      EthDcrMiner64.exe -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -esm 0 -ewal &lt;address&gt; -eworker &lt;worker&gt; -allcoins 1 -allpools 1</code>
                   </div>
                 </div>
               </div>
@@ -129,8 +129,8 @@
                 </div>
                 <div id="win_collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                   <div class="panel-body">
-                    <input type="text" class="form-control"
-                      value="ethminer.exe -U -SP 1 -S {{config.StratumHost}}:{{config.StratumPort}} -O &lt;address&gt;.&lt;worker&gt; --farm-recheck 1000 -v 2">
+                    <code>
+                      value="ethminer.exe -U -SP 1 -S {{config.StratumHost}}:{{config.StratumPort}} -O &lt;address&gt;.&lt;worker&gt; --farm-recheck 1000 -v 2"</code>
                   </div>
                 </div>
               </div>
@@ -153,8 +153,7 @@
                 <div id="smos_collapseOne" class="panel-collapse collapse in" role="tabpanel"
                   aria-labelledby="headingOne">
                   <div class="panel-body">
-                    <input type="text" class="form-control"
-                      value="-wd 1 -r 1 -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -ewal &lt;address&gt; -eworker $rigName -esm 0 -epsw x -allpools 1 -asm 1 -mode 1">
+                    <code>-wd 1 -r 1 -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -ewal &lt;address&gt; -eworker $rigName -esm 0 -epsw x -allpools 1 -asm 1 -mode 1</code>
                   </div>
                 </div>
               </div>
@@ -169,8 +168,8 @@
                 </div>
                 <div id="smos_collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                   <div class="panel-body">
-                    <input type="text" class="form-control"
-                      value="-U -P stratum1+tcp://&lt;address&gt;.$rigName@{{config.StratumHost}}:{{config.StratumPort}} --farm-recheck 200 --api-port -3333">
+                    <code>
+                      -U -P stratum1+tcp://&lt;address&gt;.$rigName@{{config.StratumHost}}:{{config.StratumPort}} --farm-recheck 200 --api-port -3333</code>
                   </div>
                 </div>
               </div>
