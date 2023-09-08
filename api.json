@@ -35,7 +35,7 @@
 			"refreshInterval": "1m",
 			"blacklist_file": "/home/pool/open-etc-pool-friends/stratum_blacklist.json",
 			"banning": {
-				"enabled": false,
+				"enabled": true,
 				"ipset": "blacklist",
 				"timeout": 1800,
 				"invalidPercent": 30,
