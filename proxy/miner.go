@@ -85,8 +85,16 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 
 	if s.config.Proxy.Debug {
-		hashrate := formatHashrate(shareDiffCalc)
-		log.Printf("Difficulty pool/block/share = %d / %d / %d(%s) from %v@%v", shareDiff, t.Difficulty, shareDiffCalc, hashrate, login, ip)
+		hashrateShareDiff := formatHashrate(shareDiffCalc)
+		hashrateBlockDiff := formatHashrate(t.Difficulty.Int64()) // Konvertieren zu int64
+		hashrateShare := formatHashrate(shareDiff)
+
+		// Ausgabe der formatierten Informationen in der Kommandozeile (cmd)
+		log.Printf("Mining Information:")
+		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShareDiff)
+		log.Printf("Block Difficulty: %d (%s)", t.Difficulty.Int64(), hashrateBlockDiff)
+		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShare)
+		log.Printf("Submitted by: %v@%v", login, ip)
 	}
 
 	h, ok := t.headers[hashNoNonce]
