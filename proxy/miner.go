@@ -85,7 +85,8 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 
 	if s.config.Proxy.Debug {
-		log.Printf("Difficulty pool/block/share = %d / %d / %d(%f) from %v@%v", shareDiff, t.Difficulty, shareDiffCalc, shareDiffFloat, login, ip)
+		hashrate := formatHashrate(shareDiffCalc)
+		log.Printf("Difficulty pool/block/share = %d / %d / %d(%s) from %v@%v", shareDiff, t.Difficulty, shareDiffCalc, hashrate, login, ip)
 	}
 
 	h, ok := t.headers[hashNoNonce]
@@ -133,4 +134,17 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 	s.backend.WriteWorkerShareStatus(login, id, true, false, false)
 	return false, true
+}
+
+func formatHashrate(shareDiffCalc int64) string {
+	units := []string{"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s"}
+	var i int
+	diff := float64(shareDiffCalc)
+
+	for i = 0; i < len(units)-1 && diff >= 1000.0; i++ {
+		diff /= 1000.0
+	}
+
+	formatted := strconv.FormatFloat(diff, 'f', 2, 64)
+	return formatted + " " + units[i]
 }
