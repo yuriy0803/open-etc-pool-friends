@@ -105,7 +105,7 @@
                   <h4 class="panel-title">
                     <a role="button" data-toggle="collapse" data-parent="#windows_settings_windows_tab"
                       href="#win_collapseOne" aria-expanded="true" aria-controls="win_collapseOne">
-                      Claymore
+                      lolMiner
                     </a>
                   </h4>
                 </div>
@@ -113,7 +113,7 @@
                   aria-labelledby="headingOne">
                   <div class="panel-body">
                     <code>
-                      EthDcrMiner64.exe -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -esm 0 -ewal &lt;address&gt; -eworker &lt;worker&gt; -allcoins 1 -allpools 1</code>
+                      lolMiner --coin {{config.Unit}} --pool {{config.StratumHost}}:{{config.StratumPort}} --user wallet_address.WorkerName</code>
                   </div>
                 </div>
               </div>
@@ -123,14 +123,14 @@
                     <a class="collapsed" role="button" data-toggle="collapse"
                       data-parent="#windows_settings_windows_tab" href="#win_collapseTwo" aria-expanded="false"
                       aria-controls="win_collapseTwo">
-                      Ethminer 0.14
+                      PhoenixMiner
                     </a>
                   </h4>
                 </div>
                 <div id="win_collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                   <div class="panel-body">
                     <code>
-                      ethminer.exe -U -SP 1 -S {{config.StratumHost}}:{{config.StratumPort}} -O &lt;address&gt;.&lt;worker&gt; --farm-recheck 1000 -v 2</code>
+                    PhoenixMiner -pool {{config.StratumHost}}:{{config.StratumPort}} -wal wallet_address.WorkerName -coin etc</code>
                   </div>
                 </div>
               </div>
@@ -146,14 +146,15 @@
                   <h4 class="panel-title">
                     <a role="button" data-toggle="collapse" data-parent="#smos_settings_smos_tab"
                       href="#smos_collapseOne" aria-expanded="true" aria-controls="smos_collapseOne">
-                      Claymore
+                      lolMiner
                     </a>
                   </h4>
                 </div>
                 <div id="smos_collapseOne" class="panel-collapse collapse in" role="tabpanel"
                   aria-labelledby="headingOne">
                   <div class="panel-body">
-                    <code>-wd 1 -r 1 -epool stratum+tcp://{{config.StratumHost}}:{{config.StratumPort}} -ewal &lt;address&gt; -eworker $rigName -esm 0 -epsw x -allpools 1 -asm 1 -mode 1</code>
+                    <code>--coin {{config.Unit}} --pool {{config.StratumHost}}:{{config.StratumPort}} --user wallet_address.WorkerName
+                    </code>
                   </div>
                 </div>
               </div>
@@ -162,14 +163,14 @@
                   <h4 class="panel-title">
                     <a class="collapsed" role="button" data-toggle="collapse" data-parent="#smos_settings_smos_tab"
                       href="#smos_collapseTwo" aria-expanded="false" aria-controls="smos_collapseTwo">
-                      Ethminer 0.14
+                      PhoenixMiner
                     </a>
                   </h4>
                 </div>
                 <div id="smos_collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                   <div class="panel-body">
                     <code>
-                      -U -P stratum1+tcp://&lt;address&gt;.$rigName@{{config.StratumHost}}:{{config.StratumPort}} --farm-recheck 200 --api-port -3333</code>
+                       -pool {{config.StratumHost}}:{{config.StratumPort}} -wal wallet_address.WorkerName -coin etc</code>
                   </div>
                 </div>
               </div>
