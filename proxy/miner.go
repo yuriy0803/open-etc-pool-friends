@@ -91,9 +91,9 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 
 		// Ausgabe der formatierten Informationen in der Kommandozeile (cmd)
 		log.Printf("Mining Information:")
-		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShareDiff)
+		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShare)
 		log.Printf("Block Difficulty: %d (%s)", t.Difficulty.Int64(), hashrateBlockDiff)
-		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShare)
+		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShareDiff)
 		log.Printf("Submitted by: %v@%v", login, ip)
 	}
 
