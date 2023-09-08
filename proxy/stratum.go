@@ -176,7 +176,7 @@ func (cs *Session) stratumMode() int {
 func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 	// Handle RPC/Stratum methods
 	switch req.Method {
-		// claymore -esm 1
+	// claymore -esm 1
 	case "eth_login":
 		// Unmarshal request parameters
 		var params []string
@@ -408,11 +408,45 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 		return cs.sendTCPResult(req.Id, &reply)
 
 	case "eth_submitHashrate":
+		var params []string
+		err := json.Unmarshal(req.Params, &params)
+		if err != nil || len(params) < 2 {
+			log.Println("Malformed stratum request params from", cs.ip)
+			return err
+		}
+
+		hashrateStr := params[0]
+		if !strings.HasPrefix(hashrateStr, "0x") {
+			log.Println("Malformed hashrate value in eth_submitHashrate request from", cs.ip)
+			return errors.New("Malformed hashrate value")
+		}
+
+		hashrate, err := strconv.ParseInt(hashrateStr[2:], 16, 64)
+		if err != nil {
+			log.Println("Malformed hashrate value in eth_submitHashrate request from", cs.ip)
+			return err
+		}
+
+		formattedHashrate := formatEthHashrate(hashrate)
+		log.Printf("Hashrate reported by %v@%v (%v): %s", cs.worker, cs.ip, cs.login, formattedHashrate)
 		return cs.sendTCPResult(req.Id, true)
 	default:
 		errReply := s.handleUnknownRPC(cs, req.Method)
 		return cs.sendTCPError(req.Id, errReply)
 	}
+}
+
+func formatEthHashrate(shareDiffCalc int64) string {
+	units := []string{"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s"}
+	var i int
+	diff := float64(shareDiffCalc)
+
+	for i = 0; i < len(units)-1 && diff >= 1000.0; i++ {
+		diff /= 1000.0
+	}
+
+	formatted := strconv.FormatFloat(diff, 'f', 2, 64)
+	return formatted + " " + units[i]
 }
 
 func (cs *Session) sendTCPResult(id json.RawMessage, result interface{}) error {
