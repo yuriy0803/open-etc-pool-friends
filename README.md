@@ -41,6 +41,8 @@ Dependencies:
      sudo apt-get install golang
      sudo apt-get install rsync
      sudo apt-get install git
+     sudo apt-get install ipset
+     sudo ipset create blacklist hash:ip
     
 ### Install npm
     sudo apt-get install npm
