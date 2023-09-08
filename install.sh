@@ -8,7 +8,9 @@ echo "Welcome to the installation!"
 sudo apt-get update && sudo apt-get upgrade -y
 
 # Install npm, rsync, git, redis-server, and nginx
-sudo apt-get install npm rsync git redis-server nginx -y
+sudo apt-get install npm rsync git ipset redis-server nginx -y
+
+sudo ipset create blacklist hash:ip
 
 sudo systemctl enable nginx
 sudo systemctl start nginx
