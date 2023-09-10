@@ -1,6 +1,6 @@
 module github.com/yuriy0803/open-etc-pool-friends
 
-go 1.21.0
+go 1.18
 
 require (
 	github.com/ethereum/go-ethereum v1.12.2
