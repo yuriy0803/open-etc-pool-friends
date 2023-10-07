@@ -25,6 +25,12 @@ jobs:
           npm install
           npx bower install --allow-root
 
+      - name: Install ESLint and create configuration
+        run: |
+          cd www  # Replace with the actual repository directory where your Ember app is located
+          npm install eslint --save-dev
+          npx eslint --init
+
       - name: Install ember-truth-helpers and jdenticon
         run: |
           cd www  # Replace with the actual repository directory where your Ember app is located
