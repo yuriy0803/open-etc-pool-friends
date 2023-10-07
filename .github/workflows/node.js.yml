@@ -3,7 +3,7 @@ name: Ember Application Build
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -24,6 +24,12 @@ jobs:
           cd www  # Replace with the actual repository directory where your Ember app is located
           npm install
           npx bower install --allow-root
+
+      - name: Install ember-truth-helpers and jdenticon
+        run: |
+          cd www  # Replace with the actual repository directory where your Ember app is located
+          npm install ember-truth-helpers
+          npm install jdenticon@2.1.0
 
       - name: Build Ember application
         run: |
