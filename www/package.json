@@ -45,6 +45,7 @@
     "ember-source": "~2.18.2",
     "ember-truth-helpers": "^2.1.0",
     "ember-welcome-page": "^3.0.0",
+    "eslint": "^8.51.0",
     "eslint-plugin-ember": "^5.0.0",
     "highcharts": "^7.2.1",
     "hint": "^7.1.3",
