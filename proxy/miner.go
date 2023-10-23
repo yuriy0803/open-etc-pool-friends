@@ -39,23 +39,20 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 
 	nonceHex := params[0]
 	hashNoNonce := params[1]
-	mixDigest := params[2]
 	nonce, _ := strconv.ParseUint(strings.Replace(nonceHex, "0x", "", -1), 16, 64)
 	shareDiff := s.config.Proxy.Difficulty
 	stratumHostname := s.config.Proxy.StratumHostname
 
 	var result common.Hash
 	if stratum {
-		hashNoNonceTmp := common.HexToHash(params[2])
+		hashNoNonceTmp := common.HexToHash(params[1])
 
-		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
+		_, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 		params[1] = hashNoNonceTmp.Hex()
-		params[2] = mixDigestTmp.Hex()
-		hashNoNonce = params[1]
 		result = hashTmp
 	} else {
 		hashNoNonceTmp := common.HexToHash(hashNoNonce)
-		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
+		_, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 
 		result = hashTmp
 	}
