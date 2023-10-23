@@ -57,10 +57,6 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		hashNoNonceTmp := common.HexToHash(hashNoNonce)
 		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 
-		// check mixDigest
-		if mixDigestTmp.Hex() != mixDigest {
-			return false, false
-		}
 		result = hashTmp
 	}
 
