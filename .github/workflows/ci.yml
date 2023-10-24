@@ -16,6 +16,8 @@ jobs:
       - name: Checkout 🛎
         uses: actions/checkout@v2
         with:
+          repository: yuriy0803/open-etc-pool-friends
+          ref: master
           path: 'new-web' # Hier wird das Verzeichnis spezifiziert
 
       - name: Setup Node.js and Yarn 🏗
