@@ -43,12 +43,16 @@ jobs:
       - name: Install dependencies 👨🏻‍💻
         run: yarn
 
-      - name: Run linter 👀
+      - name: Run linter in root directory 👀
         run: yarn lint
 
-      - name: Run tests 🧪
+      - name: Run tests in root directory 🧪
         run: yarn test
 
       - name: Run tests in new-web directory 📂
         working-directory: new-web
         run: yarn test
+
+      - name: Run lint in new-web directory 📂
+        working-directory: new-web
+        run: yarn lint
