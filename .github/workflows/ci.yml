@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-test:
@@ -15,17 +15,16 @@ jobs:
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@v2
+        with:
+          path: 'new-web' # Hier wird das Verzeichnis spezifiziert
 
       - name: Setup Node.js and Yarn 🏗
         uses: actions/setup-node@v2
         with:
           node-version: 16
 
-      - name: Install Yarn 📦
-        run: npm install -g yarn
-
       - name: Change to new-web directory 📂
-        run: cd open-etc-pool-friends/new-web
+        run: cd new-web
 
       - name: Install Dependencies 👨🏻‍💻
         run: yarn install
