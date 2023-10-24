@@ -10,22 +10,16 @@ on:
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [14]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
-      - name: Setup node env 🏗
-        uses: actions/setup-node@v2.1.5
+      - name: Setup Node.js 🏗
+        uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
-          check-latest: true
+          node-version: 14
 
       - name: Get yarn cache directory path 🛠
         id: yarn-cache-dir-path
@@ -36,23 +30,16 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          key: ubuntu-latest-yarn-${{ hashFiles('new-web/yarn.lock') }}
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
-
-      - name: Run linter in root directory 👀
-        run: yarn lint
-
-      - name: Run tests in root directory 🧪
-        run: yarn test
-
-      - name: Run tests in new-web directory 📂
         working-directory: new-web
-        run: yarn test
+        run: yarn install
 
-      - name: Run lint in new-web directory 📂
+      - name: Run linter 👀
         working-directory: new-web
         run: yarn lint
+
+      - name: Run tests 🧪
+        working-directory: new-web
+        run: yarn test
