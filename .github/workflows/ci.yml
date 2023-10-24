@@ -1,43 +1,40 @@
-name: ci
+name: CI
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  ci:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@v2
 
-      - name: Setup Node.js 🏗
-        uses: actions/setup-node@v2.5.3
+      - name: Setup Node.js and Yarn 🏗
+        uses: actions/setup-node@v2
         with:
           node-version: 16
 
-      - name: Get yarn cache directory path 🛠
-        run: echo "YARN_CACHE_DIR=$(yarn cache dir)" >> $GITHUB_ENV
+      - name: Install Yarn 📦
+        run: npm install -g yarn
 
-      - name: Cache node_modules 📦
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.YARN_CACHE_DIR }}
-          key: ubuntu-latest-yarn-${{ hashFiles('new-web/yarn.lock') }}
+      - name: Change to new-web directory 📂
+        run: cd open-etc-pool-friends/new-web
 
-      - name: Install dependencies 👨🏻‍💻
-        working-directory: new-web
+      - name: Install Dependencies 👨🏻‍💻
         run: yarn install
 
-      - name: Run linter 👀
-        working-directory: new-web
-        run: yarn lint
+      - name: Lint and Fix ✨
+        run: yarn lint-fix
 
-      - name: Run tests 🧪
-        working-directory: new-web
+      - name: Build 🏗
+        run: yarn build
+
+      - name: Test 🧪
         run: yarn test
