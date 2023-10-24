@@ -80,54 +80,49 @@ type BlockUnlocker struct {
 }
 
 func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network string) *BlockUnlocker {
-	// determine which monetary policy to use based on network
-	// configure any reward params if needed.
-	if network == "classic" {
+	// Determine which monetary policy to use based on network
+	switch network {
+	case "classic":
 		cfg.Ecip1017FBlock = 5000000
 		cfg.Ecip1017EraRounds = big.NewInt(5000000)
-	} else if network == "mordor" {
+	case "mordor":
 		cfg.Ecip1017FBlock = 0
 		cfg.Ecip1017EraRounds = big.NewInt(2000000)
-	} else if network == "ethereum" {
+	case "ethereum":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
 		cfg.ConstantinopleFBlock = big.NewInt(7280000)
-	} else if network == "ethereumPow" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "ethereumFair" {
+	case "ethereumPow", "expanse", "etica", "callisto", "ubiq", "octaspace", "universal":
+		// Nothing needs configuring here, simply proceed.
+	case "ethereumFair":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
 		cfg.ConstantinopleFBlock = big.NewInt(7280000)
-	} else if network == "ropsten" {
+	case "ropsten":
 		cfg.ByzantiumFBlock = big.NewInt(1700000)
 		cfg.ConstantinopleFBlock = big.NewInt(4230000)
-	} else if network == "expanse" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "etica" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "callisto" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "ubiq" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "octaspace" {
-		// nothing needs configuring here, simply proceed.
-	} else if network == "universal" {
-		// nothing needs configuring here, simply proceed.
-	} else {
+	default:
 		log.Fatalln("Invalid network set", network)
 	}
 
+	// Set the 'Network' field in the config
 	cfg.Network = network
 
+	// Validate 'PoolFeeAddress'
 	if len(cfg.PoolFeeAddress) != 0 && !util.IsValidHexAddress(cfg.PoolFeeAddress) {
 		log.Fatalln("Invalid poolFeeAddress", cfg.PoolFeeAddress)
 	}
+
+	// Validate 'Depth' and 'ImmatureDepth'
 	if cfg.Depth < minDepth*2 {
 		log.Fatalf("Block maturity depth can't be < %v, your depth is %v", minDepth*2, cfg.Depth)
 	}
 	if cfg.ImmatureDepth < minDepth {
 		log.Fatalf("Immature depth can't be < %v, your depth is %v", minDepth, cfg.ImmatureDepth)
 	}
+
+	// Create the BlockUnlocker instance
 	u := &BlockUnlocker{config: cfg, backend: backend}
 	u.rpc = rpc.NewRPCClient("BlockUnlocker", cfg.Daemon, cfg.Timeout)
+
 	return u
 }
 
