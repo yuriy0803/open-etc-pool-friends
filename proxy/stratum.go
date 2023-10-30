@@ -641,9 +641,10 @@ func (s *ProxyServer) broadcastNewJobs() {
 	bcast := make(chan int, 1024)
 	n := 0
 
-	for m, _ := range s.sessions {
+	for m := range s.sessions {
 		n++
 		bcast <- n
+		cs := m // Assign the value to a variable cs to capture the correct Session.
 
 		go func(cs *Session) {
 			err := cs.pushNewJob(s, &reply)
@@ -654,7 +655,7 @@ func (s *ProxyServer) broadcastNewJobs() {
 			} else {
 				s.setDeadline(cs.conn)
 			}
-		}(m)
+		}(cs)
 	}
 	log.Printf("Jobs broadcast finished %s", time.Since(start))
 }
