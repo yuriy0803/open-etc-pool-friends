@@ -256,7 +256,7 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 			reply, errReply := s.handleLoginRPC(cs, params, req.Worker)
 			if errReply != nil {
 				return cs.sendStratumError(req.Id, []string{
-					string(errReply.Code),
+					string(rune(errReply.Code)),
 					errReply.Message,
 				})
 			}
@@ -418,7 +418,7 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 		hashrateStr := params[0]
 		if !strings.HasPrefix(hashrateStr, "0x") {
 			log.Println("Malformed hashrate value in eth_submitHashrate request from", cs.ip)
-			return errors.New("Malformed hashrate value")
+			return errors.New("malformed hashrate value")
 		}
 
 		hashrate, err := strconv.ParseInt(hashrateStr[2:], 16, 64)
@@ -563,8 +563,8 @@ func (cs *Session) sendTCPReq(resp JSONStratumReq) error {
 	return cs.enc.Encode(&resp)
 }
 
-func (self *ProxyServer) setDeadline(conn net.Conn) {
-	conn.SetDeadline(time.Now().Add(self.timeout))
+func (s *ProxyServer) setDeadline(conn net.Conn) {
+	conn.SetDeadline(time.Now().Add(s.timeout))
 }
 
 func (s *ProxyServer) registerSession(cs *Session) {
@@ -586,7 +586,7 @@ func (cs *Session) sendJob(s *ProxyServer, id json.RawMessage, newjob bool) erro
 		reply, errReply := s.handleGetWorkRPC(cs)
 		if errReply != nil {
 			return cs.sendStratumError(id, []string{
-				string(errReply.Code),
+				string(rune(errReply.Code)),
 				errReply.Message,
 			})
 		}
