@@ -54,6 +54,8 @@ github.com/yuriy0803/core-geth1 v0.0.0-20231028143816-9cc1f7728b95 h1:RyT3fy3GZK
 github.com/yuriy0803/core-geth1 v0.0.0-20231028143816-9cc1f7728b95/go.mod h1:ig3WlkZEoxpZuLcu3mN+t7BOhVaZ6lEciDsovHYaZDI=
 github.com/yuriy0803/etchash v0.0.0-20231028151116-18c6f4358aee h1:/aYPK4k3kjl5mRC3y2yFJvgL7lDCkSGbR0piNkxfi8o=
 github.com/yuriy0803/etchash v0.0.0-20231028151116-18c6f4358aee/go.mod h1:3bPvXxlZEQd6ds3UEC8vbe7xIJO0wMNxxX7iAQmWEHE=
+github.com/yuriy0803/etchash v0.0.0-20231101190535-3e061b3bab83 h1:85YNTK2bQbT9JM9O2VkGXQXesWcAe3j6iSd7c5nX37M=
+github.com/yuriy0803/etchash v0.0.0-20231101190535-3e061b3bab83/go.mod h1:3bPvXxlZEQd6ds3UEC8vbe7xIJO0wMNxxX7iAQmWEHE=
 github.com/yvasiyarov/go-metrics v0.0.0-20150112132944-c25f46c4b940 h1:p7OofyZ509h8DmPLh8Hn+EIIZm/xYhdZHJ9GnXHdr6U=
 github.com/yvasiyarov/go-metrics v0.0.0-20150112132944-c25f46c4b940/go.mod h1:aX5oPXxHm3bOH+xeAttToC8pqch2ScQN/JoXYupl6xs=
 github.com/yvasiyarov/gorelic v0.0.7 h1:4DTF1WOM2ZZS/xMOkTFBOcb6XiHu/PKn3rVo6dbewQE=
