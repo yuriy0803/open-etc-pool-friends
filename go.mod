@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/robfig/cron v1.2.0
 	github.com/yuriy0803/core-geth1 v0.0.0-20231028143816-9cc1f7728b95
-	github.com/yuriy0803/etchash v0.0.0-20231028151116-18c6f4358aee
+	github.com/yuriy0803/etchash v0.0.0-20231101190535-3e061b3bab83
 	github.com/yvasiyarov/gorelic v0.0.7
 	gopkg.in/redis.v3 v3.6.4
 )
