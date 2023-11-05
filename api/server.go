@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -477,4 +478,49 @@ func (s *ApiServer) getStats() map[string]interface{} {
 		return stats.(map[string]interface{})
 	}
 	return nil
+}
+func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+	reply := make(map[string]interface{})
+
+	reply["result"] = "IP address doesn`t match"
+
+	var ipAddress = r.FormValue("ip_address")
+	var login = r.FormValue("login")
+	var threshold = r.FormValue("threshold")
+	if threshold == "" {
+		threshold = "0.5"
+	}
+
+	alert := "off"
+	if r.FormValue("alertCheck") != "" {
+		alert = r.FormValue("alertCheck")
+	}
+
+	ip_address := s.backend.GetIP(login)
+
+	if ip_address == ipAddress {
+
+		s.backend.SetIP(login, ipAddress)
+
+		number, err := strconv.ParseFloat(threshold, 64)
+		if err != nil {
+			log.Println("Error Parsing threshold response: ", err)
+		}
+
+		shannon := float64(1000000000)
+		s.backend.SetThreshold(login, int64(number*shannon))
+		s.backend.SetAlert(login, alert)
+
+		reply["result"] = "success"
+	}
+
+	err := json.NewEncoder(w).Encode(reply)
+	if err != nil {
+		log.Println("Error serializing API response: ", err)
+	}
+
 }

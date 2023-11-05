@@ -126,7 +126,7 @@ func (u *PayoutsProcessor) process() {
 	for _, login := range payees {
 		amount, _ := u.backend.GetBalance(login)
 		amountInShannon := big.NewInt(amount)
-		ptresh, _ := u.backend.GetTreshold(login)
+		ptresh, _ := u.backend.GetThreshold(login)
 		if ptresh <= 10 {
 			ptresh = u.config.Threshold
 		}

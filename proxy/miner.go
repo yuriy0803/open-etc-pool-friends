@@ -104,6 +104,8 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		return false, false
 	}
 
+	s.backend.LogIP(login, ip)
+
 	// check share difficulty
 	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
 	if result.Big().Cmp(shareTarget) > 0 {

@@ -1942,3 +1942,52 @@ func (r *RedisClient) GetExchangeData(coinsymbol string) (map[string]string, err
 	}
 	return result, err
 }
+
+func (r *RedisClient) GetThreshold(login string) (int64, error) {
+	cmd := r.client.HGet(r.formatKey("settings", login), "payoutthreshold")
+	if cmd.Err() == redis.Nil {
+		return 500000000, nil
+	} else if cmd.Err() != nil {
+		log.Println("GetThreshold error :", cmd.Err())
+		return 500000000, cmd.Err()
+	}
+
+	return cmd.Int64()
+}
+
+func (r *RedisClient) SetThreshold(login string, threshold int64) (bool, error) {
+	cmd, err := r.client.HSet(r.formatKey("settings", login), "payoutthreshold", strconv.FormatInt(threshold, 10)).Result()
+	return cmd, err
+}
+func (r *RedisClient) LogIP(login string, ip string) {
+
+	r.client.HSet(r.formatKey("settings", login), "ip_address", ip)
+	r.client.HSet(r.formatKey("settings", login), "status", "online")
+
+	ms := util.MakeTimestamp()
+	ts := ms / 1000
+	r.client.HSet(r.formatKey("settings", login), "ip_time", strconv.FormatInt(ts, 10))
+
+}
+
+func (r *RedisClient) GetIP(login string) string {
+	login = strings.ToLower(login)
+	cmd := r.client.HGet(r.formatKey("settings", login), "ip_address")
+	if cmd.Err() == redis.Nil {
+		return "NA"
+	} else if cmd.Err() != nil {
+		return "NA"
+	}
+	return cmd.Val()
+}
+
+func (r *RedisClient) SetIP(login string, ip string) {
+	login = strings.ToLower(login)
+	r.client.HSet(r.formatKey("settings", login), "ip_address", ip)
+}
+
+func (r *RedisClient) SetAlert(login string, alert string) (bool, error) {
+	login = strings.ToLower(login)
+	cmd, err := r.client.HSet(r.formatKey("settings", login), "alert", alert).Result()
+	return cmd, err
+}
