@@ -50,16 +50,17 @@ type Session struct {
 
 	// Stratum
 	sync.Mutex
-	conn          net.Conn
-	login         string
-	worker        string
-	stratum       int
-	JobDeatils    jobDetails
-	Extranonce    string
-	ExtranonceSub bool
-	JobDetails    jobDetails
-	staleJobs     map[string]staleJob
-	staleJobIDs   []string
+	conn           net.Conn
+	login          string
+	worker         string
+	stratum        int
+	subscriptionID string
+	JobDeatils     jobDetails
+	Extranonce     string
+	ExtranonceSub  bool
+	JobDetails     jobDetails
+	staleJobs      map[string]staleJob
+	staleJobIDs    []string
 }
 
 type jobDetails struct {
@@ -72,7 +73,7 @@ type jobDetails struct {
 
 func NewProxy(cfg *Config, backend *storage.RedisClient) *ProxyServer {
 	if len(cfg.Name) == 0 {
-		log.Fatal("You must set the instance name")
+		log.Fatal("You must set instance name")
 	}
 	policy := policy.Start(&cfg.Proxy.Policy, backend)
 
@@ -107,49 +108,61 @@ func NewProxy(cfg *Config, backend *storage.RedisClient) *ProxyServer {
 	stateUpdateTimer := time.NewTimer(stateUpdateIntv)
 
 	go func() {
-		for range refreshTimer.C {
-			proxy.fetchBlockTemplate()
+		for {
+			select {
+			case <-refreshTimer.C:
+				proxy.fetchBlockTemplate()
+				refreshTimer.Reset(refreshIntv)
+			}
 		}
 	}()
 
 	go func() {
-		for range checkTimer.C {
-			proxy.checkUpstreams()
+		for {
+			select {
+			case <-checkTimer.C:
+				proxy.checkUpstreams()
+				checkTimer.Reset(checkIntv)
+			}
 		}
 	}()
 
 	go func() {
-		for range stateUpdateTimer.C {
-			t := proxy.currentBlockTemplate()
-			if t != nil {
-				rpc := proxy.rpc()
-				// get the latest block height
-				height := int64(t.Height) - 1
-				block, _ := rpc.GetBlockByHeight(height)
-				timestamp, _ := strconv.ParseInt(strings.Replace(block.Timestamp, "0x", "", -1), 16, 64)
-				prev := height - 100
-				if prev < 0 {
-					prev = 0
-				}
-				n := height - prev
-				if n > 0 {
-					prevblock, err := rpc.GetBlockByHeight(prev)
-					if err != nil || prevblock == nil {
-						log.Fatalf("Error while retrieving block from the node: %v", err)
-					} else {
-						prevtime, _ := strconv.ParseInt(strings.Replace(prevblock.Timestamp, "0x", "", -1), 16, 64)
-						blocktime := float64(timestamp-prevtime) / float64(n)
-						err = backend.WriteNodeState(cfg.Name, t.Height, t.Difficulty, blocktime)
-						if err != nil {
-							log.Printf("Failed to write node state to the backend: %v", err)
-							proxy.markSick()
-						} else {
-							proxy.markOk()
-						}
+		for {
+			select {
+			case <-stateUpdateTimer.C:
+				t := proxy.currentBlockTemplate()
+				if t != nil {
+					rpc := proxy.rpc()
+					// get the latest block height
+					height := int64(t.Height) - 1
+					block, _ := rpc.GetBlockByHeight(height)
+					timestamp, _ := strconv.ParseInt(strings.Replace(block.Timestamp, "0x", "", -1), 16, 64)
+					prev := height - 100
+					if prev < 0 {
+						prev = 0
 					}
-				} else {
-					proxy.markSick()
+					n := height - prev
+					if n > 0 {
+						prevblock, err := rpc.GetBlockByHeight(prev)
+						if err != nil || prevblock == nil {
+							log.Fatalf("Error while retrieving block from node: %v", err)
+						} else {
+							prevtime, _ := strconv.ParseInt(strings.Replace(prevblock.Timestamp, "0x", "", -1), 16, 64)
+							blocktime := float64(timestamp-prevtime) / float64(n)
+							err = backend.WriteNodeState(cfg.Name, t.Height, t.Difficulty, blocktime)
+							if err != nil {
+								log.Printf("Failed to write node state to backend: %v", err)
+								proxy.markSick()
+							} else {
+								proxy.markOk()
+							}
+						}
+					} else {
+						proxy.markSick()
+					}
 				}
+				stateUpdateTimer.Reset(stateUpdateIntv)
 			}
 		}
 	}()
