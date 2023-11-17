@@ -103,7 +103,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		log.Printf("Stale share from %v@%v", login, ip)
 		return false, false
 	}
-
+	//Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
 	s.backend.LogIP(login, ip)
 
 	// check share difficulty
