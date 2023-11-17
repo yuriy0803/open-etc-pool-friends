@@ -487,7 +487,7 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	reply := make(map[string]interface{})
 
-	reply["result"] = "IP address doesn`t match"
+	reply["result"] = "IP address doesn't match"
 
 	var ipAddress = r.FormValue("ip_address")
 	var login = r.FormValue("login")
@@ -496,15 +496,18 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 		threshold = "0.5"
 	}
 
-	alert := "off"
-	if r.FormValue("alertCheck") != "" {
-		alert = r.FormValue("alertCheck")
-	}
+	// Log-Ausgabe für den Login-Wert
+	log.Printf("Received login from client: %s", login)
 
-	ip_address := s.backend.GetIP(login)
+	// Log-Ausgabe für den IP-Adressen-Vergleich
+	log.Printf("Received IP address from client: %s", ipAddress)
 
-	if ip_address == ipAddress {
+	// Überprüfung des Login-Werts in der Redis-Datenbank
+	ipFromRedis := s.backend.GetIP(login)
+	log.Printf("IP address from Redis for login %s: %s", login, ipFromRedis)
 
+	// Überprüfung, ob die IP-Adresse übereinstimmt
+	if ipFromRedis == ipAddress {
 		s.backend.SetIP(login, ipAddress)
 
 		number, err := strconv.ParseFloat(threshold, 64)
@@ -514,8 +517,6 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 
 		shannon := float64(1000000000)
 		s.backend.SetThreshold(login, int64(number*shannon))
-		s.backend.SetAlert(login, alert)
-
 		reply["result"] = "success"
 	}
 
@@ -523,5 +524,4 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error serializing API response: ", err)
 	}
-
 }

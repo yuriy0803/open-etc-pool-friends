@@ -1950,34 +1950,39 @@ func (r *RedisClient) SetThreshold(login string, threshold int64) (bool, error) 
 	return cmd, err
 }
 func (r *RedisClient) LogIP(login string, ip string) {
-
+	login = strings.ToLower(login)
 	r.client.HSet(r.formatKey("settings", login), "ip_address", ip)
-	r.client.HSet(r.formatKey("settings", login), "status", "online")
 
 	ms := util.MakeTimestamp()
 	ts := ms / 1000
 	r.client.HSet(r.formatKey("settings", login), "ip_time", strconv.FormatInt(ts, 10))
-
 }
 
 func (r *RedisClient) GetIP(login string) string {
 	login = strings.ToLower(login)
 	cmd := r.client.HGet(r.formatKey("settings", login), "ip_address")
+
+	log.Printf("Getting IP for login %s. Result: %v", login, cmd.Val())
+
 	if cmd.Err() == redis.Nil {
+		log.Printf("IP not found for login: %s", login)
 		return "NA"
 	} else if cmd.Err() != nil {
+		log.Printf("Error retrieving IP for login %s: %v", login, cmd.Err())
 		return "NA"
 	}
+
 	return cmd.Val()
 }
 
 func (r *RedisClient) SetIP(login string, ip string) {
 	login = strings.ToLower(login)
-	r.client.HSet(r.formatKey("settings", login), "ip_address", ip)
-}
+	key := r.formatKey("settings", login) // Überprüfen Sie das genaue Format des Schlüssels
 
-func (r *RedisClient) SetAlert(login string, alert string) (bool, error) {
-	login = strings.ToLower(login)
-	cmd, err := r.client.HSet(r.formatKey("settings", login), "alert", alert).Result()
-	return cmd, err
+	log.Printf("Setting IP address %s for login %s", ip, login)
+
+	cmd := r.client.HSet(key, "ip_address", ip)
+	if cmd.Err() != nil {
+		log.Printf("Error setting IP address for login %s: %v", login, cmd.Err())
+	}
 }
