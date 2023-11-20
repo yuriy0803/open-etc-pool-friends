@@ -35,6 +35,13 @@ type UnlockerConfig struct {
 
 const minDepth = 16
 
+// params for canxium
+const HydroForkBlock = 4204800
+
+var CanxiumFoundationRewardPercent = big.NewInt(2)
+var PreHydroReward = big.NewInt(1875e14)
+var HydroRewardPerHash = big.NewInt(500)
+
 // Universal block reward ethash
 const UniversalHardForkHeight = 0
 
@@ -91,7 +98,7 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	case "ethereum":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
 		cfg.ConstantinopleFBlock = big.NewInt(7280000)
-	case "ethereumPow", "expanse", "etica", "callisto", "ubiq", "octaspace", "universal":
+	case "ethereumPow", "expanse", "etica", "callisto", "ubiq", "octaspace", "universal", "canxium":
 		// Nothing needs configuring here, simply proceed.
 	case "ethereumFair":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
@@ -342,6 +349,8 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		uncleReward := new(big.Int).Div(reward, big32)
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
+	} else if u.config.Network == "canxium" {
+		reward = getConstRewardCanxium(candidate.Height, candidate.Difficulty)
 	} else {
 		log.Fatalln("Invalid network set", u.config.Network)
 	}
@@ -405,6 +414,8 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleRewardOctaspace(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardOctaspace(height))
 	} else if cfg.Network == "universal" {
 		reward = getUncleRewardUniversal(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUniversal(height))
+	} else if cfg.Network == "canxium" {
+		reward = big.NewInt(0)
 	}
 
 	candidate.Height = height
@@ -963,4 +974,17 @@ func getUncleRewardExpanse(uHeight *big.Int, height *big.Int, reward *big.Int) *
 	r.Div(r, big8)
 
 	return r
+}
+
+// Canxium Reward
+func getConstRewardCanxium(height int64, difficulty int64) *big.Int {
+	if height < HydroForkBlock {
+		return PreHydroReward
+	}
+
+	reward := HydroRewardPerHash.Mul(HydroRewardPerHash, big.NewInt(difficulty))
+	foundation := new(big.Int).Mul(CanxiumFoundationRewardPercent, reward)
+	foundation.Div(foundation, big.NewInt(100))
+	reward.Sub(reward, foundation)
+	return reward
 }

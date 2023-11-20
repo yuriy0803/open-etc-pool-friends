@@ -22,16 +22,16 @@ var (
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
 
 	if hasher == nil {
-		if s.config.Network == "classic" {
+		switch s.config.Network {
+		case "classic":
 			hasher = etchash.New(&ecip1099FBlockClassic, nil)
-		} else if s.config.Network == "mordor" {
+		case "mordor":
 			hasher = etchash.New(&ecip1099FBlockMordor, nil)
-		} else if s.config.Network == "ubiq" {
+		case "ubiq":
 			hasher = etchash.New(nil, &uip1FEpoch)
-		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" || s.config.Network == "ethereumFair" || s.config.Network == "callisto" || s.config.Network == "etica" || s.config.Network == "expanse" || s.config.Network == "octaspace" || s.config.Network == "universal" {
+		case "ethereum", "ropsten", "ethereumPow", "ethereumFair", "callisto", "etica", "expanse", "octaspace", "universal", "canxium":
 			hasher = etchash.New(nil, nil)
-		} else {
-			// unknown network
+		default:
 			log.Printf("Unknown network configuration %s", s.config.Network)
 			return false, false
 		}
