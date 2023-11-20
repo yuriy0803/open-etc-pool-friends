@@ -9,6 +9,8 @@
         </div>
         <div style="display: block;">
           <i class="fa fa-bank"></i> Pending Balance: <span>{{format-balance model.stats.balance}}</span><br>
+          <i class="fa fa-bank"></i> Your Threshold: <span>{{format-threshold model.threshold}}
+            {{config.Unit}}</span><br>
           <small>Credited coins awaiting payout.</small>
         </div>
         {{#if model.stats.pending}}
@@ -73,7 +75,7 @@
     {{#link-to 'account.payouts'}}Payouts{{/link-to}}
     {{/active-li}}
     {{#active-li currentWhen='account.settings' role='presentation'}}
-      {{#link-to 'account.settings'}}Settings{{/link-to}}
+    {{#link-to 'account.settings'}}Settings{{/link-to}}
     {{/active-li}}
   </ul>
 </div>

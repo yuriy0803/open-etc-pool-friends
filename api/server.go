@@ -462,6 +462,7 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
 		stats["shareCharts"], err = s.backend.GetShareCharts(s.config.ShareChartsNum, login)
 		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
+		stats["threshold"], err = s.backend.GetThreshold(login)
 		reply = &Entry{stats: stats, updatedAt: now}
 		s.miners[login] = reply
 	}
