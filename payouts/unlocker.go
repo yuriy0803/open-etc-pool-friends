@@ -33,7 +33,7 @@ type UnlockerConfig struct {
 	Network              string   `json:"network"`
 }
 
-const minDepth = 16
+const minDepth = 61
 
 // params for canxium
 const HydroForkBlock = 4204800
@@ -64,10 +64,9 @@ var ubiqStartReward = big.NewInt(8e+18)
 var octaspaceStartReward = big.NewInt(650e+16)
 
 // params for expanse
-const byzantiumHardForkHeight = 800000
-
-var homesteadExpanseReward = math.MustParseBig256("8000000000000000000")
-var byzantiumExpanseReward = math.MustParseBig256("4000000000000000000")
+var frontierBlockRewardExpanse = big.NewInt(8e+18)
+var byzantiumBlockRewardExpanse = big.NewInt(4e+18)
+var constantinopleBlockRewardExpanse = big.NewInt(4e+18)
 
 // misc consts
 var big32 = big.NewInt(32)
@@ -95,10 +94,16 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	case "mordor":
 		cfg.Ecip1017FBlock = 0
 		cfg.Ecip1017EraRounds = big.NewInt(2000000)
+	case "rebirth":
+		cfg.ByzantiumFBlock = big.NewInt(0)
+		cfg.ConstantinopleFBlock = big.NewInt(0)
+	case "expanse":
+		cfg.ByzantiumFBlock = big.NewInt(800000)
+		cfg.ConstantinopleFBlock = big.NewInt(1860000)
 	case "ethereum":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
 		cfg.ConstantinopleFBlock = big.NewInt(7280000)
-	case "ethereumPow", "expanse", "etica", "callisto", "ubiq", "octaspace", "universal", "canxium":
+	case "ethereumPow", "etica", "callisto", "ubiq", "octaspace", "universal", "canxium":
 		// Nothing needs configuring here, simply proceed.
 	case "ethereumFair":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
@@ -304,12 +309,18 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		reward.Add(reward, rewardForUncles)
 
 	} else if u.config.Network == "expanse" {
-		reward = getConstRewardExpanse(candidate.Height)
+		reward = getConstRewardExpanse(candidate.Height, u.config)
 		// Add reward for including uncles
 		uncleReward := new(big.Int).Div(reward, big32)
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
 
+	} else if u.config.Network == "rebirth" {
+		reward = getConstRewardExpanse(candidate.Height, u.config)
+		// Add reward for including uncles
+		uncleReward := new(big.Int).Div(reward, big32)
+		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+		reward.Add(reward, rewardForUncles)
 	} else if u.config.Network == "etica" {
 		reward = getConstRewardetica(candidate.Height)
 		// Add reward for including uncles
@@ -400,8 +411,8 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleReward(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), era, getConstReward(era))
 	} else if cfg.Network == "ubiq" {
 		reward = getUncleRewardUbiq(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
-	} else if cfg.Network == "expanse" {
-		reward = getUncleRewardExpanse(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardExpanse(height))
+	} else if cfg.Network == "expanse" || cfg.Network == "rebirth" {
+		reward = getUncleRewardExpanse(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardExpanse(height, cfg))
 	} else if cfg.Network == "etica" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardetica(height))
 	} else if cfg.Network == "callisto" {
@@ -761,14 +772,6 @@ func getUncleReward(uHeight *big.Int, height *big.Int, era *big.Int, reward *big
 	return getRewardForUncle(reward)
 }
 
-// expanse
-func getConstRewardExpanse(height int64) *big.Int {
-	if height >= byzantiumHardForkHeight {
-		return new(big.Int).Set(byzantiumExpanseReward)
-	}
-	return new(big.Int).Set(homesteadExpanseReward)
-}
-
 func getConstRewardEthereumpow(height int64) *big.Int {
 	// Rewards)
 	// EthereumPow
@@ -965,6 +968,22 @@ func getUncleRewardUniversal(uHeight *big.Int, height *big.Int, reward *big.Int)
 
 }
 
+// expanse
+func getConstRewardExpanse(height int64, cfg *UnlockerConfig) *big.Int {
+	// Select the correct block reward based on chain progression
+	blockReward := frontierBlockRewardExpanse
+	headerNumber := big.NewInt(height)
+	if cfg.ByzantiumFBlock.Cmp(headerNumber) <= 0 {
+		blockReward = byzantiumBlockRewardExpanse
+	}
+	if cfg.ConstantinopleFBlock.Cmp(headerNumber) <= 0 {
+		blockReward = constantinopleBlockRewardExpanse
+	}
+	// Accumulate the rewards for the miner and any included uncles
+	reward := new(big.Int).Set(blockReward)
+	return reward
+}
+
 // expanse Uncle rw
 func getUncleRewardExpanse(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
 	r := new(big.Int)
@@ -972,6 +991,9 @@ func getUncleRewardExpanse(uHeight *big.Int, height *big.Int, reward *big.Int) *
 	r.Sub(r, height)
 	r.Mul(r, reward)
 	r.Div(r, big8)
+	if r.Cmp(big.NewInt(0)) < 0 {
+		r = big.NewInt(0)
+	}
 
 	return r
 }

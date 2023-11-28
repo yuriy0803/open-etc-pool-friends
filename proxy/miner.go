@@ -24,7 +24,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 
 	if hasher == nil {
 		switch s.config.Network {
-		case "expanse":
+		case "expanse", "rebirth":
 			hasher = etchash.New(nil, nil, &xip5Block) // expanse rebirth network
 		case "classic":
 			hasher = etchash.New(&ecip1099FBlockClassic, nil, nil) // classic mainnet
