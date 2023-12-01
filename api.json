@@ -4,7 +4,6 @@
 	"name": "main",
 	"pplns": 9000,
 	"network": "classic",
-	"algo": "etchash",
 	"coin-name": "ETC",
 	"proxy": {
 		"enabled": true,

@@ -16,22 +16,25 @@ var (
 	ecip1099FBlockClassic uint64           = 11700000 // classic mainnet
 	ecip1099FBlockMordor  uint64           = 2520000  // mordor
 	uip1FEpoch            uint64           = 22       // ubiq mainnet
+	xip5Block             uint64           = 0        // expanse rebirth network
 	hasher                *etchash.Etchash = nil
 )
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
 
 	if hasher == nil {
-		switch s.config.Network {
-		case "classic":
-			hasher = etchash.New(&ecip1099FBlockClassic, nil) // classic mainnet
-		case "mordor":
-			hasher = etchash.New(&ecip1099FBlockMordor, nil) // mordor
-		case "ubiq":
-			hasher = etchash.New(nil, &uip1FEpoch) // ubiq mainnet
-		case "ethereum", "ropsten", "ethereumPow", "ethereumFair", "callisto", "etica", "expanse", "octaspace", "universal", "canxium":
-			hasher = etchash.New(nil, nil) //ethash
-		default:
+		if s.config.Network == "expanse" || s.config.Network == "rebirth" {
+			hasher = etchash.New(nil, nil, &xip5Block)
+		} else if s.config.Network == "classic" {
+			hasher = etchash.New(&ecip1099FBlockClassic, nil, nil)
+		} else if s.config.Network == "mordor" {
+			hasher = etchash.New(&ecip1099FBlockMordor, nil, nil)
+		} else if s.config.Network == "ubiq" {
+			hasher = etchash.New(nil, &uip1FEpoch, nil)
+		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" || s.config.Network == "ethereumFair" || s.config.Network == "callisto" || s.config.Network == "etica" || s.config.Network == "octaspace" || s.config.Network == "universal" {
+			hasher = etchash.New(nil, nil, nil)
+		} else {
+			// unknown network
 			log.Printf("Unknown network configuration %s", s.config.Network)
 			return false, false
 		}
