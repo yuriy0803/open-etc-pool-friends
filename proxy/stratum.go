@@ -221,9 +221,11 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 
 		case "mining.extranonce.subscribe":
 			var params []string
-			err := json.Unmarshal(req.Params, &params)
-			if err != nil {
-				return errors.New("invalid params")
+			if req.Params != nil {
+				err := json.Unmarshal(req.Params, &params)
+				if err != nil {
+					return errors.New("invalid params")
+				}
 			}
 			if len(params) == 0 {
 				if err := cs.sendStratumResult(req.Id, true); err != nil {
@@ -264,6 +266,7 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 				id = splitData[1]
 			}
 
+			cs.worker = id
 			// check Extranonce subscription.
 			extranonce := cs.Extranonce
 			if !cs.ExtranonceSub {
