@@ -33,7 +33,7 @@ type UnlockerConfig struct {
 	Network              string   `json:"network"`
 }
 
-const minDepth = 61
+const minDepth = 16
 
 // params for canxium
 const HydroForkBlock = 4204800
