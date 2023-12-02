@@ -52,10 +52,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuriy0803/core-geth1 v0.0.0-20231122180645-3601ffad87c7 h1:Qh1lF49wclbdRRypBz9ZhQ9NRmHAxPLwTwS/Lsc8CjY=
 github.com/yuriy0803/core-geth1 v0.0.0-20231122180645-3601ffad87c7/go.mod h1:yf10EqBwKdsy8nnhlSvJFXwzhBh0/btBez47+g+faY8=
-github.com/yuriy0803/etchash v0.0.0-20231130222458-45df99d996c1 h1:LUP0HiOgIP6ERgwp/flyMfPnhApIJwqsKzFG26ewP/U=
-github.com/yuriy0803/etchash v0.0.0-20231130222458-45df99d996c1/go.mod h1:9q4LZ8KkbmmyS8FUEdCnTeA+sWohK70OyJlzewfcLMk=
-github.com/yuriy0803/etchash v0.0.0-20231201134926-6d603b2478fb h1:feHkNXLPkbVYgfZ683qmsNOjjn+G9pGhjDCDkl/jAEc=
-github.com/yuriy0803/etchash v0.0.0-20231201134926-6d603b2478fb/go.mod h1:9q4LZ8KkbmmyS8FUEdCnTeA+sWohK70OyJlzewfcLMk=
+github.com/yuriy0803/etchash v0.0.0-20231202141039-f284c32e49a9 h1:vIEIZqukMpicb6A2qpX1OEVAZDj5i/ES3TUhuI4gi7s=
+github.com/yuriy0803/etchash v0.0.0-20231202141039-f284c32e49a9/go.mod h1:9q4LZ8KkbmmyS8FUEdCnTeA+sWohK70OyJlzewfcLMk=
 github.com/yvasiyarov/go-metrics v0.0.0-20150112132944-c25f46c4b940 h1:p7OofyZ509h8DmPLh8Hn+EIIZm/xYhdZHJ9GnXHdr6U=
 github.com/yvasiyarov/go-metrics v0.0.0-20150112132944-c25f46c4b940/go.mod h1:aX5oPXxHm3bOH+xeAttToC8pqch2ScQN/JoXYupl6xs=
 github.com/yvasiyarov/gorelic v0.0.7 h1:4DTF1WOM2ZZS/xMOkTFBOcb6XiHu/PKn3rVo6dbewQE=
