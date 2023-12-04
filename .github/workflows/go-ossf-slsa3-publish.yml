@@ -1,4 +1,4 @@
-name: SLSA Go releaser
+name: Open ETC Pool Friends
 
 on:
   workflow_dispatch:
@@ -16,10 +16,23 @@ jobs:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read # To read workflow path.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
-    with:
-      go-version: 1.19
-      output: ./dist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Install GoReleaser
+        run: |
+          curl -sfL https://install.goreleaser.com/install-goreleaser.sh | sh
+
+      - name: Build
+        run: |
+          go build -o ./dist/open-etc-pool-friends
 
   publish:
     needs: build
