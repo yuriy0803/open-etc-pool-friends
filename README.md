@@ -1,5 +1,9 @@
 ## Open Source Ethereum Mining Pool PPLNS / SOLO
 
+### index page
+
+![index/miners page](/screenshots/01.png?raw=true "index/miners page")
+
 ### Donations
 
 * Donate 1% from pool fees to developers (Attention becomes automatic)
