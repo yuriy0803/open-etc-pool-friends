@@ -1,0 +1,28 @@
+project:
+  name: Open ETC Pool Friends
+  description: A Go-based Ethereum Classic mining pool
+  version: 1.0.0
+
+before:
+  - go mod tidy
+
+builds:
+  - goos: linux
+    goarch: amd64
+    binary: open-etc-pool-friends
+
+archives:
+  - name: open-etc-pool-friends
+    format: binary
+    files:
+      - open-etc-pool-friends
+
+slsa:
+  go:
+    version: 3.0.0
+    configuration:
+      author:
+        name: Yuriy Lytvyn
+        email: yuriy.lytvyn@gmail.com
+      repository:
+        url: https://github.com/yuriy0803/open-etc-pool-friends
