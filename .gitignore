@@ -6,3 +6,6 @@ testnet.json
 /build/bin/
 # IdeaIDE  (JetBrains stuff)
 .idea/
+www/node_modules/
+www/bower_components/
+www/package-lock.json
