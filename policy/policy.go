@@ -33,12 +33,13 @@ type Limits struct {
 }
 
 type Banning struct {
-	Enabled        bool    `json:"enabled"`
-	IPSet          string  `json:"ipset"`
-	Timeout        int64   `json:"timeout"`
-	InvalidPercent float32 `json:"invalidPercent"`
-	CheckThreshold int32   `json:"checkThreshold"`
-	MalformedLimit int32   `json:"malformedLimit"`
+	Enabled         bool    `json:"enabled"`
+	IPSet           string  `json:"ipset"`
+	Timeout         int64   `json:"timeout"`
+	InvalidPercent  float32 `json:"invalidPercent"`
+	CheckThreshold  int32   `json:"checkThreshold"`
+	MalformedLimit  int32   `json:"malformedLimit"`
+	Fail2BanCommand string  `json:"fail2banCommand"`
 }
 
 type Stats struct {
@@ -67,6 +68,34 @@ type PolicyServer struct {
 	whitelist       []string
 	storage         *storage.RedisClient
 	walletblacklist []string
+}
+
+// addToFail2Ban adds the given IP address to Fail2Ban's blacklist.
+func addToFail2Ban(ip string) error {
+	cmd := exec.Command("fail2ban-client", "set", "blacklist", "add", ip)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("Error adding to Fail2Ban: %v, Output: %s", err, output)
+	}
+	return nil
+}
+
+// doBan bans the specified IP address using the configured IPSet and timeout.
+func (s *PolicyServer) doBan(ip string) {
+	set, timeout := s.config.Banning.IPSet, s.config.Banning.Timeout
+	cmd := fmt.Sprintf("sudo ipset add %s %s timeout %v -!", set, ip, timeout)
+	args := strings.Fields(cmd)
+	head := args[0]
+	args = args[1:]
+
+	log.Printf("Banned %v with timeout %v on ipset %s", ip, timeout, set)
+
+	_, err := exec.Command(head, args...).Output()
+	if err != nil {
+		log.Printf("CMD Error: %s", err)
+		// Add a call here to add the IP address to Fail2Ban
+		addToFail2Ban(ip)
+	}
 }
 
 func Start(cfg *Config, storage *storage.RedisClient) *PolicyServer {
@@ -336,21 +365,6 @@ func (s *PolicyServer) InWhiteList(ip string) bool {
 	s.RLock()
 	defer s.RUnlock()
 	return util.StringInSlice(ip, s.whitelist)
-}
-
-func (s *PolicyServer) doBan(ip string) {
-	set, timeout := s.config.Banning.IPSet, s.config.Banning.Timeout
-	cmd := fmt.Sprintf("sudo ipset add %s %s timeout %v -!", set, ip, timeout)
-	args := strings.Fields(cmd)
-	head := args[0]
-	args = args[1:]
-
-	log.Printf("Banned %v with timeout %v on ipset %s", ip, timeout, set)
-
-	_, err := exec.Command(head, args...).Output()
-	if err != nil {
-		log.Printf("CMD Error: %s", err)
-	}
 }
 
 func (x *Stats) heartbeat() {

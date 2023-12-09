@@ -39,7 +39,8 @@
 				"timeout": 1800,
 				"invalidPercent": 30,
 				"checkThreshold": 30,
-				"malformedLimit": 5
+				"malformedLimit": 5,
+				"fail2banCommand": "fail2ban-client"
 			},
 			"limits": {
 				"enabled": false,
