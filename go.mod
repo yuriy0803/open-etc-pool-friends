@@ -5,8 +5,8 @@ go 1.19
 require (
 	github.com/gorilla/mux v1.8.1
 	github.com/robfig/cron v1.2.0
-	github.com/yuriy0803/core-geth1 v0.0.0-20231122180645-3601ffad87c7
-	github.com/yuriy0803/etchash v0.0.0-20231202141039-f284c32e49a9
+	github.com/yuriy0803/core-geth1 v1.12.18-0.20231209165046-f7272fa572bc
+	github.com/yuriy0803/etchash v1.0.0
 	github.com/yvasiyarov/gorelic v0.0.7
 	gopkg.in/redis.v3 v3.6.4
 )
