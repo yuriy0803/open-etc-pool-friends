@@ -17,6 +17,9 @@ sudo sed -i '/^\[sshd\]$/a enabled = true\nmaxretry = 3\nfindtime = 600\nbantime
 # Restart Fail2Ban to apply changes
 sudo systemctl restart fail2ban
 
+# Run journalctl vacuum
+sudo journalctl --vacuum-size=500M
+
 sudo ipset create blacklist hash:ip
 
 sudo systemctl enable nginx
