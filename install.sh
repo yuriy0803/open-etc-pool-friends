@@ -7,8 +7,15 @@ echo "Welcome to the installation!"
 # Update and upgrade the package list
 sudo apt-get update && sudo apt-get upgrade -y
 
-# Install npm, rsync, git, redis-server, and nginx
-sudo apt-get install npm rsync git ipset redis-server nginx -y
+# Install npm, rsync, git, redis-server, nginx, and fail2ban
+sudo apt-get install npm rsync git ipset redis-server nginx fail2ban -y
+
+# Configure Fail2Ban for SSH
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo sed -i '/^\[sshd\]$/a enabled = true\nmaxretry = 3\nfindtime = 600\nbantime = 3600' /etc/fail2ban/jail.local
+
+# Restart Fail2Ban to apply changes
+sudo systemctl restart fail2ban
 
 sudo ipset create blacklist hash:ip
 
