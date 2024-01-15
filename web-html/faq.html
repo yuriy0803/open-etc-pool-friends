@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<title>RAVEN-SOLO.COM</title>
+	<link rel="icon" href="assets/images/favicon-32x32.png" type="image/png" />
+	<link href="assets/plugins/chartist/chartist.css" rel="stylesheet" />
+	<link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="assets/css/icons.css" />
+	<link rel="stylesheet" href="assets/css/app.css" />
+</head>
+
+<body class="bg-theme bg-theme-dark">
+	<div class="wrapper">
+		<header class="top-header">
+			<nav class="navbar navbar-expand">
+				<div class="sidebar-header">
+					<div class="d-none d-lg-flex">
+						RAVEN-SOLO.COM
+					</div>
+					<div id="poolHeader"></div>
+					<a href="#" class="toggle-btn ml-lg-auto"><i class="bx bx-menu"></i></a>
+				</div>
+				<div class="top-navbar d-none d-xl-block ms-3">
+					<ul class="navbar-nav align-items-center">
+
+					</ul>
+				</div>
+				<div class="right-topbar ml-auto">
+					<ul class="navbar-nav">
+						<li class="nav-item dropdown dropdown-lg"><span id="discord"></span></li>
+						<li class="nav-item dropdown dropdown-lg"><span id="github"></span></li>
+						<li class="nav-item dropdown dropdown-lg"><span id="donations"></span></li>
+						<li class="nav-item dropdown dropdown-user-profile">
+							<a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-toggle="dropdown">
+								<div class="media user-box align-items-center">
+									<div class="media-body user-info">
+										<p id="nameOfCoinHeader" class="user-name mb-0"></p>
+										<p id="algoOfCoinHeader" class="designattion mb-0"></p>
+									</div>
+									<span id="coinLogo"></span>
+								</div>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</header>
+		<div class="nav-container">
+			<div class="mobile-topbar-header">
+				<div class="">
+					RAVEN-SOLO.COM
+				</div>
+				<div id="poolHeader2"></div>
+				<a href="#" class="toggle-btn ml-auto" target='_blank'><i class="bx bx-menu"></i></a>
+			</div>
+			<nav class="topbar-nav">
+				<ul class="metismenu" id="menu">
+					<li>
+						<a href="index.html">
+							<div class="parent-icon"><i class="bx bx-home-alt"></i></div>
+							<div class="menu-title">Home</div>
+						</a></center>
+					</li>
+					<li>
+						<a href="stats.html">
+							<div class="parent-icon"><i class='bx bx-bar-chart-square'></i></div>
+							<div class="menu-title">Statistics</div>
+						</a>
+					</li>
+					<li>
+						<a href="dashboard.html">
+							<div class="parent-icon"><i class="bx bx-tachometer"></i></div>
+							<div class="menu-title">Dashboard</div>
+						</a>
+					</li>
+					<li>
+						<a href="miners.html">
+							<div class="parent-icon"><i class="bx bx-group"></i></div>
+							<div class="menu-title">Miners</div>
+						</a>
+					</li>
+					<li>
+						<a href="blocks.html">
+							<div class="parent-icon"><i class="bx bx-cube-alt"></i></div>
+							<div class="menu-title">Blocks</div>
+						</a>
+					</li>
+					<li>
+						<a href="payments.html">
+							<div class="parent-icon"><i class="bx bx-dollar-circle"></i></div>
+							<div class="menu-title">Payments</div>
+						</a>
+					</li>
+					<li>
+						<a href="connect.html">
+							<div class="parent-icon"><i class="bx bx-plug"></i></div>
+							<div class="menu-title">Get Connected</div>
+						</a>
+					</li>
+					<li>
+						<a href="faq.html">
+							<div class="parent-icon text-info"><i class="bx bx-help-circle"></i></div>
+							<div class="menu-title text-info">FAQ</div>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div class="page-wrapper">
+			<div class="page-content-wrapper">
+				<div class="page-content">
+					<div class="page-breadcrumb d-none d-md-flex align-items-center mb-3">
+						<div class="breadcrumb-title pr-3">FAQ</div>
+						<div class="pl-3">
+							<nav aria-label="breadcrumb">
+								<ol class="breadcrumb mb-0 p-0">
+									<li class="breadcrumb-item"><a href="index.html"><i class='bx bx-home-alt'></i></a>
+									</li>
+									<li class="breadcrumb-item active" aria-current="page">Frequently Asked Questions
+									</li>
+								</ol>
+							</nav>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq01">
+										<h5 class="card-title font-weight-bold text-info">What is difficulty?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Difficulty is a measure of how difficult it
+											is to find a hash below a given target.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq02">
+										<h5 class="card-title font-weight-bold text-info">What is luck?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Mining is probabilistic in nature: if you
+											find a block earlier than you statistically should on average you are lucky
+											if it takes longer, you are unlucky. In a perfect World pool would find a
+											block on 100% luck value. Less then 100% means the pool was lucky. More then
+											100% means the pool was unlucky.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq03">
+										<h5 class="card-title font-weight-bold text-info">What is share?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Share is a possible valid hash for the
+											block. Shares are beings sent by your rigs to the pool to prove their work.
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq04">
+										<h5 class="card-title font-weight-bold text-info">What is block?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Transaction data is recorded in blocks. New
+											transactions are being processes by miners into new blocks which are added
+											to the end of the blockchain.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq05">
+										<h5 class="card-title font-weight-bold text-info">How long does it take to find
+											a block?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">It depends on amount of active miners. The
+											more miners work on pool → the more hashrate pool has → the more blocks are
+											found by the pool. However the more miners are active → the less reward you
+											get from each block found.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq06">
+										<h5 class="card-title font-weight-bold text-info">Which payout scheme is used?
+										</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Proportional (Share-based): Every time a
+											block is found, its reward is split between miners according to the number
+											of shares they submitted.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq07">
+										<h5 class="card-title font-weight-bold text-info">How current payout estimate is
+											calculated?</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">The estimated payout is a calculated using
+											your percentage of valid shares on the total for current round. This
+											percentage is then applied to the reward of the last block found by the
+											network.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq08">
+										<h5 class="card-title font-weight-bold text-info">I have been mining on this
+											pool for 1 hour but still have not received any payouts.</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">As soon as the block is found you will get
+											your reward. Please wait a little bit more time.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq09">
+										<h5 class="card-title font-weight-bold text-info">My hashrate is wrong! Why?
+										</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">Since you start to mine your hashrate grows
+											gradually. Please wait. The pool determines your hashrate based on the
+											amount of shares sent by your mining rigs (workers). This value could be a
+											little bit different from reported hasrate (in your mining software).</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-8">
+							<div class="card radius-15 b-1">
+								<div class="card-body">
+									<a name="faq09">
+										<h5 class="card-title font-weight-bold text-info">Pool Hopping Not Allowed</h5>
+									</a>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item font-16">We consider hopping if you come with at
+											least double of the total pool hashrate, send tons of shares for short
+											period of time and leave. We respect our miners and protect them as much as
+											we can. All pool hoppers' shares will be removed and he or she will not get
+											paid. </li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="overlay toggle-btn-mobile"></div>
+		<a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<div class="footer">
+			<div class="d-flex align-items-center justify-content-between flex-wrap">
+				<span class="text-success font-weight-bold"></span>Copyright © 2024 open-etc-pool-friends</a></p>
+			</div>
+		</div>
+	</div>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/popper.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="assets/js/app.js"></script>
+	<script src="assets/js/etc.js"></script>
+	<script src="assets/plugins/chartist/chartist.js"></script>
+	<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			loadConnectOverviewPage();
+		});
+	</script>
+</body>
+
+
+</html>

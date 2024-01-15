@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<title>open-etc-pool-friends</title>
+	<link rel="icon" href="assets/images/favicon-32x32.png" type="image/png" />
+	<link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="assets/css/icons.css" />
+	<link rel="stylesheet" href="assets/css/app.css" />
+</head>
+
+<body class="bg-theme bg-theme-dark" onhashchange="loadStatsPage()">
+	<div class="wrapper">
+		<header class="top-header">
+			<nav class="navbar navbar-expand">
+				<div class="sidebar-header">
+					<div class="d-none d-lg-flex">
+						open-etc-pool-friends
+					</div>
+					<div id="poolHeader"></div>
+					<a href="#" class="toggle-btn ml-lg-auto"><i class="bx bx-menu"></i></a>
+				</div>
+				<div class="top-navbar d-none d-xl-block ms-3">
+					<ul class="navbar-nav align-items-center">
+
+
+
+
+					</ul>
+				</div>
+				<div class="right-topbar ml-auto">
+					<ul class="navbar-nav">
+						<li class="nav-item dropdown dropdown-lg"><span id="discord"></span></li>
+						<li class="nav-item dropdown dropdown-lg"><span id="github"></span></li>
+						<li class="nav-item dropdown dropdown-lg"><span id="donations"></span></li>
+						<li class="nav-item dropdown dropdown-user-profile">
+							<a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-toggle="dropdown">
+								<div class="media user-box align-items-center">
+									<div class="media-body user-info">
+										<p id="nameOfCoinHeader" class="user-name mb-0"></p>
+										<p id="algoOfCoinHeader" class="designattion mb-0"></p>
+									</div>
+									<span id="coinLogo"></span>
+								</div>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</header>
+		<div class="nav-container">
+			<div class="mobile-topbar-header">
+				<div class="">
+					open-etc-pool-friends
+				</div>
+				<div id="poolHeader2"></div>
+				<a href="#" class="toggle-btn ml-auto" target='_blank'><i class="bx bx-menu"></i></a>
+			</div>
+			<nav class="topbar-nav">
+				<ul class="metismenu" id="menu">
+					<li>
+						<a href="index.html">
+							<div class="parent-icon text-info"><i class="bx bx-home-alt"></i></div>
+							<div class="menu-title text-info">Home</div>
+						</a></center>
+					</li>
+					<li>
+						<a href="stats.html">
+							<div class="parent-icon"><i class='bx bx-bar-chart-square'></i></div>
+							<div class="menu-title">Statistics</div>
+						</a>
+					</li>
+					<li>
+						<a href="dashboard.html">
+							<div class="parent-icon"><i class="bx bx-tachometer"></i></div>
+							<div class="menu-title">Dashboard</div>
+						</a>
+					</li>
+					<li>
+						<a href="miners.html">
+							<div class="parent-icon"><i class="bx bx-group"></i></div>
+							<div class="menu-title">Miners</div>
+						</a>
+					</li>
+					<li>
+						<a href="blocks.html">
+							<div class="parent-icon"><i class="bx bx-cube-alt"></i></div>
+							<div class="menu-title">Blocks</div>
+						</a>
+					</li>
+					<li>
+						<a href="payments.html">
+							<div class="parent-icon"><i class="bx bx-dollar-circle"></i></div>
+							<div class="menu-title">Payments</div>
+						</a>
+					</li>
+					<li>
+						<a href="connect.html">
+							<div class="parent-icon"> <i class="bx bx-plug"></i></div>
+							<div class="menu-title">Get Connected</div>
+						</a>
+					</li>
+					<li>
+						<a href="faq.html">
+							<div class="parent-icon"><i class="bx bx-help-circle"></i></div>
+							<div class="menu-title">FAQ</div>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div class="page-wrapper">
+			<div class="page-content-wrapper">
+				<div class="page-content">
+					<div class="col-12">
+						<div class="card radius-15 b-2">
+							<div class="box-body"><br>
+								<h2 class="text-center font-weight-bold">open-etc-pool-friends</h2><br>
+								<h3 class="text-center font-weight-bold">IS A HIGH PERFORMANCE <span
+										id="nameOfCoinHeadline2"></span>RAVEN MINING POOL</h3><br>
+								<div class="row">
+									<div class="col-12">
+										<div class="text-center mt-15 mb-25">
+											<a href="connect.html" class="btn btn-info mx-auto">Let's start mining
+												now!</a>
+										</div>
+									</div>
+								</div><br>
+							</div>
+						</div>
+					</div>
+					<h5 class="mb-0 text-uppercase text-center">Coin Information</h5>
+					<hr>
+					<div class="user-profile-page">
+						<div class="card radius-15 b-1">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-12 col-lg-6 border-right">
+										<div class="d-md-flex align-items-center">
+											<div class="mb-md-0 mb-3">
+												<span id="geckoLogo"></span>
+											</div>
+											<div class="ml-md-4 flex-grow-1">
+												<div class="d-flex align-items-center mb-1">
+													<h4 class="mb-0">Ethereum Classic</h4>
+												</div>
+												<p class="mb-0">Ticker: ETC</p>
+												<p class="mb-0">Algorithm: ETCHASH</p>
+												<p class="mb-0"><a href="https://ethereumclassic.org/"
+														target='_blank'><i class='bx bx-world'></i> Ethereum Classic
+														Website</a></p>
+												<p class="mb-0"><a href="https://github.com/etclabscore/core-geth"
+														target='_blank'><i class='bx bxl-github'></i> Core-Geth
+														Github</a></p>
+											</div>
+										</div>
+									</div>
+									<div class="col-12 col-lg-6">
+										<table class="table table-sm table-borderless table-striped mt-md-0 mt-3">
+											<tbody>
+												<tr>
+													<th>Block Reward (Coin):</th>
+													<td id="lastBlockReward"></td>
+												</tr>
+												<tr>
+													<th>Block Reward (USD):</th>
+													<td id="blockToUSD"></td>
+												</tr>
+												<tr>
+													<th>Genesis Date:</th>
+													<td id="genesisDate"></td>
+												</tr>
+												<tr>
+													<th>Market Cap Rank:</th>
+													<td id="marketCap"></td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<h5 class="mb-0 text-uppercase text-center">Pool Information</h5>
+					<hr>
+					<div class="col-12">
+						<div class="card radius-15 b-1">
+							<div class="card-body">
+								<div class="row">
+									<ul id="webticker">
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Network Hashrate <span
+													class="text-white">
+													<div id="networkHashrateTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Network Difficulty <span
+													class="text-white">
+													<div id="networkDifficultyTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Network Blockheight <span
+													class="text-white">
+													<div id="blockchainHeightTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Pool Hashrate <span
+													class="text-white">
+													<div id="poolHashrateTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Pool Miners <span
+													class="text-white">
+													<div id="poolMinersTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Pool Workers <span
+													class="text-white">
+													<div id="poolWorkersTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Minimum Payout <span
+													class="text-white">
+													<div id="minPaymentTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Payout Scheme <span
+													class="text-white">
+													<div id="payoutShemeTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Payment Interval <span
+													class="text-white">
+													<div id="payIntervalTicker"></div>
+												</span></h3>
+										</li>
+										<li class="br-1">
+											<h3 class="mx-15 text-info text-center"> Pool Fee <span class="text-white">
+													<div id="poolFeeTicker"></div>
+												</span></h3>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<h5 class="mb-0 text-uppercase">Market Data</h5>
+					<hr>
+					<div class="card radius-15 b-1">
+						<div class="row no-gutters row-group">
+							<div class="col-12 col-lg-3">
+								<div class="card-body">
+									<div class="media align-items-center">
+										<div class="media-body">
+											<p class="mb-0">ETC to BTC</p>
+											<h4 class="mb-0 font-weight-bold" id="coinToBTC"></h4>
+										</div>
+										<div class="font-40 text-warning"><i class='bx bxl-bitcoin'></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-3">
+								<div class="card-body">
+									<div class="media align-items-center">
+										<div class="media-body">
+											<p class="mb-0">ETC to USD</p>
+											<h4 class="mb-0 font-weight-bold" id="coinToUSD"></h4>
+										</div>
+										<div class="font-40 text-info"><i class='bx bxs-dollar-circle'></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-3">
+								<div class="card-body">
+									<div class="media align-items-center">
+										<div class="media-body">
+											<p class="mb-0">24 Hour High</p>
+											<h4 class="mb-0 font-weight-bold" id="priceHigh"></h4>
+										</div>
+										<div class="font-40 text-success"><i class='bx bx-line-chart'></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-3">
+								<div class="card-body">
+									<div class="media align-items-center">
+										<div class="media-body">
+											<p class="mb-0">24 Hour Low</p>
+											<h4 class="mb-0 font-weight-bold" id="priceLow"></h4>
+										</div>
+										<div class="font-40 text-danger"><i class='bx bx-line-chart-down'></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="overlay toggle-btn-mobile"></div>
+		<a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<div class="footer">
+			<div class="d-flex align-items-center justify-content-between flex-wrap">
+				<span class="text-success font-weight-bold"></span>Copyright © 2024 open-etc-pool-friends</a></p>
+			</div>
+		</div>
+	</div>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/popper.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="assets/js/app.js"></script>
+	<script src="assets/js/etc.js"></script>
+	<script src="assets/plugins/webticker/jquery.webticker.min.js"></script>
+	<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			loadStatsPage();
+		});
+	</script>
+</body>
+
+
+</html>
