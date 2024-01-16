@@ -1,0 +1,46 @@
+{
+  "threads": 4,
+  "coin": "ETC",
+  "name": "main",
+  "pplns": 9000,
+  "network": "classic",
+  "coin-name": "ETC",
+  "unlocker": {
+    "enabled": true,
+    "poolFee": 1.0,
+    "poolFeeAddress": "",
+    "depth": 120,
+    "immatureDepth": 20,
+    "keepTxFees": false,
+    "interval": "10m",
+    "daemon": "http://127.0.0.1:8545",
+    "timeout": "10s",
+    "isLondonHardForkEnabled": false
+  },
+  "upstreamCheckInterval": "5s",
+  "upstream": [
+    {
+      "name": "main",
+      "url": "http://127.0.0.1:8545",
+      "timeout": "10s"
+    },
+    {
+      "name": "backup",
+      "url": "http://127.0.0.2:8545",
+      "timeout": "10s"
+    }
+  ],
+  "redis": {
+    "endpoint": "127.0.0.1:6379",
+    "poolSize": 10,
+    "database": 1,
+    "password": "",
+    "sentinelEnabled": false,
+    "masterName": "mymaster",
+    "sentinelAddrs": [
+      "127.0.0.1:26379",
+      "127.0.0.1:26389",
+      "127.0.0.1:26399"
+    ]
+  }
+}
