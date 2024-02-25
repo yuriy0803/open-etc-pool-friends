@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"sort"
 	"strconv"
@@ -244,6 +245,19 @@ func (s *ApiServer) collectshareCharts(login string, workerOnline int64) {
 
 func (s *ApiServer) listen() {
 	r := mux.NewRouter()
+	// Add middleware to log the real client IP address
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Get the real client IP address using the getClientIP function
+			clientIP := getClientIP(r)
+
+			// Log the request details including IP address, method, and path
+			log.Printf("[Diagnostics] Request from IP: %s - Method: %s, Path: %s", clientIP, r.Method, r.URL.Path)
+
+			// Call the next handler in the middleware chain
+			next.ServeHTTP(w, r)
+		})
+	})
 	r.HandleFunc("/api/finders", s.FindersIndex)
 	r.HandleFunc("/api/stats", s.StatsIndex)
 	r.HandleFunc("/api/miners", s.MinersIndex)
@@ -256,6 +270,26 @@ func (s *ApiServer) listen() {
 	if err != nil {
 		log.Fatalf("Failed to start API: %v", err)
 	}
+}
+
+// getClientIP returns the real client IP address from the http.Request object
+func getClientIP(r *http.Request) string {
+	// Try to use the "X-Forwarded-For" header, if available
+	forwardedFor := r.Header.Get("X-Forwarded-For")
+	if forwardedFor != "" {
+		// Extract the first IP address from the list (if multiple are present)
+		return strings.TrimSpace(strings.Split(forwardedFor, ",")[0])
+	}
+
+	// Try to use the "X-Real-IP" header, if available
+	realIP := r.Header.Get("X-Real-IP")
+	if realIP != "" {
+		return realIP
+	}
+
+	// If neither X-Forwarded-For nor X-Real-IP is set, use the remote address
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return ip
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
