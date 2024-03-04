@@ -70,13 +70,13 @@
     // List of pool information with logo paths and names
     const poolData = [
       {
-        name: 'expanse',
+        name: 'Ethereum Classic',
         apiUrl: 'https://etc.example.org/api/stats',
         logoPath: 'logo/etc.png',
         visitUrl: 'https://etc.example.org/'
       },
       {
-        name: 'ethereumclassic',
+        name: 'Expanse',
         apiUrl: 'https://exp.example.org/api/stats',
         logoPath: 'logo/exp.png',
         visitUrl: 'https://exp.example.org/'
@@ -113,17 +113,17 @@
 
         // Create HTML for current pool statistics
         const poolStatsHtml = `
-      <div class="poolStats">
-        <img src="${poolInfo.logoPath}" alt="${poolInfo.name} Logo">
-        <h2>${poolInfo.name}</h2>
-        <p>Difficulty: ${formatHashrate(difficulty)}</p>
-        <p>Network Hash Rate: ${formatHashrate(nethash)}</p>
-        <p>Block Time: ${blocktime}</p>
-        <p>Chain Height: ${chainheight}</p>
-        <p>Miners Total: ${minersTotal}</p>
-        <button class="visitButton" onclick="window.location.href='${poolInfo.visitUrl}'">Visit</button>
-      </div>
-    `;
+          <div class="poolStats">
+            <img src="${poolInfo.logoPath}" alt="${poolInfo.name} Logo" style="max-width: 100px; max-height: 100px;">
+            <h2>${poolInfo.name}</h2>
+            <p>Difficulty: ${formatHashrate(difficulty)}</p>
+            <p>Network Hash Rate: ${formatHashrate(nethash)}</p>
+            <p>Block Time: ${blocktime}</p>
+            <p>Chain Height: ${chainheight}</p>
+            <p>Miners Total: ${minersTotal}</p>
+            <button class="visitButton" onclick="window.location.href='${poolInfo.visitUrl}'">Visit</button>
+          </div>
+        `;
 
         // Add HTML statistics to the container
         poolStatsContainer.innerHTML += poolStatsHtml;
