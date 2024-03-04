@@ -1,10 +1,10 @@
 <tr>
   <td>
     {{#if block.uncle}}
-    <a href="https://expedition.dev/uncle/{{block.uncleHeight}}" rel="nofollow" target="_blank">{{format-number
+    <a href="{{t " links.blockExplorerLink_uncle"}}{{block.uncleHeight}}" rel="nofollow" target="_blank">{{format-number
       block.height}}</a>
     {{else}}
-    <a href="https://expedition.dev/block/{{block.height}}" rel="nofollow" target="_blank">{{format-number
+    <a href="{{t " links.blockExplorerLink_block"}}{{block.height}}" rel="nofollow" target="_blank">{{format-number
       block.height}}</a>
     {{/if}}
   </td>
@@ -12,10 +12,21 @@
     {{#if block.uncle}}
   <td>{{#link-to 'account' block.finder class='hash'}}{{block.finder}}{{/link-to}}</td>
   {{else if block.orphan}}
-  <span class="label label-danger">Orphan</span>
+  <span class="label label-danger">{{t "block.orphan"}}</span>
   {{else}}
   <td>{{#link-to 'account' block.finder class='hash'}}{{block.finder}}{{/link-to}}</td>
   {{/if}}
+  </td>
+  <td>
+    {{#if block.uncle}}
+    <a href="{{t " links.blockExplorerLink_uncle"}}{{block.hash}}" class="hash" rel="nofollow"
+      target="_blank">{{block.hash}}</a>
+    {{else if block.orphan}}
+    <span class="label label-danger">{{t "block.orphan"}}</span>
+    {{else}}
+    <a href="{{t " links.blockExplorerLink_block"}}{{block.hash}}" class="hash" rel="nofollow"
+      target="_blank">{{block.hash}}</a>
+    {{/if}}
   </td>
   <td>{{format-date-locale block.timestamp}}</td>
   <td>
@@ -34,13 +45,6 @@
     <span class="label label-default">{{block.formatReward}}</span>
     {{else if block.isOk}}
     <span class="label label-primary">{{block.formatReward}}</span>
-    {{/if}}
-  </td>
-  <td>
-    {{#if block.uncle}}
-    <span class="label label-default">Uncle</span>
-    {{else if block.isOk}}
-    <span class="label label-primary">Block</span>
     {{/if}}
   </td>
   <td>{{format-hashrate block.shareDiff}}</td>
