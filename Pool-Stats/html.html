@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Pool Stats</title>
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #poolStatsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .poolStats {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin: 10px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #333333;
+    }
+
+    p {
+      margin: 5px 0;
+    }
+
+    img {
+      max-width: 100px;
+      max-height: 100px;
+    }
+
+    .visitButton {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Multiple Pool Stats</h1>
+
+  <!-- Container for displaying pool statistics -->
+  <div id="poolStatsContainer"></div>
+
+  <script>
+    // List of pool information with logo paths and names
+    const poolData = [
+      {
+        name: 'expanse',
+        apiUrl: 'https://etc.example.org/api/stats',
+        logoPath: 'logo/etc.png',
+        visitUrl: 'https://etc.example.org/'
+      },
+      {
+        name: 'ethereumclassic',
+        apiUrl: 'https://exp.example.org/api/stats',
+        logoPath: 'logo/exp.png',
+        visitUrl: 'https://exp.example.org/'
+      },
+      // Add more pool information here if necessary
+    ];
+
+    // Function to fetch and display pool statistics
+    async function displayPoolStats(poolInfo) {
+      try {
+        const response = await fetch(poolInfo.apiUrl);
+        const data = await response.json();
+
+        // Extract values from API data
+        let difficulty = data.nodes[0].difficulty;
+        let nethash = difficulty / data.nodes[0].blocktime;
+        let blocktime = data.nodes[0].blocktime;
+        let chainheight = data.nodes[0].height;
+        let minersTotal = data.minersTotal;
+
+        // Function to format hashrate
+        function formatHashrate(hashrate) {
+          let i = 0;
+          const units = ['H/s', 'KH/s', 'MH/s', 'GH/s', 'TH/s', 'PH/s'];
+          while (hashrate > 1000) {
+            hashrate = hashrate / 1000;
+            i++;
+          }
+          return hashrate.toFixed(2) + ' ' + units[i];
+        }
+
+        // Container for statistics
+        const poolStatsContainer = document.getElementById('poolStatsContainer');
+
+        // Create HTML for current pool statistics
+        const poolStatsHtml = `
+      <div class="poolStats">
+        <img src="${poolInfo.logoPath}" alt="${poolInfo.name} Logo">
+        <h2>${poolInfo.name}</h2>
+        <p>Difficulty: ${formatHashrate(difficulty)}</p>
+        <p>Network Hash Rate: ${formatHashrate(nethash)}</p>
+        <p>Block Time: ${blocktime}</p>
+        <p>Chain Height: ${chainheight}</p>
+        <p>Miners Total: ${minersTotal}</p>
+        <button class="visitButton" onclick="window.location.href='${poolInfo.visitUrl}'">Visit</button>
+      </div>
+    `;
+
+        // Add HTML statistics to the container
+        poolStatsContainer.innerHTML += poolStatsHtml;
+      } catch (error) {
+        console.error(`Error fetching pool statistics from ${poolInfo.apiUrl}:`, error);
+      }
+    }
+
+    // Fetch and display data when the page is loaded
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Iterate over the list of pool information
+      for (const poolInfo of poolData) {
+        // Fetch and display pool statistics
+        await displayPoolStats(poolInfo);
+      }
+    });
+  </script>
+</body>
+
+</html>
