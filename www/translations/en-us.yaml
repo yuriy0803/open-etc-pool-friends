@@ -2,7 +2,7 @@ links:
   blockExplorerLink: 'https://explorer.test.network/'
   blockExplorerLink_tx: 'https://explorer.test.network/tx/'
   blockExplorerLink_uncle: 'https://explorer.test.network/uncles/'
-  blockExplorerLink_block: 'https://explorer.test.network/blocks/'
+  blockExplorerLink_block: 'https://etc.blockscout.com/block/'
   blockExplorerLink_address: 'https://explorer.test.network/address/'
   wallet:
   dapp_html: <a href="https://test.io/nautilus-wallet/#download">https://test.io/nautilus-wallet/#download</a>
@@ -129,6 +129,9 @@ block:
   hash: Hash
   time_found: Time Found
   variance: Share Variance (Shares/Diff)
+  login: Login
+  worker: Worker ID
+  shares: (Shares/Diff)
   matured: Matured Blocks
   immature_blocks: Immature Blocks
   no_immature_blocks_yet: No immature blocks yet
