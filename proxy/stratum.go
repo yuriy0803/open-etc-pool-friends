@@ -420,7 +420,7 @@ func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
 			cs.JobDetails.SeedHash = cs.JobDetails.SeedHash[2:]
 			cs.JobDetails.HeaderHash = cs.JobDetails.HeaderHash[2:]
 		}
-
+		a := s.currentBlockTemplate()
 		resp := JSONStratumReq{
 			Method: "mining.notify",
 			Params: []interface{}{
@@ -437,6 +437,8 @@ func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
 				// It's undetermined what's more cost-effective
 				false,
 			},
+
+			Height: util.ToHex1(int64(a.Height)),
 		}
 		return cs.enc.Encode(&resp)
 	}
@@ -523,7 +525,7 @@ func (cs *Session) sendJob(s *ProxyServer, id json.RawMessage, newjob bool) erro
 			cs.JobDetails.HeaderHash = cs.JobDetails.HeaderHash[2:]
 		}
 	}
-
+	t := s.currentBlockTemplate()
 	resp := JSONStratumReq{
 		Method: "mining.notify",
 		Params: []interface{}{
@@ -532,6 +534,8 @@ func (cs *Session) sendJob(s *ProxyServer, id json.RawMessage, newjob bool) erro
 			cs.JobDetails.HeaderHash,
 			true,
 		},
+
+		Height: util.ToHex1(int64(t.Height)),
 	}
 
 	return cs.sendTCPReq(resp)

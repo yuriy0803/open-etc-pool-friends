@@ -110,51 +110,34 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		return false, &ErrorReply{Code: -1, Message: "Malformed PoW result"}
 	}
 
-	// Process the share in a separate goroutine
-	go func(s *ProxyServer, cs *Session, login, id string, params []string) {
-		// Get the current block template
-		t := s.currentBlockTemplate()
+	t := s.currentBlockTemplate()
+	exist, validShare := s.processShare(login, id, cs.ip, t, params, stratumMode != EthProxy)
+	ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
 
-		// Check if the share already exists and if it's valid
-		exist, validShare := s.processShare(login, id, cs.ip, t, params, stratumMode != EthProxy)
-
-		// Apply the share policy to determine if the share should be accepted
-		ok := s.policy.ApplySharePolicy(cs.ip, !exist && validShare)
-
-		// Handle duplicate share
-		if exist {
-			log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
-			if !ok {
-				cs.disconnect()
-				return
-			}
-			return
-		}
-
-		// Handle invalid share
-		if !validShare {
-			log.Printf("Invalid share from %s@%s", login, cs.ip)
-			s.backend.WriteWorkerShareStatus(login, id, false, true, false)
-			// Bad shares limit reached, disconnect the session
-			if !ok {
-				cs.disconnect()
-				return
-			}
-			return
-		}
-
-		// Handle valid share
-		if s.config.Proxy.Debug {
-			log.Printf("Valid share from %s@%s", login, cs.ip)
-		}
-
-		// Apply the policy to determine if the session should be disconnected
+	if exist {
+		log.Printf("Duplicate share from %s@%s %v", login, cs.ip, params)
+		// see https://github.com/sammy007/open-ethereum-pool/compare/master...nicehashdev:patch-1
 		if !ok {
-			cs.disconnect()
-			return
+			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
 		}
-	}(s, cs, login, id, params)
+		return false, nil
+	}
 
+	if !validShare {
+		log.Printf("Invalid share from %s@%s", login, cs.ip)
+		// Bad shares limit reached, return error and close
+		if !ok {
+			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
+		}
+		return false, nil
+	}
+	if s.config.Proxy.Debug {
+		log.Printf("Valid share from %s@%s", login, cs.ip)
+	}
+
+	if !ok {
+		return true, &ErrorReply{Code: -1, Message: "High rate of invalid shares"}
+	}
 	return true, nil
 }
 
