@@ -439,6 +439,7 @@ func (cs *Session) pushNewJob(s *ProxyServer, result interface{}) error {
 			},
 
 			Height: util.ToHex1(int64(a.Height)),
+			Algo:   s.config.Algo,
 		}
 		return cs.enc.Encode(&resp)
 	}
@@ -536,6 +537,7 @@ func (cs *Session) sendJob(s *ProxyServer, id json.RawMessage, newjob bool) erro
 		},
 
 		Height: util.ToHex1(int64(t.Height)),
+		Algo:   s.config.Algo,
 	}
 
 	return cs.sendTCPReq(resp)

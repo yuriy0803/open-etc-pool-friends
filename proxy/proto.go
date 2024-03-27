@@ -13,6 +13,7 @@ type JSONStratumReq struct {
 	Method string      `json:"method"`
 	Params interface{} `json:"params"`
 	Height string      `json:"height"`
+	Algo   string      `json:"algo"`
 }
 
 type StratumReq struct {
