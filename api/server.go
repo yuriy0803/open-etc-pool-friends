@@ -523,7 +523,7 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	reply := make(map[string]interface{})
 
 	reply["result"] = "IP address doesn't match"
-
+	var email = r.FormValue("email")
 	var ipAddress = r.FormValue("ip_address")
 	var login = r.FormValue("login")
 	var threshold = r.FormValue("threshold")
@@ -536,6 +536,11 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Log-Ausgabe für den IP-Adressen-Vergleich
 	log.Printf("Received IP address from client: %s", ipAddress)
+
+	alert := "off"
+	if r.FormValue("alertCheck") != "" {
+		alert = r.FormValue("alertCheck")
+	}
 
 	// Überprüfung des Login-Werts in der Redis-Datenbank
 	ipFromRedis := s.backend.GetIP(login)
@@ -552,6 +557,8 @@ func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 
 		shannon := float64(1000000000)
 		s.backend.SetThreshold(login, int64(number*shannon))
+		s.backend.SetMailAddress(login, email)
+		s.backend.SetAlert(login, alert)
 		reply["result"] = "success"
 	}
 

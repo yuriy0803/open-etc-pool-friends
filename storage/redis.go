@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"math/big"
+	"net/smtp"
 	"sort"
 	"strconv"
 	"strings"
@@ -1318,10 +1319,21 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 		if worker.LastBeat < (now - smallWindow/2) {
 			worker.Offline = true
 			offline++
+			ret := r.GetWorker(login, id)
+			if ret == "0" {
+
+				var body = "Offline worker name : " + id
+				result := r.GetMailAddress(login)
+
+				if result != "NA" {
+					send(body, result)
+					r.SetWorkerWithEmailStatus(login, id, "1")
+				}
+			}
 		} else {
 			online++
+			r.SetWorkerWithEmailStatus(login, id, "0")
 		}
-
 		blocks := cmds[4].(*redis.ZSliceCmd).Val()
 
 		for _, val := range blocks {
@@ -1952,6 +1964,8 @@ func (r *RedisClient) SetThreshold(login string, threshold int64) (bool, error) 
 func (r *RedisClient) LogIP(login string, ip string) {
 	login = strings.ToLower(login)
 	r.client.HSet(r.formatKey("settings", login), "ip_address", ip)
+	r.client.HSet(r.formatKey("settings", login), "status", "online")
+	r.client.HSet(r.formatKey("settings", login), "email_sent", "0")
 
 	ms := util.MakeTimestamp()
 	ts := ms / 1000
@@ -1985,4 +1999,62 @@ func (r *RedisClient) SetIP(login string, ip string) {
 	if cmd.Err() != nil {
 		log.Printf("Error setting IP address for login %s: %v", login, cmd.Err())
 	}
+}
+
+func (r *RedisClient) SetMailAddress(login string, email string) (bool, error) {
+	login = strings.ToLower(login)
+	cmd, err := r.client.HSet(r.formatKey("settings", login), "email", email).Result()
+	return cmd, err
+}
+
+func send(body string, to string) {
+
+	from := "" //   "office.poolnode@gmail.com"
+	pass := "" // "pass"
+
+	msg := "From: " + from + "\n" +
+		" To: " + to + "\n" +
+		"Subject: Worker is down\n\n" +
+		body
+
+	err := smtp.SendMail("", // "smtp.gmail.com:587"
+		smtp.PlainAuth("", from, pass, ""), // "smtp.gmail.com"
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		fmt.Errorf("smtp error: %s", err)
+		return
+	}
+
+	fmt.Sprint("sent")
+}
+
+func (r *RedisClient) GetMailAddress(login string) string {
+	cmd := r.client.HGet(r.formatKey("settings", login), "email")
+	if cmd.Err() == redis.Nil {
+		return "NA"
+	} else if cmd.Err() != nil {
+		return "NA"
+	}
+	return cmd.Val()
+}
+
+func (r *RedisClient) SetWorkerWithEmailStatus(login string, worker string, emailSent string) {
+	r.client.HSet(r.formatKey("settings", login), worker, emailSent)
+}
+
+func (r *RedisClient) GetWorker(login string, worker string) string {
+	cmd := r.client.HGet(r.formatKey("settings", login), worker)
+	if cmd.Err() == redis.Nil {
+		return "NA"
+	} else if cmd.Err() != nil {
+		return "NA"
+	}
+	return cmd.Val()
+}
+
+func (r *RedisClient) SetAlert(login string, alert string) (bool, error) {
+	login = strings.ToLower(login)
+	cmd, err := r.client.HSet(r.formatKey("settings", login), "alert", alert).Result()
+	return cmd, err
 }
