@@ -108,7 +108,7 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	case "ethereum":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
 		cfg.ConstantinopleFBlock = big.NewInt(7280000)
-	case "ethereumPow", "etica", "callisto", "ubiq", "octaspace", "universal", "canxium":
+	case "ethereumPow", "etica", "ubiq", "octaspace", "universal", "canxium":
 		// Nothing needs configuring here, simply proceed.
 	case "ethereumFair":
 		cfg.ByzantiumFBlock = big.NewInt(4370000)
@@ -333,13 +333,6 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
 
-	} else if u.config.Network == "callisto" {
-		reward = getConstRewardcallisto(candidate.Height)
-		// Add reward for including uncles
-		uncleReward := new(big.Int).Div(reward, big32)
-		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
-		reward.Add(reward, rewardForUncles)
-
 	} else if u.config.Network == "ethereumPow" {
 		reward = getConstRewardEthereumpow(candidate.Height)
 		// Add reward for including uncles
@@ -420,8 +413,6 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleRewardExpanse(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardExpanse(height, cfg))
 	} else if cfg.Network == "etica" {
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardetica(height))
-	} else if cfg.Network == "callisto" {
-		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardcallisto(height))
 	} else if cfg.Network == "ethereumPow" {
 		reward = getUncleRewardEthereumpow(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardEthereumpow(height))
 	} else if cfg.Network == "ethereum" || cfg.Network == "ropsten" || cfg.Network == "ethereumFair" {
@@ -867,13 +858,6 @@ func calcBigNumber(reward float64) *big.Int {
 	return bigRewardInt
 }
 
-// callisto
-func getConstRewardcallisto(height int64) *big.Int {
-	// Rewards)
-	// callisto
-	return calcBigNumber(38.88)
-}
-
 // etica
 func getConstRewardetica(height int64) *big.Int {
 	// Rewards)
@@ -914,7 +898,7 @@ func getConstRewardEthereum(height int64, cfg *UnlockerConfig) *big.Int {
 	return reward
 }
 
-// ethash callisto etica
+// ethash etica
 func getUncleRewardEthereum(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
 	r := new(big.Int)
 	r.Add(uHeight, big8)
