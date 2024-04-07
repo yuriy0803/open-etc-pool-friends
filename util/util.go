@@ -26,7 +26,6 @@ func StringToBig(h string) *big.Int {
 	n.SetString(h, 0)
 	return n
 }
-
 func IsValidHexAddress(s string) bool {
 	if IsZeroHash(s) || !addressPattern.MatchString(s) {
 		return false

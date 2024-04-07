@@ -5,9 +5,7 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"os/exec"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/yuriy0803/core-geth1/common/hexutil"
@@ -29,10 +27,12 @@ type PayoutsConfig struct {
 	Gas          string `json:"gas"`
 	GasPrice     string `json:"gasPrice"`
 	AutoGas      bool   `json:"autoGas"`
+	KeepNwFees   bool   `json:"keepNwFees"`
+	TxGas        string `json:"nwTxGas"`
+	TxGasPrice   string `json:"nwTxGasPrice"`
 	// In Shannon
-	Threshold    int64 `json:"threshold"`
-	BgSave       bool  `json:"bgsave"`
-	ConcurrentTx int   `json:"concurrentTx"`
+	Threshold int64 `json:"threshold"`
+	BgSave    bool  `json:"bgsave"`
 }
 
 func (self PayoutsConfig) GasHex() string {
@@ -108,7 +108,6 @@ func (u *PayoutsProcessor) Start() {
 func (u *PayoutsProcessor) process() {
 	if u.halt {
 		log.Println("Payments suspended due to last critical error:", u.lastFail)
-		os.Exit(1)
 		return
 	}
 	mustPay := 0
@@ -120,12 +119,10 @@ func (u *PayoutsProcessor) process() {
 		return
 	}
 
-	waitingCount := 0
-	var wg sync.WaitGroup
-
 	for _, login := range payees {
 		amount, _ := u.backend.GetBalance(login)
 		amountInShannon := big.NewInt(amount)
+
 		ptresh, _ := u.backend.GetThreshold(login)
 		if ptresh <= 10 {
 			ptresh = u.config.Threshold
@@ -182,8 +179,23 @@ func (u *PayoutsProcessor) process() {
 			break
 		}
 
+		//Calculate the Gas Price in Wei and Computer the Transaction Charges
+		//Since pool honour only mining to wallet and not to contract, Deduct value equal to gas*21000 - Standard cost price
+
+		TxCharges := big.NewInt(0)
+
+		if u.config.KeepNwFees {
+
+			TxCharges.Mul(util.String2Big(u.config.TxGasPrice), util.String2Big(u.config.TxGas))
+
+			//Deduct the Calulated Transaction Charges
+			amountInWei.Sub(amountInWei, TxCharges)
+
+		}
+
 		value := hexutil.EncodeBig(amountInWei)
 		txHash, err := u.rpc.SendTransaction(u.config.Address, login, u.config.GasHex(), u.config.GasPriceHex(), value, u.config.AutoGas)
+
 		if err != nil {
 			log.Printf("Failed to send payment to %s, %v Shannon: %v. Check outgoing tx for %s in block explorer and docs/PAYOUTS.md",
 				login, amount, err, login)
@@ -192,18 +204,8 @@ func (u *PayoutsProcessor) process() {
 			break
 		}
 
-		if postCommand, present := os.LookupEnv("POST_PAYOUT_HOOK"); present {
-			go func(postCommand string, login string, value string) {
-				out, err := exec.Command(postCommand, login, value).CombinedOutput()
-				if err != nil {
-					log.Printf("WARNING: Error running post payout hook: %s", err.Error())
-				}
-				log.Printf("Running post payout hook with result: %s", out)
-			}(postCommand, login, value)
-		}
-
 		// Log transaction hash
-		err = u.backend.WritePayment(login, txHash, amount)
+		err = u.backend.WritePayment(login, txHash, amount, TxCharges.Int64())
 		if err != nil {
 			log.Printf("Failed to log payment data for %s, %v Shannon, tx: %s: %v", login, amount, txHash, err)
 			u.halt = true
@@ -213,41 +215,28 @@ func (u *PayoutsProcessor) process() {
 
 		minersPaid++
 		totalAmount.Add(totalAmount, big.NewInt(amount))
-		log.Printf("Paid %v Shannon to %v, TxHash: %v", amount, login, txHash)
+		log.Printf("Paid %v Shannon to %v, TxHash: %v, Transaction Charges : %v", amountInWei, login, txHash, TxCharges.Int64())
 
-		wg.Add(1)
-		waitingCount++
-		go func(txHash string, login string, wg *sync.WaitGroup) {
-			// Wait for TX confirmation before further payouts
-			for {
-				log.Printf("Waiting for tx confirmation: %v", txHash)
-				time.Sleep(txCheckInterval)
-				receipt, err := u.rpc.GetTxReceipt(txHash)
-				if err != nil {
-					log.Printf("Failed to get tx receipt for %v: %v", txHash, err)
-					continue
-				}
-				// Tx has been mined
-				if receipt != nil && receipt.Confirmed() {
-					if receipt.Successful() {
-						log.Printf("Payout tx successful for %s: %s", login, txHash)
-					} else {
-						log.Printf("Payout tx failed for %s: %s. Address contract throws on incoming tx.", login, txHash)
-					}
-					break
-				}
+		// Wait for TX confirmation before further payouts
+		for {
+			log.Printf("Waiting for tx confirmation: %v", txHash)
+			time.Sleep(txCheckInterval)
+			receipt, err := u.rpc.GetTxReceipt(txHash)
+			if err != nil {
+				log.Printf("Failed to get tx receipt for %v: %v", txHash, err)
+				continue
 			}
-			wg.Done()
-		}(txHash, login, &wg)
-
-		if waitingCount > u.config.ConcurrentTx {
-			wg.Wait()
-			waitingCount = 0
+			// Tx has been mined
+			if receipt != nil && receipt.Confirmed() {
+				if receipt.Successful() {
+					log.Printf("Payout tx successful for %s: %s", login, txHash)
+				} else {
+					log.Printf("Payout tx failed for %s: %s. Address contract throws on incoming tx.", login, txHash)
+				}
+				break
+			}
 		}
 	}
-
-	wg.Wait()
-	waitingCount = 0
 
 	if mustPay > 0 {
 		log.Printf("Paid total %v Shannon to %v of %v payees", totalAmount, minersPaid, mustPay)

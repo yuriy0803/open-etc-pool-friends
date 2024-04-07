@@ -17,12 +17,13 @@ type Config struct {
 
 	Threads int `json:"threads"`
 
+	Coin     string         `json:"coin"`
+	CoinSolo string         `json:"coin-solo"`
+	Pplns    int64          `json:"pplns"`
+	CoinName string         `json:"coin-name"`
 	Network  string         `json:"network"`
 	Algo     string         `json:"algo"`
-	Coin     string         `json:"coin"`
-	Pplns    int64          `json:"pplns"`
 	Redis    storage.Config `json:"redis"`
-	CoinName string         `json:"coin-name"`
 
 	BlockUnlocker payouts.UnlockerConfig `json:"unlocker"`
 	Payouts       payouts.PayoutsConfig  `json:"payouts"`

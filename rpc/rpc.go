@@ -16,24 +16,6 @@ import (
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
-const (
-	// RPC method "eth_getWork"
-	RPCEthGetWork = "eth_getWork"
-
-	// RPC method "eth_getBlockByNumber"
-	RPCEthGetBlockByNumber = "eth_getBlockByNumber"
-
-	// RPC method "eth_getBlockByHash"
-	RPCEthGetBlockByHash = "eth_getBlockByHash"
-
-	// Additional RPC method constants can be added here
-	RPCMethodFoo = "foo"
-	RPCMethodBar = "bar"
-
-	RPCMethodBaz = "baz"
-	RPCMethodQux = "qux"
-)
-
 type RPCClient struct {
 	sync.RWMutex
 	Url         string
@@ -45,20 +27,19 @@ type RPCClient struct {
 }
 
 type GetBlockReply struct {
-	Number       string   `json:"number"`
-	Hash         string   `json:"hash"`
-	Nonce        string   `json:"nonce"`
-	Miner        string   `json:"miner"`
-	Difficulty   string   `json:"difficulty"`
-	GasLimit     string   `json:"gasLimit"`
-	GasUsed      string   `json:"gasUsed"`
-	Timestamp    string   `json:"timestamp"`
-	Transactions []Tx     `json:"transactions"`
-	Uncles       []string `json:"uncles"`
+	Number        string   `json:"number"`
+	Hash          string   `json:"hash"`
+	Nonce         string   `json:"nonce"`
+	Miner         string   `json:"miner"`
+	Difficulty    string   `json:"difficulty"`
+	GasLimit      string   `json:"gasLimit"`
+	GasUsed       string   `json:"gasUsed"`
+	BaseFeePerGas string   `json:"baseFeePerGas"`
+	Timestamp     string   `json:"timestamp"`
+	Transactions  []Tx     `json:"transactions"`
+	Uncles        []string `json:"uncles"`
 	// https://github.com/ethereum/EIPs/issues/95
 	SealFields []string `json:"sealFields"`
-	// london hard fork
-	BaseFeePerGas string `json:"baseFeePerGas"`
 }
 
 type GetBlockReplyPart struct {

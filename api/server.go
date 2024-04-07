@@ -4,18 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"sort"
 	"strconv"
+
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/gorilla/mux"
-	"github.com/robfig/cron"
+	"math/big"
 
+	"github.com/gorilla/mux"
+
+	"github.com/robfig/cron"
 	"github.com/yuriy0803/open-etc-pool-friends/storage"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
@@ -23,14 +25,6 @@ import (
 type ApiConfig struct {
 	Enabled              bool   `json:"enabled"`
 	Listen               string `json:"listen"`
-	PoolCharts           string `json:"poolCharts"`
-	PoolChartsNum        int64  `json:"poolChartsNum"`
-	NetCharts            string `json:"netCharts"`
-	NetChartsNum         int64  `json:"netChartsNum"`
-	MinerChartsNum       int64  `json:"minerChartsNum"`
-	MinerCharts          string `json:"minerCharts"`
-	ShareCharts          string `json:"shareCharts"`
-	ShareChartsNum       int64  `json:"shareChartsNum"`
 	StatsCollectInterval string `json:"statsCollectInterval"`
 	HashrateWindow       string `json:"hashrateWindow"`
 	HashrateLargeWindow  string `json:"hashrateLargeWindow"`
@@ -39,6 +33,14 @@ type ApiConfig struct {
 	Blocks               int64  `json:"blocks"`
 	PurgeOnly            bool   `json:"purgeOnly"`
 	PurgeInterval        string `json:"purgeInterval"`
+	PoolCharts           string `json:"poolCharts"`
+	PoolChartsNum        int64  `json:"poolChartsNum"`
+	MinerChartsNum       int64  `json:"minerChartsNum"`
+	NetCharts            string `json:"netCharts"`
+	NetChartsNum         int64  `json:"netChartsNum"`
+	MinerCharts          string `json:"minerCharts"`
+	ShareCharts          string `json:"shareCharts"`
+	ShareChartsNum       int64  `json:"shareChartsNum"`
 }
 
 type ApiServer struct {
@@ -56,6 +58,8 @@ type Entry struct {
 	stats     map[string]interface{}
 	updatedAt int64
 }
+
+const diff = 4000000000
 
 func NewApiServer(cfg *ApiConfig, backend *storage.RedisClient) *ApiServer {
 	hashrateWindow := util.MustParseDuration(cfg.HashrateWindow)
@@ -110,7 +114,6 @@ func (s *ApiServer) Start() {
 
 	go func() {
 		c := cron.New()
-
 		poolCharts := s.config.PoolCharts
 		log.Printf("Pool charts config is :%v", poolCharts)
 		c.AddFunc(poolCharts, func() {
@@ -126,14 +129,16 @@ func (s *ApiServer) Start() {
 		minerCharts := s.config.MinerCharts
 		log.Printf("Miner charts config is :%v", minerCharts)
 		c.AddFunc(minerCharts, func() {
-
 			miners, err := s.backend.GetAllMinerAccount()
+
 			if err != nil {
 				log.Println("Get all miners account error: ", err)
 			}
 			for _, login := range miners {
+
 				miner, _ := s.backend.CollectWorkersStats(s.hashrateWindow, s.hashrateLargeWindow, login)
 				s.collectMinerCharts(login, miner["currentHashrate"].(int64), miner["hashrate"].(int64), miner["workersOnline"].(int64))
+
 			}
 		})
 
@@ -176,6 +181,42 @@ func (s *ApiServer) Start() {
 	}
 }
 
+func (s *ApiServer) listen() {
+	r := mux.NewRouter()
+	r.HandleFunc("/api/stats", s.StatsIndex)
+	r.HandleFunc("/api/finders", s.FindersIndex)
+	r.HandleFunc("/api/miners", s.MinersIndex)
+	r.HandleFunc("/api/blocks", s.BlocksIndex)
+	r.HandleFunc("/api/payments", s.PaymentsIndex)
+	r.HandleFunc("/api/accounts/{login:0x[0-9a-fA-F]{40}}", s.AccountIndex)
+	r.HandleFunc("/api/settings", s.SubscribeHandler).Methods("POST")
+	r.HandleFunc("/api/mining", s.MiningHandler).Methods("POST")
+	r.NotFoundHandler = http.HandlerFunc(notFound)
+	err := http.ListenAndServe(s.config.Listen, r)
+	if err != nil {
+		log.Fatalf("Failed to start API: %v", err)
+	}
+}
+
+func (s *ApiServer) FindersIndex(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+
+	reply := make(map[string]interface{})
+	stats := s.getStats()
+	if stats != nil {
+		reply["now"] = util.MakeTimestamp()
+		reply["finders"] = stats["finders"]
+	}
+
+	err := json.NewEncoder(w).Encode(reply)
+	if err != nil {
+		log.Println("Error serializing API response: ", err)
+	}
+}
+
 func (s *ApiServer) collectPoolCharts() {
 	ts := util.MakeTimestamp() / 1000
 	now := time.Now()
@@ -184,112 +225,111 @@ func (s *ApiServer) collectPoolCharts() {
 	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
 	stats := s.getStats()
 	hash := fmt.Sprint(stats["hashrate"])
-	log.Println("Pool Hash is ", ts, t2, hash)
 	err := s.backend.WritePoolCharts(ts, t2, hash)
 	if err != nil {
 		log.Printf("Failed to fetch pool charts from backend: %v", err)
 		return
 	}
 }
-
-func (s *ApiServer) collectnetCharts() {
-	ts := util.MakeTimestamp() / 1000
-	now := time.Now()
-	year, month, day := now.Date()
-	hour, min, _ := now.Clock()
-	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
-	//stats := s.getStats()
-	//diff := fmt.Sprint(stats["difficulty"])
-	nodes, erro := s.backend.GetNodeStates()
-	if erro != nil {
-		log.Printf("Failed to fetch Diff charts from backend: %v", erro)
-		return
-	}
-	diff := fmt.Sprint(nodes[0]["difficulty"])
-	log.Println("Difficulty Hash is ", ts, t2, diff)
-	err := s.backend.WriteDiffCharts(ts, t2, diff)
-	if err != nil {
-		log.Printf("Failed to fetch Diff charts from backend: %v", err)
-		return
-	}
-}
-
 func (s *ApiServer) collectMinerCharts(login string, hash int64, largeHash int64, workerOnline int64) {
 	ts := util.MakeTimestamp() / 1000
 	now := time.Now()
 	year, month, day := now.Date()
 	hour, min, _ := now.Clock()
 	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
+	//log.Println("Miner "+login+" Hash is", ts, t2, hash, largeHash)
 
-	log.Println("Miner "+login+" Hash is", ts, t2, hash, largeHash)
 	err := s.backend.WriteMinerCharts(ts, t2, login, hash, largeHash, workerOnline)
 	if err != nil {
 		log.Printf("Failed to fetch miner %v charts from backend: %v", login, err)
 	}
+
 }
 
-func (s *ApiServer) collectshareCharts(login string, workerOnline int64) {
-	ts := util.MakeTimestamp() / 1000
-	now := time.Now()
-	year, month, day := now.Date()
-	hour, min, _ := now.Clock()
-	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
+func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+	reply := make(map[string]interface{})
 
-	log.Println("Share chart is created", ts, t2)
+	reply["result"] = "IP address doesn`t match"
+	var email = r.FormValue("email")
+	//var threshold = r.FormValue("threshold")
+	var ipAddress = r.FormValue("ip_address")
+	var login = r.FormValue("login")
+	var threshold = r.FormValue("threshold")
+	if threshold == "" {
+		threshold = "0.5"
+	}
 
-	err := s.backend.WriteShareCharts(ts, t2, login, 0, 0, workerOnline)
+	alert := "off"
+	if r.FormValue("alertCheck") != "" {
+		alert = r.FormValue("alertCheck")
+	}
+
+	ip_address := s.backend.GetIP(login)
+	password := s.backend.GetPassword(login)
+
+	if ip_address == ipAddress || password == ipAddress {
+
+		s.backend.SetIP(login, ipAddress)
+
+		number, err := strconv.ParseFloat(threshold, 64)
+		if err != nil {
+			log.Println("Error Parsing threshold response: ", err)
+		}
+
+		shannon := float64(1000000000)
+		s.backend.SetThreshold(login, int64(number*shannon))
+		s.backend.SetMailAddress(login, email)
+		s.backend.SetAlert(login, alert)
+
+		reply["result"] = "success"
+	}
+
+	err := json.NewEncoder(w).Encode(reply)
 	if err != nil {
-		log.Printf("Failed to fetch miner %v charts from backend: %v", login, err)
+		log.Println("Error serializing API response: ", err)
 	}
+
 }
 
-func (s *ApiServer) listen() {
-	r := mux.NewRouter()
-	// Add middleware to log the real client IP address
-	r.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get the real client IP address using the getClientIP function
-			clientIP := getClientIP(r)
+func dot2comma(r rune) rune {
+	if r == '.' {
+		return ','
+	}
+	return r
+}
 
-			// Log the request details including IP address, method, and path
-			log.Printf("[Diagnostics] Request from IP: %s - Method: %s, Path: %s", clientIP, r.Method, r.URL.Path)
+func (s *ApiServer) MiningHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+	reply := make(map[string]interface{})
 
-			// Call the next handler in the middleware chain
-			next.ServeHTTP(w, r)
-		})
-	})
-	r.HandleFunc("/api/finders", s.FindersIndex)
-	r.HandleFunc("/api/stats", s.StatsIndex)
-	r.HandleFunc("/api/miners", s.MinersIndex)
-	r.HandleFunc("/api/blocks", s.BlocksIndex)
-	r.HandleFunc("/api/payments", s.PaymentsIndex)
-	r.HandleFunc("/api/accounts/{login:0x[0-9a-fA-F]{40}}", s.AccountIndex)
-	r.HandleFunc("/api/settings", s.SubscribeHandler).Methods("POST")
-	r.NotFoundHandler = http.HandlerFunc(notFound)
-	err := http.ListenAndServe(s.config.Listen, r)
+	reply["result"] = "IP address doesn`t match"
+	var miningType = r.FormValue("radio")
+	var login = r.FormValue("login")
+
+	var ipAddress = r.FormValue("ip_address")
+
+	ip_address := s.backend.GetIP(login)
+	password := s.backend.GetPassword(login)
+
+	if ip_address == ipAddress || password == ipAddress {
+		s.backend.SetMiningType(login, miningType)
+		s.backend.SetIP(login, ipAddress)
+
+		reply["result"] = "success"
+	}
+
+	err := json.NewEncoder(w).Encode(reply)
 	if err != nil {
-		log.Fatalf("Failed to start API: %v", err)
-	}
-}
-
-// getClientIP returns the real client IP address from the http.Request object
-func getClientIP(r *http.Request) string {
-	// Try to use the "X-Forwarded-For" header, if available
-	forwardedFor := r.Header.Get("X-Forwarded-For")
-	if forwardedFor != "" {
-		// Extract the first IP address from the list (if multiple are present)
-		return strings.TrimSpace(strings.Split(forwardedFor, ",")[0])
+		log.Println("Error serializing API response: ", err)
 	}
 
-	// Try to use the "X-Real-IP" header, if available
-	realIP := r.Header.Get("X-Real-IP")
-	if realIP != "" {
-		return realIP
-	}
-
-	// If neither X-Forwarded-For nor X-Real-IP is set, use the remote address
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	return ip
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
@@ -319,34 +359,15 @@ func (s *ApiServer) collectStats() {
 	if len(s.config.LuckWindow) > 0 {
 		stats["luck"], err = s.backend.CollectLuckStats(s.config.LuckWindow)
 		stats["luckCharts"], err = s.backend.CollectLuckCharts(s.config.LuckWindow[0])
+		stats["netCharts"], err = s.backend.GetNetCharts(s.config.NetChartsNum)
 		if err != nil {
 			log.Printf("Failed to fetch luck stats from backend: %v", err)
 			return
 		}
 	}
-	stats["netCharts"], err = s.backend.GetNetCharts(s.config.NetChartsNum)
 	stats["poolCharts"], err = s.backend.GetPoolCharts(s.config.PoolChartsNum)
 	s.stats.Store(stats)
 	log.Printf("Stats collection finished %s", time.Since(start))
-}
-
-func (s *ApiServer) FindersIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(http.StatusOK)
-
-	reply := make(map[string]interface{})
-	stats := s.getStats()
-	if stats != nil {
-		reply["now"] = util.MakeTimestamp()
-		reply["finders"] = stats["finders"]
-	}
-
-	err := json.NewEncoder(w).Encode(reply)
-	if err != nil {
-		log.Println("Error serializing API response: ", err)
-	}
 }
 
 func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
@@ -366,15 +387,16 @@ func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	if stats != nil {
 		reply["now"] = util.MakeTimestamp()
 		reply["stats"] = stats["stats"]
-		reply["poolCharts"] = stats["poolCharts"]
 		reply["hashrate"] = stats["hashrate"]
 		reply["minersTotal"] = stats["minersTotal"]
 		reply["maturedTotal"] = stats["maturedTotal"]
 		reply["immatureTotal"] = stats["immatureTotal"]
 		reply["candidatesTotal"] = stats["candidatesTotal"]
 		reply["exchangedata"] = stats["exchangedata"]
+		reply["poolCharts"] = stats["poolCharts"]
 		reply["netCharts"] = stats["netCharts"]
 		reply["workersTotal"] = stats["workersTotal"]
+		//reply["nShares"] = stats["nShares"]
 	}
 
 	err = json.NewEncoder(w).Encode(reply)
@@ -396,6 +418,7 @@ func (s *ApiServer) MinersIndex(w http.ResponseWriter, r *http.Request) {
 		reply["miners"] = stats["miners"]
 		reply["hashrate"] = stats["hashrate"]
 		reply["minersTotal"] = stats["minersTotal"]
+		reply["workersTotal"] = stats["workersTotal"]
 	}
 
 	err := json.NewEncoder(w).Encode(reply)
@@ -421,6 +444,41 @@ func (s *ApiServer) BlocksIndex(w http.ResponseWriter, r *http.Request) {
 		reply["candidatesTotal"] = stats["candidatesTotal"]
 		reply["luck"] = stats["luck"]
 		reply["luckCharts"] = stats["luckCharts"]
+
+		mt, _ := strconv.Atoi(fmt.Sprintf("%d", stats["maturedTotal"]))
+		it, _ := strconv.Atoi(fmt.Sprintf("%d", stats["immatureTotal"]))
+		ct, _ := strconv.Atoi(fmt.Sprintf("%d", stats["candidatesTotal"]))
+		reply["blocksTotal"] = mt + it + ct
+		tmp := stats["stats"].(map[string]interface{})
+
+		crs := fmt.Sprintf("%d", tmp["currentRoundShares"])
+
+		crsInt, _ := strconv.Atoi(crs)
+
+		networkDiff, _ := s.backend.GetNetworkDifficulty()
+
+		multiple := crsInt * diff
+
+		multipleFloat := float64(multiple)
+		networkDiffFloat := new(big.Float).SetInt(networkDiff)
+		x := big.NewFloat(multipleFloat)
+
+		variance := new(big.Float).Quo(x, networkDiffFloat)
+
+		reply["variance"] = variance
+		nodes, err := s.backend.GetNodeStates()
+		if err != nil {
+			log.Printf("Failed to get nodes stats from backend: %v", err)
+		}
+		reply["nodes"] = nodes
+		reply["lastBlockFound"] = tmp["lastBlockFound"]
+
+		currentHeight := "0"
+		for _, value := range nodes {
+			currentHeight = value["height"].(string)
+		}
+
+		reply["currentHeight"] = currentHeight
 	}
 
 	err := json.NewEncoder(w).Encode(reply)
@@ -437,9 +495,11 @@ func (s *ApiServer) PaymentsIndex(w http.ResponseWriter, r *http.Request) {
 
 	reply := make(map[string]interface{})
 	stats := s.getStats()
+
 	if stats != nil {
 		reply["payments"] = stats["payments"]
 		reply["paymentsTotal"] = stats["paymentsTotal"]
+		reply["paymentsSum"] = stats["paymentsSum"]
 		reply["exchangedata"] = stats["exchangedata"]
 	}
 
@@ -458,8 +518,6 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 	s.minersMu.Lock()
 	defer s.minersMu.Unlock()
 
-	generalstats := s.getStats()
-
 	reply, ok := s.miners[login]
 	now := util.MakeTimestamp()
 	cacheIntv := int64(s.statsIntv / time.Millisecond)
@@ -476,7 +534,14 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		stats, err := s.backend.GetMinerStats(login, s.config.Payments)
+		miningType := s.backend.GetMiningType(login)
+		var stats map[string]interface{}
+		if miningType == "solo" {
+			stats, err = s.backend.GetMinerStatsSolo(login, s.config.Payments)
+		} else {
+			stats, err = s.backend.GetMinerStats(login, s.config.Payments)
+		}
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			log.Printf("Failed to fetch stats from backend: %v", err)
@@ -492,11 +557,22 @@ func (s *ApiServer) AccountIndex(w http.ResponseWriter, r *http.Request) {
 			stats[key] = value
 		}
 		stats["pageSize"] = s.config.Payments
-		stats["exchangedata"] = generalstats["exchangedata"]
 		stats["minerCharts"], err = s.backend.GetMinerCharts(s.config.MinerChartsNum, login)
 		stats["shareCharts"], err = s.backend.GetShareCharts(s.config.ShareChartsNum, login)
 		stats["paymentCharts"], err = s.backend.GetPaymentCharts(login)
+		stats["difficulty"], err = s.backend.GetNetworkDifficulty()
 		stats["threshold"], err = s.backend.GetThreshold(login)
+
+		blocks, err := s.backend.CollectBlocks(login)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Printf("Failed to fetch stats from backend -While collecting block status: %v", err)
+			return
+		}
+		for key, value := range blocks {
+			stats[key] = value
+		}
+
 		reply = &Entry{stats: stats, updatedAt: now}
 		s.miners[login] = reply
 	}
@@ -515,55 +591,40 @@ func (s *ApiServer) getStats() map[string]interface{} {
 	}
 	return nil
 }
-func (s *ApiServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(http.StatusOK)
-	reply := make(map[string]interface{})
 
-	reply["result"] = "IP address doesn't match"
-	var email = r.FormValue("email")
-	var ipAddress = r.FormValue("ip_address")
-	var login = r.FormValue("login")
-	var threshold = r.FormValue("threshold")
-	if threshold == "" {
-		threshold = "0.5"
+func (s *ApiServer) collectnetCharts() {
+	ts := util.MakeTimestamp() / 1000
+	now := time.Now()
+	year, month, day := now.Date()
+	hour, min, _ := now.Clock()
+	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
+	//stats := s.getStats()
+	//diff := fmt.Sprint(stats["difficulty"])
+	nodes, erro := s.backend.GetNodeStates()
+	if erro != nil {
+		log.Printf("Failed to fetch Diff charts from backend: %v", erro)
+		return
 	}
-
-	// Log-Ausgabe für den Login-Wert
-	log.Printf("Received login from client: %s", login)
-
-	// Log-Ausgabe für den IP-Adressen-Vergleich
-	log.Printf("Received IP address from client: %s", ipAddress)
-
-	alert := "off"
-	if r.FormValue("alertCheck") != "" {
-		alert = r.FormValue("alertCheck")
-	}
-
-	// Überprüfung des Login-Werts in der Redis-Datenbank
-	ipFromRedis := s.backend.GetIP(login)
-	log.Printf("IP address from Redis for login %s: %s", login, ipFromRedis)
-
-	// Überprüfung, ob die IP-Adresse übereinstimmt
-	if ipFromRedis == ipAddress {
-		s.backend.SetIP(login, ipAddress)
-
-		number, err := strconv.ParseFloat(threshold, 64)
-		if err != nil {
-			log.Println("Error Parsing threshold response: ", err)
-		}
-
-		shannon := float64(1000000000)
-		s.backend.SetThreshold(login, int64(number*shannon))
-		s.backend.SetMailAddress(login, email)
-		s.backend.SetAlert(login, alert)
-		reply["result"] = "success"
-	}
-
-	err := json.NewEncoder(w).Encode(reply)
+	diff := fmt.Sprint(nodes[0]["difficulty"])
+	log.Println("Difficulty Hash is ", ts, t2, diff)
+	err := s.backend.WriteDiffCharts(ts, t2, diff)
 	if err != nil {
-		log.Println("Error serializing API response: ", err)
+		log.Printf("Failed to fetch Diff charts from backend: %v", err)
+		return
+	}
+}
+
+func (s *ApiServer) collectshareCharts(login string, workerOnline int64) {
+	ts := util.MakeTimestamp() / 1000
+	now := time.Now()
+	year, month, day := now.Date()
+	hour, min, _ := now.Clock()
+	t2 := fmt.Sprintf("%d-%02d-%02d %02d_%02d", year, month, day, hour, min)
+
+	log.Println("Share chart is created", ts, t2)
+
+	err := s.backend.WriteShareCharts(ts, t2, login, 0, 0, workerOnline)
+	if err != nil {
+		log.Printf("Failed to fetch miner %v charts from backend: %v", login, err)
 	}
 }

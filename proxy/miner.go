@@ -32,7 +32,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		} else if s.config.Network == "ubiq" {
 			hasher = etchash.New(nil, &uip1FEpoch, nil)
 		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" ||
-			s.config.Network == "ethereumFair" || s.config.Network == "callisto" || s.config.Network == "etica" ||
+			s.config.Network == "ethereumFair" || s.config.Network == "etica" ||
 			s.config.Network == "octaspace" || s.config.Network == "universal" || s.config.Network == "canxium" {
 			hasher = etchash.New(nil, nil, nil)
 		} else {
@@ -69,15 +69,6 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		result = hashTmp
 	}
 
-	//this is to stop people in wallet blacklist, from getting shares into the db.
-	//rare instances of hacks require letting the hacks waste thier money on occassion
-	if !s.policy.ApplyLoginWalletPolicy(login) {
-		// check to see if this wallet login is blocked
-		log.Printf("Blacklisted wallet share, skipped from %v", login)
-		return false, false
-		//return codes need work here, a lot of it.
-	}
-
 	// Block "difficulty" is BigInt
 	// NiceHash "difficulty" is float64 ...
 	// diffFloat => target; then: diffInt = 2^256 / target
@@ -90,17 +81,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 
 	if s.config.Proxy.Debug {
-		hashrateShareDiff := formatHashrate(shareDiffCalc)
-		hashrateBlockDiff := formatHashrate(t.Difficulty.Int64()) // Konvertieren zu int64
-		hashrateShare := formatHashrate(shareDiff)
-
-		// Ausgabe der formatierten Informationen in der Kommandozeile (cmd)
-		log.Printf("Mining Information:")
-		log.Printf("Blockchain Height: %d", t.Height) // Geändert zu "Blockchain Height"
-		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShare)
-		log.Printf("Block Difficulty: %d (%s)", t.Difficulty.Int64(), hashrateBlockDiff)
-		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShareDiff)
-		log.Printf("Submitted by: %v@%v", login, ip)
+		log.Printf("Difficulty pool/block/share = %d / %d / %d(%f) from %v@%v", shareDiff, t.Difficulty, shareDiffCalc, shareDiffFloat, login, ip)
 	}
 
 	h, ok := t.headers[hashNoNonce]
@@ -108,15 +89,19 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		log.Printf("Stale share from %v@%v", login, ip)
 		return false, false
 	}
-	//Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
-	s.backend.LogIP(login, ip)
 
 	// check share difficulty
 	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
 	if result.Big().Cmp(shareTarget) > 0 {
-		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
+
+	//Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
+	s.backend.LogIP(login, ip)
+
+	miningType := s.backend.GetMiningType(login)
+
 	// check target difficulty
 	target := new(big.Int).Div(maxUint256, big.NewInt(h.diff.Int64()))
 	if result.Big().Cmp(target) <= 0 {
@@ -128,39 +113,49 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 			return false, false
 		} else {
 			s.fetchBlockTemplate()
-			exist, err := s.backend.WriteBlock(login, id, params, shareDiff, shareDiffCalc, h.diff.Int64(), h.height, s.hashrateExpiration, stratumHostname)
+			if miningType == "solo" {
+				exist, err := s.backend.WriteBlockSolo(login, id, params, shareDiff, shareDiffCalc, h.diff.Int64(), h.height, s.hashrateExpiration, stratumHostname)
+				if exist {
+					return true, false
+				}
+				if err != nil {
+					log.Println("Failed to insert block candidate into backend:", err)
+				} else {
+					log.Printf("Inserted block %v to backend", h.height)
+				}
+			} else {
+				exist, err := s.backend.WriteBlock(login, id, params, shareDiff, shareDiffCalc, h.diff.Int64(), h.height, s.hashrateExpiration, stratumHostname)
+				if exist {
+					return true, false
+				}
+				if err != nil {
+					log.Println("Failed to insert block candidate into backend:", err)
+				} else {
+					log.Printf("Inserted block %v to backend", h.height)
+				}
+			}
+
+			log.Printf("Block found by miner %v@%v at height %d", login, ip, h.height)
+		}
+	} else {
+		if miningType == "solo" {
+			exist, err := s.backend.WriteShareSolo(login, id, params, shareDiff, shareDiffCalc, h.height, s.hashrateExpiration, stratumHostname)
 			if exist {
 				return true, false
 			}
 			if err != nil {
-				log.Println("Failed to insert block candidate into backend:", err)
-			} else {
-				log.Printf("Inserted block %v to backend", h.height)
+				log.Println("Failed to insert share data into backend:", err)
 			}
-			log.Printf("Block found by miner %v@%v at height %d", login, ip, h.height)
-		}
-	} else {
-		exist, err := s.backend.WriteShare(login, id, params, shareDiff, shareDiffCalc, h.height, s.hashrateExpiration, stratumHostname)
-		if exist {
-			return true, false
-		}
-		if err != nil {
-			log.Println("Failed to insert share data into backend:", err)
+		} else {
+			exist, err := s.backend.WriteShare(login, id, params, shareDiff, shareDiffCalc, h.height, s.hashrateExpiration, stratumHostname)
+			if exist {
+				return true, false
+			}
+			if err != nil {
+				log.Println("Failed to insert share data into backend:", err)
+			}
 		}
 	}
 	s.backend.WriteWorkerShareStatus(login, id, true, false, false)
 	return false, true
-}
-
-func formatHashrate(shareDiffCalc int64) string {
-	units := []string{"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s"}
-	var i int
-	diff := float64(shareDiffCalc)
-
-	for i = 0; i < len(units)-1 && diff >= 1000.0; i++ {
-		diff /= 1000.0
-	}
-
-	formatted := strconv.FormatFloat(diff, 'f', 2, 64)
-	return formatted + " " + units[i]
 }

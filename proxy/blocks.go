@@ -7,11 +7,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/yuriy0803/core-geth1/common"
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
-const maxBacklog = 3
+const maxBacklog = 10
 
 type heightDiffPair struct {
 	diff   *big.Int
@@ -25,24 +26,24 @@ type BlockTemplate struct {
 	Target               string
 	Difficulty           *big.Int
 	Height               uint64
-	GetPendingBlockCache *rpc.GetBlockReplyPart // Assuming this type is defined elsewhere
-	Nonce                string
+	GetPendingBlockCache *rpc.GetBlockReplyPart
+	nonces               map[string]bool
 	headers              map[string]heightDiffPair
 }
 
 type Block struct {
 	difficulty  *big.Int
-	hashNoNonce string // Replacing common.Hash with string
+	hashNoNonce common.Hash
 	nonce       uint64
-	mixDigest   string // Replacing common.Hash with string
+	mixDigest   common.Hash
 	number      uint64
 }
 
-func (b Block) Difficulty() *big.Int { return b.difficulty }
-func (b Block) HashNoNonce() string  { return b.hashNoNonce }
-func (b Block) Nonce() uint64        { return b.nonce }
-func (b Block) MixDigest() string    { return b.mixDigest }
-func (b Block) NumberU64() uint64    { return b.number }
+func (b Block) Difficulty() *big.Int     { return b.difficulty }
+func (b Block) HashNoNonce() common.Hash { return b.hashNoNonce }
+func (b Block) Nonce() uint64            { return b.nonce }
+func (b Block) MixDigest() common.Hash   { return b.mixDigest }
+func (b Block) NumberU64() uint64        { return b.number }
 
 func (s *ProxyServer) fetchBlockTemplate() {
 	rpc := s.rpc()
@@ -58,8 +59,13 @@ func (s *ProxyServer) fetchBlockTemplate() {
 		return
 	}
 	// No need to update, we have fresh job
-	if t != nil && t.Header == reply[0] {
-		return
+	if t != nil {
+		if t.Header == reply[0] {
+			return
+		}
+		if _, ok := t.headers[reply[0]]; ok {
+			return
+		}
 	}
 
 	pendingReply.Difficulty = util.ToHex(s.config.Proxy.Difficulty)
@@ -92,6 +98,7 @@ func (s *ProxyServer) fetchBlockTemplate() {
 	if s.config.Proxy.Stratum.Enabled {
 		go s.broadcastNewJobs()
 	}
+
 }
 
 func (s *ProxyServer) fetchPendingBlock() (*rpc.GetBlockReplyPart, uint64, int64, error) {

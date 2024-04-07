@@ -1,6 +1,3 @@
-//go:build go1.9
-// +build go1.9
-
 package main
 
 import (
@@ -89,10 +86,11 @@ func main() {
 
 	startNewrelic()
 
-	backend = storage.NewRedisClient(&cfg.Redis, cfg.Coin, cfg.Pplns, cfg.CoinName)
+	backend = storage.NewRedisClient(&cfg.Redis, cfg.Coin, cfg.Pplns, cfg.CoinName, cfg.CoinSolo)
 	pong, err := backend.Check()
 	if err != nil {
 		log.Printf("Can't establish connection to backend: %v", err)
+		//os.Exit(0)
 	} else {
 		log.Printf("Backend check reply: %v", pong)
 	}
@@ -109,9 +107,11 @@ func main() {
 	if cfg.Payouts.Enabled {
 		go startPayoutsProcessor()
 	}
+
 	if cfg.Exchange.Enabled {
 		go startExchangeProcessor()
 	}
+
 	quit := make(chan bool)
 	<-quit
 }

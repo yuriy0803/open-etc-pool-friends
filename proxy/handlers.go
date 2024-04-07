@@ -49,6 +49,10 @@ func (s *ProxyServer) handleLoginRPC(cs *Session, params []string, id string) (b
 	if !s.policy.ApplyLoginPolicy(login, cs.ip) {
 		return false, &ErrorReply{Code: -1, Message: "You are blacklisted"}
 	}
+	// If password is provided, write it to the backend
+	if len(params) > 1 {
+		s.backend.WritePasswordByMiner(login, params[1])
+	}
 
 	// Update session information and register the session
 	cs.login = login
