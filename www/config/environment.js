@@ -23,7 +23,7 @@ module.exports = function (environment) {
 
       // Stratum mining endpoint
       StratumHost: '192.168.178.41',
-      StratumPort: 3001,
+      StratumPort: 8008,
 
       // The ETC network
       Unit: 'ETC',
