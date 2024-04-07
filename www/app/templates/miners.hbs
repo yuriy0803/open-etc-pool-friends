@@ -14,6 +14,7 @@
           <th>Login</th>
           <th>Hashrate</th>
           <th>Last Beat</th>
+          <th>Mining Type</th>
         </tr>
       </thead>
       <tbody>
@@ -22,6 +23,14 @@
           <td>{{#link-to 'account' m.login class='hash'}}{{m.login}}{{/link-to}}</td>
           <td>{{format-hashrate m.hr}}</td>
           <td>{{format-date-locale m.lastBeat}}</td>
+                      <td>
+                {{#if m.solo}}
+                    <span class="label label-danger">solo</span>
+                {{else}}
+                    <span class="label label-warning">pplns</span>
+                {{/if}}
+
+            </td>
         </tr>
         {{/each}}
       </tbody>

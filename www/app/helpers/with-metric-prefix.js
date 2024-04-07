@@ -13,7 +13,7 @@ export function withMetricPrefix(params/*, hash*/) {
     n = n / 1000;
     i++;
   }
-  return n.toFixed(3) + ' ' + units[i - 1];
+  return n.toFixed(2) + ' ' + units[i - 1];
 }
 
 export default Ember.Helper.helper(withMetricPrefix);

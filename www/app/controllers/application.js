@@ -100,7 +100,7 @@ export default Ember.Controller.extend({
 
   nextEpoch: Ember.computed('height', {
     get() {
-      var epochOffset = (60000 - (this.getWithDefault('height', 1) % 60000)) * 1000 * this.get('blockTime');
+      var epochOffset = (60000 - (this.getWithDefault('height', 1) % 30000)) * 1000 * this.get('blockTime');
       return Date.now() + epochOffset;
     }
   })

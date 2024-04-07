@@ -16,7 +16,7 @@
     <tbody>
       {{#each model.finders as |f|}}
       <tr>
-        <td>{{#link-to 'account' f.address class='hash'}}{{f.address}}{{/link-to}}</td>
+        <td>{{wallet f.address}}</td>
         <td>{{format-number f.blocks}}</td>
       </tr>
       {{/each}}

@@ -3,62 +3,57 @@
   <h4>Your Latest Rewards</h4>
   <table class="table table-condensed table-striped">
     <thead>
-      <tr>
-        <th>Time</th>
-        <th>Blocks</th>
-        <th>Amount</th>
-        <th>Luck</th>
-        <th>USD</th>
-      </tr>
-    </thead>
+    <tr>
+    <th>Time</th>
+    <th>Blocks</th>
+    <th>Amount</th>
+    <th>Personal Luck</th>
+    </tr>
+      </thead>
 
     <tbody>
       {{#each model.sumrewards as |sumreward|}}
       <tr>
         <td>{{sumreward.name}}</td>
-        <td>{{sumreward.blocks}}</td>
+         <td>{{sumreward.blocks}}</td>
         <td>{{format-balance sumreward.reward}}</td>
-        <td>{{format-number sumreward.personalLuck style='percent'}}</td>
-        <td><em>
-
-            {{#if (eq config.Currency 'USD') }}
-            {{format-ethusd sumreward.reward model.exchangedata.price_usd}}
-            {{else}}
-            {{format-ethinr sumreward.reward model.exchangedata.price_inr}}
-            {{/if}}
-
-          </em></td>
+        <td>
+         {{format-number sumreward.averageLuck style='percent'}}
+        </td>
+        
       </tr>
       {{/each}}
     </tbody>
   </table>
-  <span class="label label-default">Immature</span> <span class="label label-success">Matured</span>
+   <span class="label label-default">Immature</span> <span class="label label-success">Matured</span>
   <table class="table table-condensed table-striped">
     <thead>
       <tr>
         <th>Block Height</th>
         <th>Time Found</th>
         <th>Reward</th>
-        <th>Your Round Share</th>
+        <th>Round Share</th>
         <th>Personal Luck</th>
-
+        
       </tr>
     </thead>
     <tbody>
       {{#each model.rewards as |tx|}}
-      <tr>
-        <td>{{format-number tx.blockheight}}</td>
-        <td>{{format-date-locale tx.timestamp}}</td>
-        <td>
-          {{#if tx.immature}}
-          <span class="label label-default">{{format-balance tx.reward}}</span>
-          {{else}}
-          <span class="label label-success">{{format-balance tx.reward}}</span>
-          {{/if}}
+        <tr>
+          <td>{{format-number  tx.blockheight}}</td>
+          <td>{{format-date-locale tx.timestamp}}</td>
+          <td>
+		{{#if tx.immature}}
+                        <span class="label label-default">{{format-balance tx.reward}}</span>
+                {{else}}
+                        <span class="label label-success">{{format-balance tx.reward}}</span>
+                {{/if}}
+	  </td>
+          <td>{{format-number tx.percent style='percent' maximumFractionDigits='2'}}</td>
+                  <td>
+    {{format-number tx.personalLuck style='percent'}}
         </td>
-        <td>{{format-number tx.percent style='percent' maximumFractionDigits='2'}}</td>
-        <td>{{format-number tx.personalLuck style='percent' maximumFractionDigits='2'}}</td>
-      </tr>
+        </tr>
       {{/each}}
     </tbody>
   </table>

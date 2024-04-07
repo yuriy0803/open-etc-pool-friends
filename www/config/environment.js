@@ -15,27 +15,57 @@ module.exports = function (environment) {
 
     APP: {
       // API host and port
-      ApiUrl: '//192.168.178.27/',
+      ApiUrl: '//192.168.178.41/',
 
       // HTTP mining endpoint
-      HttpHost: 'http://192.168.178.27',
+      HttpHost: 'http://192.168.178.41',
       HttpPort: 8888,
 
       // Stratum mining endpoint
-      StratumHost: 'example.net',
-      StratumPort: 8008,
+      StratumHost: '192.168.178.41',
+      StratumPort: 3001,
 
       // The ETC network
       Unit: 'ETC',
-      Currency: 'USD',
+      Mining: 'SOLO',
 
       // Fee and payout details
-      PoolFee: '1%',
+      PoolFee: '1.0%',
       PayoutThreshold: '0.5 ETC',
       BlockReward: 2.56,
 
       // For network hashrate (change for your favourite fork)
-      BlockTime: 13.2
+      BlockTime: 14.4,
+      highcharts: {
+        main: {
+          enabled: true,
+          height: 200,
+          type: 'spline',
+          color: '',
+          labelColor: '#909090',
+          lineColor: '#404850',
+          tickColor: '#404850',
+          gridLineColor: '#404850',
+          gridLineWidthX: 1,
+          gridLineWidthY: 1,
+          backgroundColor: 'transparent',
+          title: '',
+          ytitle: '',
+          interval: 180000,
+          chartInterval: 900000
+        },
+        account: {
+          enabled: true,
+          height: 300,
+          type: 'spline',
+          color: ['', ''],
+          title: '',
+          ytitle: '',
+          interval: 180000,
+          chartInterval: 900000,
+          paymentInterval: 30000
+        }
+      }
     }
   };
 
@@ -68,4 +98,3 @@ module.exports = function (environment) {
 
   return ENV;
 };
-

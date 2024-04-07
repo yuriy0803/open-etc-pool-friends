@@ -11,6 +11,7 @@
       </div>
     </div>
 
+
     <form action="/api/settings" method="post">
 
       <div class="form-group">
@@ -20,7 +21,6 @@
           placeholder="Enter email">
         <small id="emailHelp" class="form-text text-dark">We'll never share your email with anyone else.</small>
       </div>
-
       <div class="form-group">
         <label for="threshold">Payment Threshold</label>
         <input class="form-control" id="threshold" name="threshold" placeholder="min 0.5 - max 10000" min="0.5"
@@ -28,7 +28,6 @@
         <small id="thresholdHelp" class="form-text text-dark">Payment threshold in {{config.Unit}} (Min: 0.5, Max:
           10000)</small>
       </div>
-
       <div class="form-group">
         <label for="ip_address">Active Worker IP address</label>
         <input class="form-control" name="ip_address" id="ip_address" placeholder="192.168.0.1" type="text">
@@ -36,7 +35,6 @@
           Please complete your worker`s IP address in order to validate and save your settings.
         </small>
       </div>
-
       <div class="form-group form-check">
         <label class="form-check-label" for="worker_offline">
           <input type="checkbox" name="alertCheck" class="form-check-input" id="alertCheck" checked> Send a mail if one
@@ -44,7 +42,6 @@
           my workers goes offline
         </label>
       </div>
-
       <button type="submit" class="btn btn-primary">Submit</button>
 
     </form>

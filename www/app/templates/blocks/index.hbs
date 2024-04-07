@@ -1,26 +1,27 @@
 {{#if model.matured}}
-<h3>{{t "block.matured"}}</h3>
+<h4>Matured Blocks</h4>
 <div class="table-responsive">
-  <table class="table table-condensed table-striped">
-    <thead>
-      <tr>
-        <th>{{t "block.height"}}</th>
-        <th>{{t "block.login"}}</th>
-        <th>{{t "block.hash"}}</th>
-        <th>{{t "block.time_found"}}</th>
-        <th>{{t "block.variance"}}</th>
-        <th>{{t "block.reward"}}</th>
-        <th>{{t "block.shares"}}</th>
-        <th>{{t "block.worker"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each model.matured as |block|}}
+<table class="table table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>Height</th>
+      <th>Login</th>
+      <th>Time Found</th>
+      <th>Current Type</th>
+      <th>Variance</th>
+      <th>Reward</th>
+      <th>Type</th>
+      <th>Shares/Diff</th>
+      <th>Worker ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each model.matured as |block|}}
       {{partial "blocks/block"}}
-      {{/each}}
-    </tbody>
-  </table>
+    {{/each}}
+  </tbody>
+</table>
 </div>
 {{else}}
-<h3>{{t "block.no_matured_blocks_yet"}}</h3>
+<h3>No matured blocks yet</h3>
 {{/if}}

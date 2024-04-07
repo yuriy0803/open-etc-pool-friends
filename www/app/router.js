@@ -10,6 +10,7 @@ Router.map(function() {
     this.route('payouts');
     this.route('rewards');
     this.route('settings');
+    this.route('mining');
   });
   this.route('not-found');
 

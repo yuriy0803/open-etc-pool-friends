@@ -16,6 +16,12 @@ export default Ember.Controller.extend({
         },
     }),
 
+    roundSharesN: Ember.computed("stats", "model", {
+        get() {
+            return parseInt(this.get("model.stats.roundShares") / 10000000000);
+        },
+    }),
+
   roundPercent: Ember.computed('stats', 'model', {
     get() {
       var percent = this.get('model.roundShares') / this.get('stats.nShares');
@@ -30,25 +36,11 @@ export default Ember.Controller.extend({
     }
   }),
   
-    earnPerDayToken: Ember.computed('model', {
+    earnPerDay: Ember.computed('model', {
         get() {
             return 24 * 60 * 60 / this.get('applicationController.blockTime') * this.get('config').BlockReward *
                 this.getWithDefault('model.hashrate') / this.get('hashrate');
         }
-    }),
-
-    earnPerDayUsd: Ember.computed('model', {
-        get() {
-            return 24 * 60 * 60 / this.get('applicationController.blockTime') * this.get('config').BlockReward *
-                this.getWithDefault('model.hashrate') / this.get('hashrate') * this.get ('model.exchangedata.price_usd');
-        }
-    }),
-
-    earnTotalPaid: Ember.computed('model', {
-        get() {
-            return 1 * this.get ('model.exchangedata.price_usd') * this.get ('model.stats.paid');
-        }
     })
-
   
 });
