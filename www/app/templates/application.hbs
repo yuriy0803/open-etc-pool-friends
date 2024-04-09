@@ -15,7 +15,7 @@
       <ul class="nav navbar-nav">
         {{#active-li currentWhen='index' }}
         {{#link-to 'index'}}
-        <i class="fa fa-home"></i> Home
+        <i class="fa fa-home"></i> {{t 'menu.home'}}
         {{/link-to}}
         {{/active-li}}
         {{#active-li currentWhen='blocks' }}
@@ -51,6 +51,18 @@
         <i class="fa fa-comments"></i> About
         {{/link-to}}
         {{/active-li}}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a class="nav-item nav-link dropdown-toggle" data-toggle="dropdown" id="selectedLanguage">
+            {{selectedLanguage}}
+            <b class="caret"></b></a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            {{#each languages as |lang|}}
+            <li><a href="#" {{action 'selectLanguage' lang.value on='click' }}>{{lang.name}}</a></li>
+            {{/each}}
+          </ul>
+        </li>
       </ul>
     </div>
     <script>
