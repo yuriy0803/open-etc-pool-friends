@@ -1,4 +1,6 @@
-import Ember from 'ember';
+
+import { computed } from '@ember/object';
+import $ from 'jquery';
 import config from '../config/environment';
 
 export default Ember.Controller.extend({
@@ -34,16 +36,16 @@ export default Ember.Controller.extend({
 
   ethinr: Ember.computed('stats', {
     get() {
-        return parseFloat(this.get('model.exchangedata.price_inr'));
+      return parseFloat(this.get('model.exchangedata.price_inr'));
     }
   }),
 
- ethusd: Ember.computed('stats', {
+  ethusd: Ember.computed('stats', {
     get() {
-        return parseFloat(this.get('model.exchangedata.current_price'));
+      return parseFloat(this.get('model.exchangedata.current_price'));
     }
   }),
-   
+
   blockTime: Ember.computed('model.nodes', {
     get() {
       var node = this.get('bestNode');
@@ -53,10 +55,10 @@ export default Ember.Controller.extend({
       return config.APP.BlockTime;
     }
   }),
-  
+
   hashrate: Ember.computed('difficulty', {
     get() {
-     var blockTime = this.get('blockTime');
+      var blockTime = this.get('blockTime');
       return this.getWithDefault('difficulty', 0) / blockTime;
     }
   }),
@@ -102,6 +104,24 @@ export default Ember.Controller.extend({
     get() {
       var epochOffset = (60000 - (this.getWithDefault('height', 1) % 30000)) * 1000 * this.get('blockTime');
       return Date.now() + epochOffset;
+    }
+  }),
+  languages: computed('model', {
+    get() {
+      return this.get('model.languages');
+    }
+  }),
+
+  selectedLanguage: computed({
+    get() {
+      var langs = this.get('languages');
+      var lang = $.cookie('lang');
+      for (var i = 0; i < langs.length; i++) {
+        if (langs[i].value == lang) {
+          return langs[i].name;
+        }
+      }
+      return lang;
     }
   })
 });

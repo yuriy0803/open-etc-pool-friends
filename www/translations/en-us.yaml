@@ -1,4 +1,3 @@
-
 errors:
   header: Stats API Temporarily Down
   message: Usually it's just a temporal issue and mining is not affected.
@@ -25,6 +24,7 @@ menu:
   language: language
 
 lang:
+  arabic: عربي
   english: English
 
 home:
