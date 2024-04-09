@@ -25,6 +25,12 @@ module.exports = function (environment) {
       StratumHost: '192.168.178.41',
       StratumPort: 8008,
 
+      blockExplorerLink: 'https://explorer.test.network/',
+      blockExplorerLink_tx: 'https://explorer.test.network/tx/',
+      blockExplorerLink_uncle: 'https://explorer.test.network/uncles/',
+      blockExplorerLink_block: 'https://etc.explorer.com/block/',
+      blockExplorerLink_address: 'https://explorer.test.network/address/',
+
       // The ETC network
       Unit: 'ETC',
       Mining: 'SOLO',

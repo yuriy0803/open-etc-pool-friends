@@ -1,12 +1,3 @@
-links:
-  blockExplorerLink: 'https://explorer.test.network/'
-  blockExplorerLink_tx: 'https://explorer.test.network/tx/'
-  blockExplorerLink_uncle: 'https://explorer.test.network/uncles/'
-  blockExplorerLink_block: 'https://etc.blockscout.com/block/'
-  blockExplorerLink_address: 'https://explorer.test.network/address/'
-  wallet:
-  dapp_html: <a href="https://test.io/nautilus-wallet/#download">https://test.io/nautilus-wallet/#download</a>
-  online_html: <a href="https://wallet.test.io/">https://wallet.test.io</a> official online test wallet
 
 errors:
   header: Stats API Temporarily Down

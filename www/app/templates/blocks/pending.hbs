@@ -15,7 +15,7 @@
     <tbody>
       {{#each model.candidates as |block|}}
       <tr>
-        <td><a href="https://etc.blockscout.com/block/{{block.height}}" rel="nofollow" target="_blank">{{format-number
+        <td><a href="{{config.blockExplorerLink_block}}{{block.height}}" rel="nofollow" target="_blank">{{format-number
             block.height}}</a></td>
         <td>{{#link-to 'account' block.finder class='hash'}}{{block.finder}}{{/link-to}}</td>
         <td>{{format-date-locale block.timestamp}}</td>

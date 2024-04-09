@@ -23,11 +23,11 @@
           <td>{{format-date-locale tx.timestamp}}</td>
           <td>{{format-number tx.formatAmount}}</td>
           <td>
-            <a href="https://etc.blockscout.com/address/{{tx.address}}" class="hash" rel="nofollow"
+            <a href="{{config.blockExplorerLink_address}}{{tx.address}}" class="hash" rel="nofollow"
               target="_blank">{{wallet tx.address}}</a>
           </td>
           <td>
-            <a href="https://etc.blockscout.com/tx/{{tx.tx}}" class="hash" rel="nofollow" target="_blank">{{format-tx
+            <a href="{{config.blockExplorerLink_tx}}{{tx.tx}}" class="hash" rel="nofollow" target="_blank">{{format-tx
               tx.tx}}</a>
           </td>
         </tr>
