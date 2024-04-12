@@ -156,7 +156,29 @@ func (cs *Session) handleTCPMessage(s *ProxyServer, req *StratumReq) error {
 		cs.setStratumMode("EthProxy")
 		log.Println("EthProxy login", cs.ip)
 		return cs.sendTCPResult(req.Id, reply)
+	case "zilliqa switch":
+		// Setze den Stratum-Modus auf "Zilliqa"
+		cs.setStratumMode("Zilliqa")
 
+		// Bestätige die Umschaltung an den Client
+		confirmationMessage := JSONStratumResult{
+			Id:     req.Id,
+			Result: "Stratum mode switched to Zilliqa. Currently no ZIL work available.",
+		}
+		err := cs.sendTCPResult(req.Id, confirmationMessage)
+		if err != nil {
+			return err
+		}
+
+		// Senden einer Meldung an den Client, dass keine ZIL-Arbeit verfügbar ist
+		noZILWorkMessage := JSONStratumResult{
+			Id:     req.Id,
+			Result: "No ZIL work available at the moment.",
+		}
+		err = cs.sendTCPResult(req.Id, noZILWorkMessage)
+		if err != nil {
+			return err
+		}
 	case "mining.subscribe":
 		var params []string
 		err := json.Unmarshal(req.Params, &params)

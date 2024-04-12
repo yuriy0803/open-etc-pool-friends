@@ -44,3 +44,10 @@ type ErrorReply struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
+
+// Definiere den Typ JSONStratumResult
+type JSONStratumResult struct {
+	Id     interface{} `json:"id"`
+	Result interface{} `json:"result,omitempty"`
+	Error  interface{} `json:"error,omitempty"`
+}
