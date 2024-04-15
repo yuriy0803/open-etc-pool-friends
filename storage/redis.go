@@ -1938,8 +1938,8 @@ func (r *RedisClient) GetMiningType(login string) string {
 	cmd := r.client.HGet(r.formatKey("settings", login), "miningType")
 	//log.Println("MINING TYPE for : ", login)
 	if cmd.Err() == redis.Nil {
-		//	log.Println("MINING TYPE RETURN pplns")
-		return "pplns"
+		//	log.Println("MINING TYPE RETURN solo")
+		return "solo"
 	} else if cmd.Err() != nil {
 		//log.Println("MINING TYPE RETURN NA")
 		return "NA"
