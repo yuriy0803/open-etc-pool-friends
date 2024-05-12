@@ -6,41 +6,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yuriy0803/core-geth1/common"
-	"github.com/yuriy0803/etchash"
+	"github.com/ethereum/go-ethereum/common"
+	ethash "github.com/yuriy0803/ethashb3"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
 
 var (
-	maxUint256                             = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
-	ecip1099FBlockClassic uint64           = 11700000 // classic mainnet
-	ecip1099FBlockMordor  uint64           = 2520000  // mordor
-	uip1FEpoch            uint64           = 22       // ubiq mainnet
-	xip5Block             uint64           = 0        // expanse rebirth network
-	hasher                *etchash.Etchash = nil
+	maxUint256 = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
 )
 
-func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
+var hasher = ethash.New()
 
-	if hasher == nil {
-		if s.config.Network == "expanse" || s.config.Network == "rebirth" {
-			hasher = etchash.New(nil, nil, &xip5Block)
-		} else if s.config.Network == "classic" {
-			hasher = etchash.New(&ecip1099FBlockClassic, nil, nil)
-		} else if s.config.Network == "mordor" {
-			hasher = etchash.New(&ecip1099FBlockMordor, nil, nil)
-		} else if s.config.Network == "ubiq" {
-			hasher = etchash.New(nil, &uip1FEpoch, nil)
-		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" ||
-			s.config.Network == "ethereumFair" || s.config.Network == "etica" ||
-			s.config.Network == "octaspace" || s.config.Network == "universal" || s.config.Network == "canxium" {
-			hasher = etchash.New(nil, nil, nil)
-		} else {
-			// unknown network
-			log.Printf("Unknown network configuration %s", s.config.Network)
-			return false, false
-		}
-	}
+func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
 
 	nonceHex := params[0]
 	hashNoNonce := params[1]
@@ -53,14 +30,14 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	if stratum {
 		hashNoNonceTmp := common.HexToHash(params[2])
 
-		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
+		_, mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 		params[1] = hashNoNonceTmp.Hex()
 		params[2] = mixDigestTmp.Hex()
 		hashNoNonce = params[1]
 		result = hashTmp
 	} else {
 		hashNoNonceTmp := common.HexToHash(hashNoNonce)
-		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
+		_, mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 
 		// check mixDigest
 		if mixDigestTmp.Hex() != mixDigest {
