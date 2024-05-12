@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/yuriy0803/core-geth1/common"
 	"github.com/yuriy0803/open-etc-pool-friends/rpc"
 	"github.com/yuriy0803/open-etc-pool-friends/util"
 )
@@ -25,24 +26,24 @@ type BlockTemplate struct {
 	Target               string
 	Difficulty           *big.Int
 	Height               uint64
-	GetPendingBlockCache *rpc.GetBlockReplyPart // Assuming this type is defined elsewhere
+	GetPendingBlockCache *rpc.GetBlockReplyPart
 	nonces               map[string]bool
 	headers              map[string]heightDiffPair
 }
 
 type Block struct {
 	difficulty  *big.Int
-	hashNoNonce string // Replacing common.Hash with string
+	hashNoNonce common.Hash
 	nonce       uint64
-	mixDigest   string // Replacing common.Hash with string
+	mixDigest   common.Hash
 	number      uint64
 }
 
-func (b Block) Difficulty() *big.Int { return b.difficulty }
-func (b Block) HashNoNonce() string  { return b.hashNoNonce }
-func (b Block) Nonce() uint64        { return b.nonce }
-func (b Block) MixDigest() string    { return b.mixDigest }
-func (b Block) NumberU64() uint64    { return b.number }
+func (b Block) Difficulty() *big.Int     { return b.difficulty }
+func (b Block) HashNoNonce() common.Hash { return b.hashNoNonce }
+func (b Block) Nonce() uint64            { return b.nonce }
+func (b Block) MixDigest() common.Hash   { return b.mixDigest }
+func (b Block) NumberU64() uint64        { return b.number }
 
 func (s *ProxyServer) fetchBlockTemplate() {
 	rpc := s.rpc()
