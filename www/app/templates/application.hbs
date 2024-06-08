@@ -18,37 +18,37 @@
         <i class="fa fa-home"></i> {{t 'menu.home'}}
         {{/link-to}}
         {{/active-li}}
-        {{#active-li currentWhen='blocks' }}
+        {{#active-li currentWhen='blocks'}}
         {{#link-to 'blocks'}}
-        <i class="fa fa-cubes"></i> Pool Blocks
+        <i class="fa fa-cubes"></i> {{t 'menu.pool_blocks'}}
         {{#if immatureTotal}}
-        <span class="ul">{{immatureTotal}}</span>
+        <span class="badge alert-success">{{immatureTotal}}</span>
         {{/if}}
         {{/link-to}}
         {{/active-li}}
-        {{#active-li currentWhen='payments' }}
+        {{#active-li currentWhen='payments'}}
         {{#link-to 'payments'}}
-        <i class="fa fa-paper-plane"></i> Payments
+        <i class="fa fa-paper-plane-o"></i> {{t 'menu.payments'}}
         {{/link-to}}
         {{/active-li}}
-        {{#active-li currentWhen='miners' }}
+        {{#active-li currentWhen='miners'}}
         {{#link-to 'miners'}}
-        <i class="fa fa-users"></i> Miners
+        <i class="fa fa-users"></i> {{t 'menu.miners'}}
+        {{/link-to}}
+        {{/active-li}}
+        {{#active-li currentWhen='about'}}
+        {{#link-to (t 'menu.i18n.about')}}
+        <i class="fa fa-comments"></i> {{t 'menu.about'}}
+        {{/link-to}}
+        {{/active-li}}
+        {{#active-li currentWhen='help'}}
+        {{#link-to (t 'menu.i18n.help')}}
+        <i class="fa fa-rocket"></i> {{t 'menu.help'}}
         {{/link-to}}
         {{/active-li}}
         {{#active-li currentWhen='finders'}}
         {{#link-to 'finders'}}
-        <i class="fa fa-diamond"></i> Finders
-        {{/link-to}}
-        {{/active-li}}
-        {{#active-li currentWhen='help' }}
-        {{#link-to 'help'}}
-        <i class="fa fa-rocket"></i> Help
-        {{/link-to}}
-        {{/active-li}}
-        {{#active-li currentWhen='about' }}
-        {{#link-to 'about'}}
-        <i class="fa fa-comments"></i> About
+        <i class="fa fa-diamond"></i> {{t 'menu.finders'}}
         {{/link-to}}
         {{/active-li}}
       </ul>

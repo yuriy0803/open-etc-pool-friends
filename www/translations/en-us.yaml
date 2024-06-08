@@ -25,6 +25,7 @@ menu:
   payments: Payments
   miners: Miners
   about: About
+  finders: Finders
   i18n:
     about: about
     help: help
