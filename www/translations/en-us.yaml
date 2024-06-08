@@ -1,9 +1,9 @@
 links:
-      blockExplorerLink: 'https://explorer.test.network/',
-      blockExplorerLink_tx: 'https://explorer.test.network/tx/',
-      blockExplorerLink_uncle: 'https://explorer.test.network/uncles/',
-      blockExplorerLink_block: 'https://etc.explorer.com/block/',
-      blockExplorerLink_address: 'https://explorer.test.network/address/',
+  blockExplorerLink: 'https://explorer.test.network/'
+  blockExplorerLink_tx: 'https://explorer.test.network/tx/'
+  blockExplorerLink_uncle: 'https://explorer.test.network/uncles/'
+  blockExplorerLink_block: 'https://etc.explorer.com/block/'
+  blockExplorerLink_address: 'https://explorer.test.network/address/'
 
 errors:
   header: Stats API Temporarily Down
