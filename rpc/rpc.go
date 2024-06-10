@@ -40,6 +40,8 @@ type GetBlockReply struct {
 	Uncles        []string `json:"uncles"`
 	// https://github.com/ethereum/EIPs/issues/95
 	SealFields []string `json:"sealFields"`
+	// london hard fork
+	BaseFeePerGas string `json:"baseFeePerGas"`
 }
 
 type GetBlockReplyPart struct {
