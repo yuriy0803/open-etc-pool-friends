@@ -93,19 +93,29 @@ account:
   epoch_switch: Epoch Switch
   workers: Workers
   payouts: Payouts
-
+  threshold: Your Threshold
+  payoutThreshold: Payout Threshold
+  last24hReward: Last 24h Reward
+  earningsperday24havg : Earnings per day (24h avg)
+  sharesfound: Shares found
   your_workers: Workers
   server: Server
   difficulty: Difficulty
   last_share: Last Seen
   short_average: rough, short average
-  short_average_abbrv: 30m
+  short_average_abbrv: 1 Hour
   long_average: accurate, long average
-  long_average_abbrv: 3h
+  long_average_abbrv: 6 Hour
   no_workers_online: No workers online
   notice: Notice
   notice_html: Your average hashrate will be smoothly adjusted until you have shares to fullfill estimation window.<br/>There are two windows, long and short, first is equal to about 30 minutes and long window is usually equal to 3 hours.<br/>Dead (sick) workers will be highlighted in a table of workers if they didn't submit a share for 1/2 of short window, so you can perform maintenance of your rigs.
   json_api_url: Your bulk stats JSON API URL
+  payoutScheme: Payout Scheme
+  personalLuck: Personal Luck
+  pPLNSYourRoundShare: PPLNS Your Round Share
+  rewards: Rewards
+  settings: Settings
+  pPLNSSOLO: PPLNS/SOLO
 
 payout:
   latest_payouts: Your Latest Payouts
