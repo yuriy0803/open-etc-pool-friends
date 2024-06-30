@@ -4,7 +4,7 @@
 	"name": "main",
 	"pplns": 9000,
 	"network": "classic",
-	"coin-name": "ETC",
+	"coin-name": "etc",
 	"algo": "etchash",
 	"proxy": {
 		"enabled": true,
@@ -103,7 +103,7 @@
 	},
 	"exchange": {
 		"enabled": true,
-		"url": "https://api.coinpaprika.com/v1/ticker/etc-ethereum-classic",
+		"url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
 		"timeout": "50s",
 		"refreshInterval": "900s"
 	},
