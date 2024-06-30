@@ -38,7 +38,13 @@
         <div><i class="fa fa-bars"></i> Mining Block: <span>{{stats.height}}</span></div>
         <div><i class="fa fa-clock-o"></i> Luck: <span>{{format-number stats.roundVariance style='percent'}}</span>
         </div>
-        <div><i class="fa fa-credit-card-alt fa-fw"></i> Current price: <span>$ {{model.exchangedata.price_usd}}</span>
+        <div>
+          <i class="fa fa-credit-card-alt fa-fw"></i> Current price:
+          <span>$ {{#if (unless (eq model.exchangedata.price_usd 0) model.exchangedata.price_usd)}}
+            {{else}}
+            {{model.exchangedata.current_price}}
+            {{/if}}
+          </span>
         </div>
       </div>
     </div>
