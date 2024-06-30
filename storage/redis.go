@@ -492,30 +492,63 @@ func (r *RedisClient) WriteBlockSolo(login, id string, params []string, diff, sh
 	}
 }
 
+// writeShare processes and stores miner shares in Redis
 func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, shareDiffCalc int64, expire time.Duration, hostname string) {
-	/* # Note To Me:
-	Will have to write to get from redis the current value for round
-	shares and increase by 1, then include the new number to be added to redis
-	*/
-
+	// Calculate the number of seconds in the difference time
 	times := int(diff / 1000000000)
 
-	// Moved get hostname to stratums
+	// Push the miner's name 'times' times into a Redis list
 	for i := 0; i < times; i++ {
 		tx.LPush(r.formatKey("lastshares"), login)
 	}
-	tx.LTrim(r.formatKey("lastshares"), 0, r.pplns)
+
+	// Calculate the dynamic PPLNS value based on miner performance
+	dynamicPPLNS := r.calculateDynamicPPLNS(login)
+	// Trim the list to the dynamic PPLNS value
+	tx.LTrim(r.formatKey("lastshares"), 0, dynamicPPLNS)
+	// Increase the number of round shares for the miner
 	tx.HIncrBy(r.formatKey("miners", login), "roundShares", diff)
 
+	// Increase the current round shares for the miner
 	tx.HIncrBy(r.formatKey("shares", "roundCurrent"), login, diff)
-	// For aggregation of hashrate, to store value in hashrate key
+	// Add the hashrate value for the entire group
 	tx.ZAdd(r.formatKey("hashrate"), redis.Z{Score: float64(ts), Member: join(diff, login, id, ms, diff, hostname)})
-	// For separate miner's workers hashrate, to store under hashrate table under login key
+	// Add the hashrate value for the individual miner
 	tx.ZAdd(r.formatKey("hashrate", login), redis.Z{Score: float64(ts), Member: join(diff, id, ms, diff, hostname)})
-	// Will delete hashrates for miners that gone
+	// Set an expiration time for the miner's hashrate data
 	tx.Expire(r.formatKey("hashrate", login), expire)
+	// Set the value of the last share and its difficulty
 	tx.HSet(r.formatKey("miners", login), "lastShare", strconv.FormatInt(ts, 10))
 	tx.HSet(r.formatKey("miners", login), "lastShareDiff", strconv.FormatInt(shareDiffCalc, 10))
+}
+
+// calculateDynamicPPLNS calculates the dynamic PPLNS value based on miner performance
+func (r *RedisClient) calculateDynamicPPLNS(login string) int64 {
+	// Number of shares of the miner in the last 10 minutes
+	sharesCount := r.getSharesCount(login, 10*60) // 10 minutes
+
+	// Using the base PPLNS value from the RedisClient structure
+	if sharesCount > r.pplns {
+		// Increase the PPLNS value if the miner has more shares than the base value
+		return r.pplns + (sharesCount / 100)
+	} else {
+		// Decrease the PPLNS value if the miner has fewer shares than the base value
+		return r.pplns - ((r.pplns - sharesCount) / 100)
+	}
+}
+
+// getSharesCount returns the number of shares of a miner within a specific period
+func (r *RedisClient) getSharesCount(login string, duration int64) int64 {
+	now := time.Now().Unix()
+	past := now - duration
+
+	// Retrieve the number of shares from Redis
+	shares, err := r.client.ZCount(r.formatKey("shares", login), strconv.FormatInt(past, 10), strconv.FormatInt(now, 10)).Result()
+	if err != nil {
+		log.Println("Error retrieving shares:", err)
+		return 0
+	}
+	return shares
 }
 
 func (r *RedisClient) writeShareSolo(tx *redis.Multi, ms, ts int64, login, id string, diff int64, shareDiffCalc int64, expire time.Duration, hostname string) {
