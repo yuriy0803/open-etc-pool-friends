@@ -1868,15 +1868,33 @@ func (r *RedisClient) GetExchangeData(coinsymbol string) (map[string]string, err
 	return result, err
 }
 
-func (r *RedisClient) WritePoolCharts(time1 int64, time2 string, poolHash string) error {
-	s := join(time1, time2, poolHash)
-	cmd := r.client.ZAdd(r.formatKey("charts", "pool"), redis.Z{Score: float64(time1), Member: s})
-	return cmd.Err()
+func (r *RedisClient) WritePoolCharts(time1 int64, time2, poolHash string) error {
+	go func() {
+		s := join(time1, time2, poolHash)
+		cmd := r.client.ZAdd(r.formatKey("charts", "pool"), redis.Z{Score: float64(time1), Member: s})
+		if err := cmd.Err(); err != nil {
+			log.Printf("Error writing pool charts to Redis: %v", err)
+		}
+	}()
+
+	return nil
 }
+
 func (r *RedisClient) WriteMinerCharts(time1 int64, time2, k string, hash, largeHash, workerOnline int64) error {
-	s := join(time1, time2, hash, largeHash, workerOnline)
-	cmd := r.client.ZAdd(r.formatKey("charts", "miner", k), redis.Z{Score: float64(time1), Member: s})
-	return cmd.Err()
+	go func() {
+		// Concatenate parameters into a string
+		s := join(time1, time2, hash, largeHash, workerOnline)
+
+		// Add data to Redis sorted set asynchronously
+		cmd := r.client.ZAdd(r.formatKey("charts", "miner", k), redis.Z{Score: float64(time1), Member: s})
+
+		// Check for any errors during the Redis operation
+		if err := cmd.Err(); err != nil {
+			log.Printf("Error writing to Redis: %v", err)
+		}
+	}()
+
+	return nil
 }
 
 func (r *RedisClient) GetPoolCharts(poolHashLen int64) (stats []*PoolCharts, err error) {
@@ -2286,57 +2304,66 @@ func (r *RedisClient) NumberStratumWorker(count int) {
 	})
 }
 
-func (r *RedisClient) WriteDiffCharts(time1 int64, time2 string, netHash string) error {
-	s := join(time1, time2, netHash)
-	cmd := r.client.ZAdd(r.formatKey("charts", "difficulty"), redis.Z{Score: float64(time1), Member: s})
-	return cmd.Err()
+func (r *RedisClient) WriteDiffCharts(time1 int64, time2, netHash string) error {
+	go func() {
+		s := join(time1, time2, netHash)
+		cmd := r.client.ZAdd(r.formatKey("charts", "difficulty"), redis.Z{Score: float64(time1), Member: s})
+		if err := cmd.Err(); err != nil {
+			log.Printf("Error writing difficulty charts to Redis: %v", err)
+		}
+	}()
+
+	return nil
 }
 
 func (r *RedisClient) WriteShareCharts(time1 int64, time2, login string, valid, stale, workerOnline int64) error {
-	valid_s := r.client.HGet(r.formatKey("chartsNum", "share", login), "valid")
-	stale_s := r.client.HGet(r.formatKey("chartsNum", "share", login), "stale")
+	go func() {
+		valid_s := r.client.HGet(r.formatKey("chartsNum", "share", login), "valid")
+		stale_s := r.client.HGet(r.formatKey("chartsNum", "share", login), "stale")
 
-	if valid_s.Err() == redis.Nil || stale_s.Err() == redis.Nil {
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "valid", strconv.FormatInt(0, 10))
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "stale", strconv.FormatInt(0, 10))
-		//return nil, nil
-	} else if valid_s.Err() != nil || stale_s.Err() != nil {
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "valid", strconv.FormatInt(0, 10))
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "stale", strconv.FormatInt(0, 10))
-		//return nil, valid_s.Err()
-	}
+		if valid_s.Err() == redis.Nil || stale_s.Err() == redis.Nil {
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "valid", strconv.FormatInt(0, 10))
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "stale", strconv.FormatInt(0, 10))
+		} else if valid_s.Err() != nil || stale_s.Err() != nil {
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "valid", strconv.FormatInt(0, 10))
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "stale", strconv.FormatInt(0, 10))
+		}
 
-	v_s, _ := valid_s.Int64()
-	s_s, _ := stale_s.Int64()
+		v_s, _ := valid_s.Int64()
+		s_s, _ := stale_s.Int64()
 
-	l_valid := r.client.HGet(r.formatKey("chartsNum", "share", login), "lastvalid")
-	l_stale := r.client.HGet(r.formatKey("chartsNum", "share", login), "laststale")
+		l_valid := r.client.HGet(r.formatKey("chartsNum", "share", login), "lastvalid")
+		l_stale := r.client.HGet(r.formatKey("chartsNum", "share", login), "laststale")
 
-	if l_valid.Err() == redis.Nil || l_stale.Err() == redis.Nil {
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(0, 10))
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(0, 10))
-		//return nil, nil
-	} else if l_valid.Err() != nil || l_stale.Err() != nil {
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(0, 10))
-		r.client.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(0, 10))
-		//return nil, l_valid.Err()
-	}
-	l_v, _ := l_valid.Int64()
-	l_s, _ := l_stale.Int64()
+		if l_valid.Err() == redis.Nil || l_stale.Err() == redis.Nil {
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(0, 10))
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(0, 10))
+		} else if l_valid.Err() != nil || l_stale.Err() != nil {
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(0, 10))
+			r.client.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(0, 10))
+		}
+		l_v, _ := l_valid.Int64()
+		l_s, _ := l_stale.Int64()
 
-	valid_c := v_s - l_v
-	stale_c := s_s - l_s
-	s := join(time1, time2, valid_c, stale_c, workerOnline)
-	cmd := r.client.ZAdd(r.formatKey("charts", "share", login), redis.Z{Score: float64(time1), Member: s})
+		valid_c := v_s - l_v
+		stale_c := s_s - l_s
+		s := join(time1, time2, valid_c, stale_c, workerOnline)
+		cmd := r.client.ZAdd(r.formatKey("charts", "share", login), redis.Z{Score: float64(time1), Member: s})
 
-	tx := r.client.Multi()
-	defer tx.Close()
-	tx.Exec(func() error {
-		tx.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(v_s, 10))
-		tx.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(s_s, 10))
-		return nil
-	})
-	return cmd.Err()
+		tx := r.client.Multi()
+		defer tx.Close()
+		tx.Exec(func() error {
+			tx.HSet(r.formatKey("chartsNum", "share", login), "lastvalid", strconv.FormatInt(v_s, 10))
+			tx.HSet(r.formatKey("chartsNum", "share", login), "laststale", strconv.FormatInt(s_s, 10))
+			return nil
+		})
+
+		if err := cmd.Err(); err != nil {
+			log.Printf("Error writing share charts to Redis: %v", err)
+		}
+	}()
+
+	return nil
 }
 
 func (r *RedisClient) GetNetCharts(netHashLen int64) (stats []*NetCharts, err error) {
