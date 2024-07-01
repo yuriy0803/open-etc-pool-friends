@@ -115,7 +115,7 @@ Description=geth
 After=network-online.target
 
 [Service]
-ExecStart=/home/pool/core-geth/build/bin/geth --datadir /home/pool/classic/.ethereum/ --syncmode "snap" --http --http.api eth,net,web3,txpool,miner --miner.etherbase=0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --mine --cache=8000 --maxpeers 100 --password="/home/pool/.pw" --allow-insecure-unlock --http.port "8545" --nat "any" --unlock 0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --miner.extradata ys --classic --snapshot=false --port 30305
+ExecStart=/home/pool/core-geth/build/bin/geth --miner.threads=1 --datadir /home/pool/classic/.ethereum/ --syncmode "snap" --http --http.api eth,net,web3,txpool,miner --miner.etherbase=0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --mine --cache=8000 --maxpeers 100 --password="/home/pool/.pw" --allow-insecure-unlock --http.port "8545" --nat "any" --unlock 0x95f296f317E8E3AFb3DEf009173E77cCe00B5aeC --miner.extradata ys --classic --snapshot=false --port 30305
 
 User=pool
 
