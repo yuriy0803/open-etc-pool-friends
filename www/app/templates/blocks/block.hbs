@@ -14,7 +14,7 @@
   {{else if block.orphan}}
   <span class="label label-danger">Orphan</span>
   {{else}}
-  <td>{{#link-to 'account' block.finder class='hash'}}{{block.finder}}{{/link-to}}</td>
+  <td>{{#link-to 'account' block.finder class='hash'}}{{identicon block.finder 25}}{{block.finder}}{{/link-to}}</td>
   {{/if}}
   </td>
   <td>{{format-date-locale block.timestamp}}</td>
