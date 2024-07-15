@@ -2,7 +2,7 @@
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 var Funnel = require('broccoli-funnel');
 
-module.exports = function(defaults) {
+module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
     // Add options here
     SRI: {
@@ -25,6 +25,11 @@ module.exports = function(defaults) {
   app.import('bower_components/bootstrap/dist/css/bootstrap.min.css')
   app.import('bower_components/bootstrap/dist/js/bootstrap.min.js');
   app.import('bower_components/font-awesome/css/font-awesome.min.css')
+  app.import('vendor/jdenticon.js', {
+    using: [
+      { transformation: 'amd', as: 'jdenticon' }
+    ]
+  });
 
   var extraAssets = new Funnel('bower_components/font-awesome/fonts', {
     srcDir: '/',
