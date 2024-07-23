@@ -76,13 +76,23 @@ func (s *ProxyServer) ListenTCP() {
 
 		accept <- n
 		go func(cs *Session) {
-			err = s.handleTCPClient(cs)
-			if err != nil {
-				s.removeSession(cs)
-				conn.Close()
-			}
+			s.logConnectionTime(cs)
 			<-accept
 		}(cs)
+	}
+}
+
+func (s *ProxyServer) logConnectionTime(cs *Session) {
+	start := time.Now()
+	defer func() {
+		duration := time.Since(start)
+		log.Printf("Connection time for %s: %s", cs.ip, duration)
+	}()
+	err := s.handleTCPClient(cs)
+	if err != nil {
+		log.Printf("Error handling TCP client %s: %v", cs.ip, err)
+		s.removeSession(cs)
+		cs.conn.Close()
 	}
 }
 
