@@ -100,7 +100,7 @@ npm WARN deprecated bower@1.8.2: ...psst! Your project can stop working at any m
  
  New Wallet
  ```
- geth account new --datadir /home/pool/classic/.ethereum/
+ ./geth account new --datadir /home/pool/classic/.ethereum/
 ```
 If you use Ubuntu, it is easier to control services by using serviced.
 
