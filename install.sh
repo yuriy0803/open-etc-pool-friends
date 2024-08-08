@@ -85,12 +85,6 @@ module.exports = function (environment) {
       PayoutThreshold: '0.5 ETC',
       BlockReward: 2.56,
 
-      blockExplorerLink: 'https://explorer.test.network/',
-      blockExplorerLink_tx: 'https://explorer.test.network/tx/',
-      blockExplorerLink_uncle: 'https://explorer.test.network/uncles/',
-      blockExplorerLink_block: 'https://etc.explorer.com/block/',
-      blockExplorerLink_address: 'https://explorer.test.network/address/',
-
       // For network hashrate (change for your favourite fork)
       BlockTime: 14.4,
       highcharts: {
