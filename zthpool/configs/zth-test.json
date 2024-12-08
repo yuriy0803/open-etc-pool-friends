@@ -1,0 +1,10 @@
+{
+    "name": "Zether Testnet",
+    "blockReward": {
+        "0": 50.0,
+        "1000": 25.0,
+        "2000": 12.5
+    },
+    "adjustmentFreq": 1000,
+    "hasUncles": false
+}

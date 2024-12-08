@@ -1,0 +1,10 @@
+{
+    "name": "Zether",
+    "blockReward": {
+        "0": 50.0,
+        "100000": 25.0,
+        "200000": 12.5
+    },
+    "adjustmentFreq": 100000,
+    "hasUncles": false
+}
