@@ -1401,6 +1401,32 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	stats["hashrate"] = totalHashrate
 	stats["currentHashrate"] = currentHashrate
 
+	// Handle worker deletion if no workers are online
+	if online == 0 {
+		allOfflineFor10Minutes := true
+		for _, worker := range workers {
+			timeOffline := now - worker.LastBeat
+			if timeOffline < 1200 { // 20 Minuten = 1200 Sekunden
+				allOfflineFor10Minutes = false
+				break
+			}
+		}
+		if allOfflineFor10Minutes {
+			for id := range workers {
+				tx.HSet(r.formatKey("minerShare", login, id), "valid", strconv.FormatInt(0, 10))
+				tx.HSet(r.formatKey("minerShare", login, id), "stale", strconv.FormatInt(0, 10))
+				tx.HSet(r.formatKey("minerShare", login, id), "invalid", strconv.FormatInt(0, 10))
+			}
+		}
+	}
+	// Execute the transaction
+	_, err = tx.Exec(func() error {
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	stats["rewards"] = convertRewardResults(cmds[2].(*redis.ZSliceCmd)) // last 40
 	rewards := convertRewardResults(cmds[3].(*redis.ZSliceCmd))         // all
 
