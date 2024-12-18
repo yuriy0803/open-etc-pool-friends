@@ -133,6 +133,7 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, login, id string, params []st
 		if !ok {
 			return false, &ErrorReply{Code: 23, Message: "Invalid share"}
 		}
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, nil
 	}
 	if s.config.Proxy.Debug {
