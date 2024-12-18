@@ -55,6 +55,7 @@ type Proxy struct {
 	Debug       bool  `json:"debug"`
 
 	Stratum Stratum `json:"stratum"`
+	VarDiff VarDiff `json:"varDiff"`
 }
 
 type Stratum struct {
@@ -65,6 +66,14 @@ type Stratum struct {
 	TLS      bool   `json:"tls"`
 	CertFile string `json:"certFile"`
 	KeyFile  string `json:"keyFile"`
+}
+
+type VarDiff struct {
+	MinDiff         int64   `json:"minDiff"`
+	MaxDiff         int64   `json:"maxDiff"`
+	TargetTime      float64 `json:"targetTime"`
+	VariancePercent int     `json:"variancePercent"`
+	MaxJump         int64   `json:"maxJump"`
 }
 
 type Upstream struct {
