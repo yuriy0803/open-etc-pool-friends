@@ -76,7 +76,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	shareDiffFloat := util.DiffIntToFloat(shareDiffCalc)
 	if shareDiffFloat < 0.0001 {
 		log.Printf("share difficulty too low, %f < %d, from %v@%v", shareDiffFloat, t.Difficulty, login, ip)
-		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
 	}
 
@@ -97,13 +97,14 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
 	// check share difficulty
 	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
 	if result.Big().Cmp(shareTarget) > 0 {
-		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
 	}
 
