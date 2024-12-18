@@ -2303,52 +2303,31 @@ func (r *RedisClient) getSharesStatus(login string, id string) (int64, int64, in
 
 // lets try to fuck without understanding and see if it works
 func (r *RedisClient) WriteWorkerShareStatus(login string, id string, valid bool, stale bool, invalid bool) {
-
-	valid_int := 0
-	stale_int := 0
-	invalid_int := 0
+	validInt := 0
+	staleInt := 0
+	invalidInt := 0
 	if valid {
-		valid_int = 1
+		validInt = 1
 	}
 	if stale {
-		stale_int = 1
+		staleInt = 1
 	}
 	if invalid {
-		invalid_int = 1
+		invalidInt = 1
 	}
-
-	// var after = time.Now().AddDate(0, 0, -1).Unix()
-	//  var now = time.Now().Unix()
-	// if(now >= after){
-	//   tx.HDel(r.formatKey("minerShare", login, id))
-	// }
-	t := time.Now().Local()
-	if t.Format("15:04:05") >= "23:59:00" {
-		tx := r.client.Multi()
-		defer tx.Close()
-		tx.Exec(func() error {
-			//tx.Del(r.formatKey("minerShare", login, id))
-			tx.HSet(r.formatKey("minerShare", login, id), "valid", strconv.FormatInt(0, 10))
-			tx.HSet(r.formatKey("minerShare", login, id), "stale", strconv.FormatInt(0, 10))
-			tx.HSet(r.formatKey("minerShare", login, id), "invalid", strconv.FormatInt(0, 10))
-			return nil
-		})
-	} else {
-		// So, we need to initiate the tx object
-		tx := r.client.Multi()
-		defer tx.Close()
-
-		tx.Exec(func() error {
-			// OK, good, no need to read reset and add if i use Hset and HGet shit
-			tx.HIncrBy(r.formatKey("minerShare", login, id), "valid", int64(valid_int))
-			tx.HIncrBy(r.formatKey("minerShare", login, id), "stale", int64(stale_int))
-			tx.HIncrBy(r.formatKey("minerShare", login, id), "invalid", int64(invalid_int))
-			tx.HIncrBy(r.formatKey("chartsNum", "share", login), "valid", int64(valid_int))
-			tx.HIncrBy(r.formatKey("chartsNum", "share", login), "stale", int64(stale_int)) // Would that work?
-
-			return nil
-		})
-	} //end else
+	// Start a new Redis transaction
+	tx := r.client.Multi()
+	defer tx.Close()
+	tx.HIncrBy(r.formatKey("minerShare", login, id), "valid", int64(validInt))
+	tx.HIncrBy(r.formatKey("minerShare", login, id), "stale", int64(staleInt))
+	tx.HIncrBy(r.formatKey("minerShare", login, id), "invalid", int64(invalidInt))
+	// Execute the transaction
+	_, err := tx.Exec(func() error {
+		return nil
+	})
+	if err != nil {
+		log.Println("Error executing Redis transaction:", err)
+	}
 }
 
 func (r *RedisClient) NumberStratumWorker(count int) {
