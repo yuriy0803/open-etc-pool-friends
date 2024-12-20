@@ -32,7 +32,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		} else if s.config.Network == "ubiq" {
 			hasher = etchash.New(nil, &uip1FEpoch, nil)
 		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" ||
-			s.config.Network == "ethereumFair" || s.config.Network == "etica" ||
+			s.config.Network == "ethereumFair" || s.config.Network == "etica" || s.config.Network == "zether" ||
 			s.config.Network == "octaspace" || s.config.Network == "universal" || s.config.Network == "canxium" {
 			hasher = etchash.New(nil, nil, nil)
 		} else {

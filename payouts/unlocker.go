@@ -43,6 +43,9 @@ const londonHardForkHeight = 12965000
 // Universal block reward ethash
 const UniversalHardForkHeight = 0
 
+// params for Zether
+var zetherStartReward = math.MustParseBig256("10000000000000000000000")
+
 var UniversalBlockReward = math.MustParseBig256("2000000000000000000") // 2.00
 var UniversalUncleReward = math.MustParseBig256("1750000000000000000") // 1.75
 
@@ -111,6 +114,8 @@ func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient, network
 	} else if network == "ubiq" {
 		// nothing needs configuring here, simply proceed.
 	} else if network == "octaspace" {
+		// nothing needs configuring here, simply proceed.
+	} else if network == "zether" {
 		// nothing needs configuring here, simply proceed.
 	} else if network == "universal" {
 		// nothing needs configuring here, simply proceed.
@@ -337,6 +342,12 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		uncleReward := new(big.Int).Div(reward, big32)
 		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
 		reward.Add(reward, rewardForUncles)
+	} else if u.config.Network == "zether" {
+		reward = getConstRewardZether(candidate.Height)
+		// Add reward for including uncles
+		uncleReward := new(big.Int).Div(reward, big32)
+		rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+		reward.Add(reward, rewardForUncles)
 	} else if u.config.Network == "universal" {
 		reward = getConstRewardUniversal(candidate.Height)
 		// Add reward for including uncles
@@ -402,6 +413,8 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 		reward = getUncleRewardEthereum(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUbiq(height))
 	} else if cfg.Network == "octaspace" {
 		reward = getUncleRewardOctaspace(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardOctaspace(height))
+	} else if cfg.Network == "zether" {
+		reward = getUncleRewardZether(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardZether(height))
 	} else if cfg.Network == "universal" {
 		reward = getUncleRewardUniversal(new(big.Int).SetInt64(uncleHeight), new(big.Int).SetInt64(height), getConstRewardUniversal(height))
 	}
@@ -997,5 +1010,79 @@ func getUncleRewardExpanse(uHeight *big.Int, height *big.Int, reward *big.Int) *
 	r.Mul(r, reward)
 	r.Div(r, big8)
 
+	return r
+}
+
+// Zether
+func getConstRewardZether(height int64) *big.Int {
+	reward := new(big.Int)
+	switch {
+	case height <= 100_000:
+		reward.SetString("10000000000000000000000", 10) // 10,000 coins
+	case height <= 200_000:
+		reward.SetString("9000000000000000000000", 10) // 9,000 coins
+	case height <= 300_000:
+		reward.SetString("8000000000000000000000", 10) // 8,000 coins
+	case height <= 400_000:
+		reward.SetString("7000000000000000000000", 10) // 7,000 coins
+	case height <= 500_000:
+		reward.SetString("6000000000000000000000", 10) // 6,000 coins
+	case height <= 600_000:
+		reward.SetString("5000000000000000000000", 10) // 5,000 coins
+	case height <= 700_000:
+		reward.SetString("4000000000000000000000", 10) // 4,000 coins
+	case height <= 800_000:
+		reward.SetString("3000000000000000000000", 10) // 3,000 coins
+	case height <= 900_000:
+		reward.SetString("2000000000000000000000", 10) // 2,000 coins
+	case height <= 1_000_000:
+		reward.SetString("1000000000000000000000", 10) // 1,000 coins
+	case height <= 1_100_000:
+		reward.SetString("900000000000000000000", 10) // 900 coins
+	case height <= 1_200_000:
+		reward.SetString("800000000000000000000", 10) // 800 coins
+	case height <= 1_300_000:
+		reward.SetString("700000000000000000000", 10) // 700 coins
+	case height <= 1_400_000:
+		reward.SetString("600000000000000000000", 10) // 600 coins
+	case height <= 1_500_000:
+		reward.SetString("500000000000000000000", 10) // 500 coins
+	case height <= 1_600_000:
+		reward.SetString("400000000000000000000", 10) // 400 coins
+	case height <= 1_700_000:
+		reward.SetString("300000000000000000000", 10) // 300 coins
+	case height <= 1_800_000:
+		reward.SetString("200000000000000000000", 10) // 200 coins
+	case height <= 1_900_000:
+		reward.SetString("100000000000000000000", 10) // 100 coins
+	case height <= 2_000_000:
+		reward.SetString("90000000000000000000", 10) // 90 coins
+	case height <= 2_100_000:
+		reward.SetString("80000000000000000000", 10) // 80 coins
+	case height <= 2_200_000:
+		reward.SetString("70000000000000000000", 10) // 70 coins
+	case height <= 2_300_000:
+		reward.SetString("60000000000000000000", 10) // 60 coins
+	case height <= 2_400_000:
+		reward.SetString("50000000000000000000", 10) // 50 coins
+	case height <= 2_500_000:
+		reward.SetString("40000000000000000000", 10) // 40 coins
+	case height <= 2_600_000:
+		reward.SetString("30000000000000000000", 10) // 30 coins
+	case height <= 2_700_000:
+		reward.SetString("20000000000000000000", 10) // 20 coins
+	default:
+		reward.SetString("10000000000000000000", 10) // Default 10 coins
+	}
+	return reward
+}
+
+// Zether Uncle rw
+func getUncleRewardZether(uHeight *big.Int, height *big.Int, reward *big.Int) *big.Int {
+	r := new(big.Int)
+	r.Add(uHeight, big8)
+	r.Sub(r, height)
+	r.Mul(r, reward)
+	r.Div(r, big8)
 	return r
 }
