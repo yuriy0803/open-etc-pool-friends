@@ -299,219 +299,141 @@ otherwise you will get errors on start because of JSON comments.**
 
 ```javascript
 {
-  // Set to the number of CPU cores of your server
-  "threads": 2,
-  // Prefix for keys in redis store
-  "coin": "etc",
-  // Give unique name to each instance
-  "name": "main",
-  // shares or (solo "pplns": 0,)
-  "pplns": 9000,
-   // mordor, classic, ethereum, ropsten or ubiq, etica,
-   //  ethereumPow, ethereumFair, expanse, octaspace, canxium, universal, Zether  
-  "network": "classic",
-  // etchash, ethash, ubqhash
-  "algo": "etchash",
-  // exchange api coingecko
-  "coin-name":"etc",
-  
-  "proxy": {
-    "enabled": true,
-
-    // Bind HTTP mining endpoint to this IP:PORT
-    "listen": "0.0.0.0:8888",
-
-    // Allow only this header and body size of HTTP request from miners
-    "limitHeadersSize": 1024,
-    "limitBodySize": 256,
-
-    /* Set to true if you are behind CloudFlare (not recommended) or behind http-reverse
-      proxy to enable IP detection from X-Forwarded-For header.
-      Advanced users only. It's tricky to make it right and secure.
-    */
-    "behindReverseProxy": false,
-
-    // Stratum mining endpoint
-    "stratum": {
-      "enabled": true,
-      // Bind stratum mining socket to this IP:PORT
-      "listen": "0.0.0.0:8008",
-      "timeout": "120s",
-      "maxConn": 8192,
-      "tls": false,
-      "certFile": "/path/to/cert.pem",
-      "keyFile": "/path/to/key.pem"
+    "threads": 4, // Number of threads used for processing
+    "coin": "ETC", // Abbreviation of the supported cryptocurrency
+    "name": "Ethereum-Classic", // Full name of the cryptocurrency
+    "pplns": 9000, // Pay-Per-Last-N-Shares, a reward system for miners (solo "pplns": 0,)
+    "network": "classic", // Network type the pool is running on mordor, classic, ethereum, ropsten or ubiq, etica, ethereumPow, ethereumFair, expanse, octaspace, canxium, universal, Zether  
+    "coin-name": "etc", // Internal name of the cryptocurrency // exchange api coingecko
+    "algo": "etchash", // Algorithm used for mining  etchash, ethash, ubqhash
+    "proxy": {
+        "enabled": true, // Indicates if the proxy is enabled
+        "listen": "0.0.0.0:8888", // Address and port the proxy listens on
+        "limitHeadersSize": 1024, // Maximum size of headers in bytes
+        "limitBodySize": 256, // Maximum size of the body in bytes
+        "behindReverseProxy": false, // Indicates if the proxy is behind a reverse proxy
+        "blockRefreshInterval": "50ms", // Interval for refreshing blocks
+        "stateUpdateInterval": "3s", // Interval for updating state
+        "difficulty": 17179869184, // Mining difficulty
+        "hashrateExpiration": "3h", // Time period after which hashrate is considered expired
+        "stratumHostname": "example.org", // Hostname for Stratum connections
+        "healthCheck": true, // Indicates if health checks are enabled
+        "debug": true, // Indicates if debug mode is enabled
+        "maxFails": 100, // Maximum number of failed attempts before closing a connection
+        "stratum": {
+            "enabled": true, // Indicates if Stratum is enabled
+            "listen": "0.0.0.0:8008", // Address and port Stratum listens on
+            "timeout": "120s", // Timeout for Stratum connections
+            "maxConn": 8192, // Maximum number of concurrent connections
+            "tls": false, // Indicates if TLS is used for Stratum connections
+            "certFile": "/etc/letsencrypt/live/example.com/fullchain.pem", // Path to the TLS certificate file
+            "keyFile": "/etc/letsencrypt/live/example.com/privkey.pem" // Path to the TLS key file
+        },
+        "policy": {
+            "workers": 8, // Number of workers used for processing
+            "resetInterval": "60m", // Interval for resetting limits
+            "refreshInterval": "1m", // Interval for refreshing limits
+            "blacklist_file": "/home/pool/open-etc-pool-friends/stratum_blacklist.json", // Path to the blacklist file
+            "banning": {
+                "enabled": true, // Indicates if IP banning is enabled
+                "ipset": "blacklist", // Name of the IP set for banned IPs
+                "timeout": 1800, // Timeout for banned IPs in seconds
+                "invalidPercent": 30, // Percentage of invalid requests before banning
+                "checkThreshold": 30, // Threshold for checking invalid requests
+                "malformedLimit": 5, // Limit for malformed requests
+                "fail2banCommand": "fail2ban-client" // Command to execute Fail2Ban
+            },
+            "limits": {
+                "enabled": false, // Indicates if limits are enabled
+                "limit": 30, // Maximum number of requests per minute
+                "grace": "5m", // Grace period before applying limits
+                "limitJump": 10 // Increase in limit upon exceeding
+            }
+        }
     },
-
-    // Try to get new job from node in this interval
-    "blockRefreshInterval": "120ms",
-    "stateUpdateInterval": "3s",
-    // Require this share difficulty from miners
-    "difficulty": 2000000000,
-
-    /* Reply error to miner instead of job if redis is unavailable.
-      Should save electricity to miners if pool is sick and they didn't set up failovers.
-    */
-    "healthCheck": true,
-    // Mark pool sick after this number of redis failures.
-    "maxFails": 100,
-    // TTL for workers stats, usually should be equal to large hashrate window from API section
-    "hashrateExpiration": "3h",
-
-    "policy": {
-      "workers": 8,
-      "resetInterval": "60m",
-      "refreshInterval": "1m",
-      //blacklist Wallet for miners
-      "blacklist_file" : "/home/pool/open-etc-pool-friends/stratum_blacklist.json",
-
-      "banning": {
-        "enabled": false,
-        /* Name of ipset for banning.
-        Check http://ipset.netfilter.org/ documentation.
-        */
-        "ipset": "blacklist",
-        // Remove ban after this amount of time
-        "timeout": 1800,
-        // Percent of invalid shares from all shares to ban miner
-        "invalidPercent": 30,
-        // Check after after miner submitted this number of shares
-        "checkThreshold": 30,
-        // Bad miner after this number of malformed requests
-        "malformedLimit": 5
-      },
-      // Connection rate limit
-      "limits": {
-        "enabled": false,
-        // Number of initial connections
-        "limit": 30,
-        "grace": "5m",
-        // Increase allowed number of connections on each valid share
-        "limitJump": 10
-      }
-    }
-  },
-
-  // Provides JSON data for frontend which is static website
-  "api": {
-    "enabled": true,
-    "listen": "0.0.0.0:8080",
-    // Collect miners stats (hashrate, ...) in this interval
-    "statsCollectInterval": "5s",
-    // Purge stale stats interval
-    "purgeInterval": "10m",
-    // Fast hashrate estimation window for each miner from it's shares
-    "hashrateWindow": "30m",
-    // Long and precise hashrate from shares, 3h is cool, keep it
-    "hashrateLargeWindow": "3h",
-    // Collect stats for shares/diff ratio for this number of blocks
-    "luckWindow": [64, 128, 256],
-    // Max number of payments to display in frontend
-    "payments": 50,
-    // Max numbers of blocks to display in frontend
-    "blocks": 50,
-
-    /* If you are running API node on a different server where this module
-      is reading data from redis writeable slave, you must run an api instance with this option enabled in order to purge hashrate stats from main redis node.
-      Only redis writeable slave will work properly if you are distributing using redis slaves.
-      Very advanced. Usually all modules should share same redis instance.
-    */
-    "purgeOnly": false
-  },
-
-  // Check health of each node in this interval
-  "upstreamCheckInterval": "5s",
-
-  /* List of parity nodes to poll for new jobs. Pool will try to get work from
-    first alive one and check in background for failed to back up.
-    Current block template of the pool is always cached in RAM indeed.
-  */
-  "upstream": [
-    {
-      "name": "main",
-      "url": "http://127.0.0.1:8545",
-      "timeout": "10s"
+    "api": {
+        "enabled": true, // Indicates if the API is enabled
+        "purgeOnly": false, // Indicates if the API is used only for purging
+        "purgeInterval": "10m", // Interval for purging data
+        "listen": "0.0.0.0:8080", // Address and port the API listens on
+        "statsCollectInterval": "5s", // Interval for collecting statistics
+        "hashrateWindow": "30m", // Time period for calculating hashrate
+        "hashrateLargeWindow": "3h", // Longer time period for calculating hashrate
+        "luckWindow": [64, 128, 256], // Time windows for calculating luck
+        "payments": 30, // Number of payments to retain
+        "blocks": 50, // Number of blocks to retain
+        "poolCharts": "0 */20 * * * *", // Cron expression for updating pool charts
+        "poolChartsNum": 74, // Number of pool charts to retain
+        "minerCharts": "0 */20 * * * *", // Cron expression for updating miner charts
+        "minerChartsNum": 74, // Number of miner charts to retain
+        "netCharts": "0 */20 * * * *", // Cron expression for updating network charts
+        "netChartsNum": 74, // Number of network charts to retain
+        "shareCharts": "0 */20 * * * *", // Cron expression for updating share charts
+        "shareChartsNum": 74 // Number of share charts to retain
     },
-    {
-      "name": "backup",
-      "url": "http://127.0.0.2:8545",
-      "timeout": "10s"
-    }
-  ],
-
-  // This is standard redis connection options
-  "redis": {
-    // Where your redis instance is listening for commands
-    "endpoint": "127.0.0.1:6379",
-    "poolSize": 10,
-    "database": 0,
-    "password": "",
-        "sentinelEnabled": false,
-        "masterName": "mymaster",
+    "upstreamCheckInterval": "5s", // Interval for checking upstream connections
+    "upstream": [
+        {
+            "name": "main", // Name of the main upstream server
+            "url": "http://127.0.0.1:8545", // URL of the main upstream server connected to a Geth node
+            "timeout": "10s" // Timeout for connections to the main upstream server
+        },
+        {
+            "name": "backup", // Name of the backup upstream server
+            "url": "http://127.0.0.2:8545", // URL of the backup upstream server connected to a Geth node
+            "timeout": "10s" // Timeout for connections to the backup upstream server
+        }
+    ],
+    "redis": {
+        "endpoint": "127.0.0.1:6379", // Redis server endpoint
+        "poolSize": 10, // Size of the Redis connection pool
+        "database": 0, // Redis database number
+        "password": "", // Password for the Redis connection
+        "sentinelEnabled": false, // Indicates if Redis Sentinel is enabled
+        "masterName": "mymaster", // Name of the Redis master
         "sentinelAddrs": [
-            "127.0.0.1:26379",
-            "127.0.0.1:26389",
-            "127.0.0.1:26399"
+            "127.0.0.1:26379", // Address of the first Redis Sentinel
+            "127.0.0.1:26389", // Address of the second Redis Sentinel
+            "127.0.0.1:26399"  // Address of the third Redis Sentinel
         ]
-	},
-
-  "exchange": {
-    "enabled": true,
-     "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
-     "timeout": "50s",
-     "refreshInterval": "900s"
     },
-
-  // This module periodically remits ether to miners
-  "unlocker": {
-    "enabled": false,
-    // Pool fee percentage
-    "poolFee": 1.0,
-    // Pool fees beneficiary address (leave it blank to disable fee withdrawals)
-    "poolFeeAddress": "",
-    // Donate 10% from pool fees to developers
-    "donate": true,
-    // Unlock only if this number of blocks mined back
-    "depth": 120,
-    // Simply don't touch this option
-    "immatureDepth": 20,
-    // Keep mined transaction fees as pool fees
-    "keepTxFees": false,
-    // Run unlocker in this interval
-    "interval": "10m",
-    // Parity node rpc endpoint for unlocking blocks
-    "daemon": "http://127.0.0.1:8545",
-    // Rise error if can't reach parity
-    "timeout": "10s",
-    // london hard fork ON or OFF
-    "isLondonHardForkEnabled": false
-  },
-
-  // Pay out miners using this module
-  "payouts": {
-    "enabled": false,
-    // Require minimum number of peers on node
-    "requirePeers": 25,
-    // Run payouts in this interval
-    "interval": "12h",
-    // Parity node rpc endpoint for payouts processing
-    "daemon": "http://127.0.0.1:8545",
-    // Rise error if can't reach parity
-    "timeout": "10s",
-    // Address with pool balance
-    "address": "0x0",
-    // Let parity to determine gas and gasPrice
-    "autoGas": true,
-    // Sends as EIP1559 TX
-    "maxPriorityFee": "2000000000",
-    // Gas amount and price for payout tx (advanced users only)
-    "gas": "21000",
-    "gasPrice": "50000000000",
-    // Send payment only if miner's balance is >= 0.5 Ether
-    "threshold": 500000000,
-    // Perform BGSAVE on Redis after successful payouts session
-    "bgsave": false
-  }
+    "exchange": {
+        "enabled": true, // Indicates if the exchange service is enabled
+        "name": "coingecko", // Name of the exchange service
+        "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic", // URL for the exchange service
+        "timeout": "50s", // Timeout for requests to the exchange service
+        "refreshInterval": "900s" // Interval for refreshing exchange data
+    },
+    "unlocker": {
+        "enabled": true, // Indicates if the unlocker is enabled
+        "poolFee": 1.0, // Pool fee percentage
+        "poolFeeAddress": "", // Address to which the pool fee is sent
+        "depth": 120, // Depth of transactions considered
+        "immatureDepth": 20, // Depth of immature transactions
+        "keepTxFees": false, // Indicates if transaction fees are retained
+        "interval": "10m", // Interval for running the unlocker
+        "daemon": "http://127.0.0.1:8545", // URL of the daemon connected to a Geth node
+        "timeout": "10s", // Timeout for connections to the daemon
+        "isLondonHardForkEnabled": false // Indicates if the London Hard Fork is enabled
+    },
+    "payouts": {
+        "enabled": false, // Indicates if payouts are enabled
+        "requirePeers": 1, // Number of required peers for payouts
+        "interval": "20m", // Interval for payouts
+        "daemon": "http://127.0.0.1:8545", // URL of the daemon for payouts connected to a Geth node
+        "timeout": "10s", // Timeout for connections to the daemon
+        "address": "0xd92fa5a9732a0aec36dc8d5a6a1305dc2d3e09e6", // Address to which payouts are sent
+        "gas": "21000", // Gas limit for payouts
+        "gasPrice": "50000000000", // Gas price for payouts
+        "autoGas": true, // Indicates if gas price is adjusted automatically
+        "threshold": 500000000, // Threshold for payouts
+        "bgsave": false, // Indicates if background saving is enabled
+        "concurrentTx": 10 // Number of concurrent transactions
+    },
+    "newrelicEnabled": false, // Indicates if New Relic monitoring is enabled
+    "newrelicName": "MyEtherProxy", // Name of the New Relic application
+    "newrelicKey": "SECRET_KEY", // API key for New Relic
+    "newrelicVerbose": false // Indicates if verbose logging for New Relic is enabled
 }
 ```
 
