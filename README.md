@@ -303,7 +303,8 @@ otherwise you will get errors on start because of JSON comments.**
     "coin": "ETC", // Abbreviation of the supported cryptocurrency
     "name": "Ethereum-Classic", // Full name of the cryptocurrency
     "pplns": 9000, // Pay-Per-Last-N-Shares, a reward system for miners (solo "pplns": 0,)
-    "network": "classic", // Network type the pool is running on mordor, classic, ethereum, ropsten or ubiq, etica, ethereumPow, ethereumFair, expanse, octaspace, canxium, universal, Zether  
+    "network": "classic", // Network type the pool is running on mordor, classic, ethereum, ropsten or 
+    // ubiq, etica, ethereumPow, ethereumFair, expanse, octaspace, canxium, universal, Zether  
     "coin-name": "etc", // Internal name of the cryptocurrency // exchange api coingecko
     "algo": "etchash", // Algorithm used for mining  etchash, ethash, ubqhash
     "proxy": {
