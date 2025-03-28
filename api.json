@@ -29,6 +29,13 @@
 			"certFile": "/etc/letsencrypt/live/example.com/fullchain.pem",
 			"keyFile": "/etc/letsencrypt/live/example.com/privkey.pem"
 		},
+		"varDiff": {
+			"minDiff": 17179869184,
+			"maxDiff": 68719476736,
+			"targetTime": 100,
+			"variancePercent": 30,
+			"maxJump": 50
+		},
 		"policy": {
 			"workers": 8,
 			"resetInterval": "60m",
@@ -103,7 +110,7 @@
 	},
 	"exchange": {
 		"enabled": true,
-		"name":"coingecko",
+		"name": "coingecko",
 		"url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum-classic",
 		"timeout": "50s",
 		"refreshInterval": "900s"

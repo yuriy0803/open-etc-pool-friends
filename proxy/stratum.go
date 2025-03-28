@@ -574,6 +574,9 @@ func (s *ProxyServer) broadcastNewJobs() {
 		bcast <- n
 
 		go func(cs *Session) {
+
+			cs.diff = cs.nextDiff
+			reply := []string{t.Header, t.Seed, util.GetTargetHex(cs.diff)}
 			err := cs.pushNewJob(s, &reply)
 			<-bcast
 			if err != nil {
