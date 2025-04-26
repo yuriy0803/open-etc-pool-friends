@@ -20,8 +20,10 @@ var (
 	hasher                *etchash.Etchash = nil
 )
 
-func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, shareDiff int64, stratum bool) (bool, bool) {
+// Definieren der bestShareDiff-Variable
+var bestShareDiff int64
 
+func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
 	if hasher == nil {
 		if s.config.Network == "expanse" || s.config.Network == "rebirth" {
 			hasher = etchash.New(nil, nil, &xip5Block)
@@ -32,7 +34,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		} else if s.config.Network == "ubiq" {
 			hasher = etchash.New(nil, &uip1FEpoch, nil)
 		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" ||
-			s.config.Network == "ethereumFair" || s.config.Network == "etica" || s.config.Network == "zether" ||
+			s.config.Network == "ethereumFair" || s.config.Network == "etica" ||
 			s.config.Network == "octaspace" || s.config.Network == "universal" || s.config.Network == "canxium" {
 			hasher = etchash.New(nil, nil, nil)
 		} else {
@@ -46,7 +48,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	hashNoNonce := params[1]
 	mixDigest := params[2]
 	nonce, _ := strconv.ParseUint(strings.Replace(nonceHex, "0x", "", -1), 16, 64)
-	//shareDiff := s.config.Proxy.Difficulty
+	shareDiff := s.config.Proxy.Difficulty
 	stratumHostname := s.config.Proxy.StratumHostname
 
 	var result common.Hash
@@ -76,8 +78,13 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	shareDiffFloat := util.DiffIntToFloat(shareDiffCalc)
 	if shareDiffFloat < 0.0001 {
 		log.Printf("share difficulty too low, %f < %d, from %v@%v", shareDiffFloat, t.Difficulty, login, ip)
-		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
+	}
+
+	// Überprüfe und aktualisiere die höchste Share-Schwierigkeit (Best Share)
+	if shareDiffCalc > bestShareDiff {
+		bestShareDiff = shareDiffCalc
 	}
 
 	if s.config.Proxy.Debug {
@@ -91,24 +98,24 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShare)
 		log.Printf("Block Difficulty: %d (%s)", t.Difficulty.Int64(), hashrateBlockDiff)
 		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShareDiff)
+		log.Printf("Best Share: %d (%s)", bestShareDiff, formatHashrate(bestShareDiff))
 		log.Printf("Submitted by: %v@%v", login, ip)
 	}
 
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
-		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
 	// check share difficulty
 	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
 	if result.Big().Cmp(shareTarget) > 0 {
-		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
-	//Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
+	// Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
 	s.backend.LogIP(login, ip)
 
 	miningType := s.backend.GetMiningType(login)
@@ -170,6 +177,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	s.backend.WriteWorkerShareStatus(login, id, true, false, false)
 	return false, true
 }
+
 func formatHashrate(shareDiffCalc int64) string {
 	units := []string{"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s"}
 	var i int
