@@ -20,10 +20,7 @@ var (
 	hasher                *etchash.Etchash = nil
 )
 
-// Definieren der bestShareDiff-Variable
-var bestShareDiff int64
-
-func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, stratum bool) (bool, bool) {
+func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string, shareDiff int64, stratum bool) (bool, bool) {
 	if hasher == nil {
 		if s.config.Network == "expanse" || s.config.Network == "rebirth" {
 			hasher = etchash.New(nil, nil, &xip5Block)
@@ -34,11 +31,10 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		} else if s.config.Network == "ubiq" {
 			hasher = etchash.New(nil, &uip1FEpoch, nil)
 		} else if s.config.Network == "ethereum" || s.config.Network == "ropsten" || s.config.Network == "ethereumPow" ||
-			s.config.Network == "ethereumFair" || s.config.Network == "etica" ||
+			s.config.Network == "ethereumFair" || s.config.Network == "etica" || s.config.Network == "zether" ||
 			s.config.Network == "octaspace" || s.config.Network == "universal" || s.config.Network == "canxium" {
 			hasher = etchash.New(nil, nil, nil)
 		} else {
-			// unknown network
 			log.Printf("Unknown network configuration %s", s.config.Network)
 			return false, false
 		}
@@ -48,7 +44,6 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	hashNoNonce := params[1]
 	mixDigest := params[2]
 	nonce, _ := strconv.ParseUint(strings.Replace(nonceHex, "0x", "", -1), 16, 64)
-	shareDiff := s.config.Proxy.Difficulty
 	stratumHostname := s.config.Proxy.StratumHostname
 
 	var result common.Hash
@@ -64,63 +59,50 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		hashNoNonceTmp := common.HexToHash(hashNoNonce)
 		mixDigestTmp, hashTmp := hasher.Compute(t.Height, hashNoNonceTmp, nonce)
 
-		// check mixDigest
 		if mixDigestTmp.Hex() != mixDigest {
 			return false, false
 		}
 		result = hashTmp
 	}
 
-	// Block "difficulty" is BigInt
-	// NiceHash "difficulty" is float64 ...
-	// diffFloat => target; then: diffInt = 2^256 / target
 	shareDiffCalc := util.TargetHexToDiff(result.Hex()).Int64()
 	shareDiffFloat := util.DiffIntToFloat(shareDiffCalc)
 	if shareDiffFloat < 0.0001 {
 		log.Printf("share difficulty too low, %f < %d, from %v@%v", shareDiffFloat, t.Difficulty, login, ip)
-		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
-	}
-
-	// Überprüfe und aktualisiere die höchste Share-Schwierigkeit (Best Share)
-	if shareDiffCalc > bestShareDiff {
-		bestShareDiff = shareDiffCalc
 	}
 
 	if s.config.Proxy.Debug {
 		hashrateShareDiff := formatHashrate(shareDiffCalc)
-		hashrateBlockDiff := formatHashrate(t.Difficulty.Int64()) // Konvertieren zu int64
+		hashrateBlockDiff := formatHashrate(t.Difficulty.Int64())
 		hashrateShare := formatHashrate(shareDiff)
 
-		// Ausgabe der formatierten Informationen in der Kommandozeile (cmd)
 		log.Printf("Mining Information:")
-		log.Printf("Blockchain Height: %d", t.Height) // Geändert zu "Blockchain Height"
+		log.Printf("Blockchain Height: %d", t.Height)
 		log.Printf("Pool Difficulty: %d (%s)", shareDiff, hashrateShare)
 		log.Printf("Block Difficulty: %d (%s)", t.Difficulty.Int64(), hashrateBlockDiff)
 		log.Printf("Share Difficulty: %d (%s)", shareDiffCalc, hashrateShareDiff)
-		log.Printf("Best Share: %d (%s)", bestShareDiff, formatHashrate(bestShareDiff))
 		log.Printf("Submitted by: %v@%v", login, ip)
 	}
 
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
-		return false, false
-	}
-
-	// check share difficulty
-	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
-	if result.Big().Cmp(shareTarget) > 0 {
 		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
-	// Write the Ip address into the settings:login:ipaddr and timeit added to settings:login:iptime hash
+	shareTarget := new(big.Int).Div(maxUint256, big.NewInt(shareDiff))
+	if result.Big().Cmp(shareTarget) > 0 {
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
+		return false, false
+	}
+
 	s.backend.LogIP(login, ip)
 
 	miningType := s.backend.GetMiningType(login)
 
-	// check target difficulty
 	target := new(big.Int).Div(maxUint256, big.NewInt(h.diff.Int64()))
 	if result.Big().Cmp(target) <= 0 {
 		ok, err := s.rpc().SubmitBlock(params)
